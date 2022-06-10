@@ -1,6 +1,8 @@
 import requests
 import json
 import re
+from h5py import File
+import numpy as np
 
 if __name__ == "__main__":
     with open("data/tsplib_urls.json", "r") as f:
@@ -12,8 +14,8 @@ if __name__ == "__main__":
     regexes = {
         "data": rf"^{pattern_number} +({pattern_number}) +({pattern_number})$",
         "dataOpt": r"^({pattern_number})$",
-        "type": r"^TYPE : (.*)$",
-        "edge_weight_type": r"^EDGE_WEIGHT_TYPE : (.*)$",
+        "type": r"^TYPE ?: ?(.*)$",
+        "edge_weight_type": r"^EDGE_WEIGHT_TYPE ?: ?(.*)$",
         "comment": r"^COMMENT : (.*)$",
     }
     for url in urls:
@@ -49,4 +51,15 @@ if __name__ == "__main__":
             )
     with open("data/tsplib.json", "w") as f:
         json.dump(problems, f)
+    with open("data/tsplib_dans_papier.json", "r") as f:
+        in_paper = json.load(f)
+    with File("data/tsplib.hdf5", "w") as f:
+        for k, v in problems.items():
+            k = k.split(".")[0]
+            data = np.array(v["data"]).flatten()
+            condition = 51 * 2 <= np.array(v["data"]).flatten().shape[0] <= 1432 * 2
+            condition = condition or k == "pr2392"
+            if condition:
+                if k in in_paper:
+                    f.create_dataset(k, data=np.array(v["data"]).flatten(), dtype="f")
 

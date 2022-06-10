@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\data">
+      <UniqueIdentifier>{d5a30d77-d317-4bfb-8f5a-a48979205556}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\algorithms">
+      <UniqueIdentifier>{89f64a6a-22d4-44bd-ab50-2dbe4e50b161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\output">
+      <UniqueIdentifier>{f7c0fa60-d6f7-41c1-89f5-bdeaf9464ac8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\data">
+      <UniqueIdentifier>{02b5c541-83cf-452a-80dc-cbf1855a2d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\algorithms">
+      <UniqueIdentifier>{f8735f16-f463-4613-b2f6-7610f2d8d40a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\output">
+      <UniqueIdentifier>{50a16639-4d5c-4470-991d-2671927f3d5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\data\points">
+      <UniqueIdentifier>{11d917fb-1fbf-4615-9770-d586a18046d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\data\init_clust">
+      <UniqueIdentifier>{fd5b1031-4546-429c-b4b4-0ea5b2c01cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\data\init_clust">
+      <UniqueIdentifier>{3710c017-7eb7-4087-95d6-d61abc42bad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\data\points">
+      <UniqueIdentifier>{8925e650-feac-4294-86d8-67b9bf7206da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\data\improvement">
+      <UniqueIdentifier>{b1f0dd10-bcf1-49b9-b6f7-1d040e6070f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\data\improvement">
+      <UniqueIdentifier>{3aabb400-8c0f-4ec0-8d9a-207878c23d86}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="constants.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="tests.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm.h">
+      <Filter>Fichiers d%27en-tête\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="blobs.h">
+      <Filter>Fichiers d%27en-tête\data\points</Filter>
+    </ClInclude>
+    <ClInclude Include="moon.h">
+      <Filter>Fichiers d%27en-tête\data\points</Filter>
+    </ClInclude>
+    <ClInclude Include="uniform.h">
+      <Filter>Fichiers d%27en-tête\data\points</Filter>
+    </ClInclude>
+    <ClInclude Include="factory.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="random_clust.h">
+      <Filter>Fichiers d%27en-tête\data\init_clust</Filter>
+    </ClInclude>
+    <ClInclude Include="centroids.h">
+      <Filter>Fichiers d%27en-tête\data</Filter>
+    </ClInclude>
+    <ClInclude Include="dataset.h">
+      <Filter>Fichiers d%27en-tête\output</Filter>
+    </ClInclude>
+    <ClInclude Include="kmeans.h">
+      <Filter>Fichiers d%27en-tête\data\improvement</Filter>
+    </ClInclude>
+    <ClInclude Include="operations.h">
+      <Filter>Fichiers d%27en-tête\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="clustering.h">
+      <Filter>Fichiers d%27en-tête\data</Filter>
+    </ClInclude>
+    <ClInclude Include="improvementChoice.h">
+      <Filter>Fichiers d%27en-tête\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="iteration_order.h">
+      <Filter>Fichiers d%27en-tête\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="results.h">
+      <Filter>Fichiers d%27en-tête\output</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="utils.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="tests.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm.cpp">
+      <Filter>Fichiers sources\algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="blobs.cpp">
+      <Filter>Fichiers sources\data\points</Filter>
+    </ClCompile>
+    <ClCompile Include="moon.cpp">
+      <Filter>Fichiers sources\data\points</Filter>
+    </ClCompile>
+    <ClCompile Include="uniform.cpp">
+      <Filter>Fichiers sources\data\points</Filter>
+    </ClCompile>
+    <ClCompile Include="factory.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="random_clust.cpp">
+      <Filter>Fichiers sources\data\init_clust</Filter>
+    </ClCompile>
+    <ClCompile Include="centroids.cpp">
+      <Filter>Fichiers sources\data</Filter>
+    </ClCompile>
+    <ClCompile Include="dataset.cpp">
+      <Filter>Fichiers sources\output</Filter>
+    </ClCompile>
+    <ClCompile Include="kmeans.cpp">
+      <Filter>Fichiers sources\data\improvement</Filter>
+    </ClCompile>
+    <ClCompile Include="operations.cpp">
+      <Filter>Fichiers sources\algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="clustering.cpp">
+      <Filter>Fichiers sources\data</Filter>
+    </ClCompile>
+    <ClCompile Include="improvementChoice.cpp">
+      <Filter>Fichiers sources\algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="iteration_order.cpp">
+      <Filter>Fichiers sources\algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="results.cpp">
+      <Filter>Fichiers sources\output</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
