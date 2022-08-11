@@ -3,7 +3,7 @@ int* improved_tour(Config* config, DistanceMatrix* distances) {
     int* tour = new int[config->NUM_POINTS];
     // Add a set to avoid duplicates (a points can be the nearest one for two different points)
     std::set<int> available_points;
-    for (int i = 1; i < config->NUM_POINTS; i++) {
+    for (int i = 0; i < config->NUM_POINTS; i++) {
         available_points.insert(i);
     }
     std::mt19937 gen_dist(config->SEED_ASSIGN);
@@ -15,23 +15,16 @@ int* improved_tour(Config* config, DistanceMatrix* distances) {
         // Find the argmin of distance
         double min = std::numeric_limits<double>::max();
         int argmin = -1;
-        if (available_points.size() == 1) {
-            min = distances->get(i, tour[0]);
-            argmin = tour[0];
-        }
-        else {
-            for (int j : available_points) {
-                double d = distances->get(i, j);
-                if (j != i && d < min) {
-                    min = d;
-                    argmin = j;
-                }
+        for (int j : available_points) {
+            double d = distances->get(tour[i], j);
+            if (d < min) {
+                min = d;
+                argmin = j;
             }
         }
         tour[i+1] = argmin;
         // Erase the point to avoid duplicates
-        if (available_points.size() != 1)
-            available_points.erase(argmin);
+        available_points.erase(argmin);
     }
     return tour;
 }

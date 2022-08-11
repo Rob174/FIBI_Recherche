@@ -3,7 +3,7 @@
 //#define DEBUG_LV2
 //#define DEBUG_LV3
 //#define DEBUG_IDJ
-#define EPSILON 1e-9
+#define EPSILON 1e-5
 void run_FI(Tour* tour, DistanceMatrix* dist, Result*res,Config* conf) {
 	//Source algorithm: https://ars.els-cdn.com/content/image/1-s2.0-S0166218X05003070-gr2.jpg
 	// Note we follow the algorithm with inclusive intervals and index starting at 1. 

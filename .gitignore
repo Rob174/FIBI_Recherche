@@ -555,4 +555,11 @@ FodyWeavers.xsd
 
 *.json
 *.hdf5
+*.html
+*.css
+*.npy
+*.csv
+*.txt
 venv/
+visualize/node_modules/
+visualize/dist/

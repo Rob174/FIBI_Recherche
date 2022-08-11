@@ -1,7 +1,7 @@
 #include "BI.h"
 //#define DEBUG_LV1
 //#define DEBUG_LV2
-#define EPSILON 1e-9
+#define EPSILON 1e-5
 void run_BI(Tour* tour, DistanceMatrix*dist, Result* res,Config* conf) {
 	//Source algorithm: https://ars.els-cdn.com/content/image/1-s2.0-S0166218X05003070-gr1.jpg
 	// Note we follow the algorithm with inclusive intervals and index starting at 1. 
@@ -9,6 +9,9 @@ void run_BI(Tour* tour, DistanceMatrix*dist, Result* res,Config* conf) {
 	//2. Initial solution
 	double tour_length = tour->get_cost(dist);
 	res->set_init_cost(tour_length);
+#if defined(DEBUG_LV1) || defined(DEBUG_LV2)
+	tour->describe();
+#endif
 	//3. Best Improvement
 	double delta = 0;
 	// Utilitary function to keep same indexes as in the paper
@@ -56,24 +59,28 @@ void run_BI(Tour* tour, DistanceMatrix*dist, Result* res,Config* conf) {
 		}
 		//4. Update: Exchange positions for the loops
 		tour->apply_two_opt(i_star, j_star,conf);
-		// Update cost
-		tour_length += delta;
 		//Debug informations (LV1 = only stop when cost < 0 ; LV2 = print always infos)
 #if defined(DEBUG_LV1) || defined(DEBUG_LV2)
 		if (tour->check_tour() == 0) {
 			std::cout << "Error tour " << std::endl;
 			exit(1);
 		}
+		const int backup_tour_lenght = tour_length;
 		const double real_length = tour->get_cost(dist);
 #endif
+		// Update cost
+		tour_length += delta;
 #if defined(DEBUG_LV1) && !defined(DEBUG_LV2)
-		if (abs(real_length - tour_length) > 1e-5) {
+		if (abs(real_length - tour_length) > 1e-9) {
 			std::cout << "Error ";
 #endif
 #if defined(DEBUG_LV1) || defined(DEBUG_LV2)
 			std::cout << "cost computation " << std::endl
-				<< "Found: "<< tour_length << " ; "
-				<< "Real: " << real_length << std::endl
+				<< "Found: " << std::fixed << std::setprecision(16) << tour_length << " ; "
+				<< "Real: " << std::fixed << std::setprecision(16) << real_length << std::endl
+				<< "With delat: " << std::fixed << std::setprecision(16) << delta << std::endl
+				<< "Diff observed: " << std::fixed << std::setprecision(16) << abs(real_length - tour_length) << std::endl
+				<< "Previous tour length: " << std::fixed << std::setprecision(16) << backup_tour_lenght << std::endl
 				<< "For tour: "
 				<< std::flush;
 			tour->describe(cyclic_id(i_star), cyclic_id(j_star+1));
