@@ -1,7 +1,7 @@
 """In charge of creating franti et al datasets and aloise et al benchmark for the clustering problem"""
 import numpy as np
-from pathlib import Path
-import re
+from pathlib import Path # type: ignore
+import re # type: ignore
 from h5py import File
 import json
 
@@ -55,6 +55,8 @@ def main_franti():
             gpe_clusters.create_dataset(name=str(i),dtype="f",data=np.array([mapping_num_clust[f],mapping_num_clust[f]]))
     with open(path_mapping_names,'w') as f:
         json.dump({i:str(k) for i,k in enumerate(datasets.keys())},f)
+
+
 def main_aloise():
     """
     Function that parses the aloise et al benchmark for the clustering problem and creates the hdf5 file containing the dataset with the points coordinates and the metadata (number of points and number of dimensions).
@@ -97,12 +99,12 @@ def main_aloise():
     with File(path_data_out / "benchmark_aloise.hdf5", "w") as f:
         groups = {g: None for g in ["points", "dims", "num_clusters"]}
         for g in groups:
-            groups[g] = f.create_group(g)
+            groups[g] = f.create_group(g) # type: ignore
         for i, (inst, d) in enumerate(data.items()):
             for g, inp in zip(
                 groups, [d, metadata[inst]["NUM_DIM"], metadata[inst]["NUM_POINTS"]]
             ):
-                groups[g].create_dataset(
+                groups[g].create_dataset( # type: ignore
                     name=str(i), dtype="f", data=np.array(inp).flatten()
                 )
             metadata[inst]["ID"] = i

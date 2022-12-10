@@ -23,5 +23,11 @@ Then the script create_datasets.py has been used to create the hdf5 file contain
 
 The source files are provided in the folder data/src_datasets/clustering/benchmark_aloise
 
+The script FIBI.get_datasets.clustering.create_datasets.main_aloise has been used to create the hdf5 file containing the datasets (points coordinates, number of dimensions and number of clusters for each instance).
 
+A metadata file has been created to store:
+
+- the number of dimensions
+- the number of clusters
+- the id of each instance in the hdf5 file
 """
