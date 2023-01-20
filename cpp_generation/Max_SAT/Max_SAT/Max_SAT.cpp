@@ -203,192 +203,56 @@ void test_generate_benchmark3(int start, int stop)
 
 	Runner<MAXSATConfig, MAXSATFactory, AbstractMAXSATFactoryObserver> runner(params_poss, params_order, constants);
 	runner.run(start, stop);
-	const int NUM_INST = 8;
-	const int NUM_REP = 1000;
-	int seed_glob = 0;
-	Progress p(start, stop);
-	for (int inst = 0; inst < NUM_INST; inst++)
-	{
-		for (int FI = 0; FI < 2; FI++)
-		{
-			for (int impr = 0; impr < 2; impr++)
-			{
-				for (int seed_clause = 0; seed_clause < NUM_REP; seed_clause++)
-				{
-					std::map<std::string, int> *args = new std::map<std::string, int>();
-					M_insert(DATASET, 4);
-					M_insert(SEED_PROBLEM, inst);
-					M_insert(FI_BI, FI);
-					M_insert(IMPR, impr);
-					M_insert(SEED_GLOB, seed_glob);
-					M_insert(SEED_ASSIGN, seed_clause);
-					if (seed_glob >= start && seed_glob <= stop)
-					{
-						MAXSATConfig *conf = new MAXSATConfig(args);
-						MAXSATFactory *f = new MAXSATFactory(std::vector<AbstractMAXSATFactoryObserver *>{});
-						f->run(conf, seed_glob == 0);
-						delete conf;
-						delete f;
-						std::cout << "seed_glob: " << seed_glob << " ; ";
-						p.print(seed_glob);
-						std::cout << std::endl;
-					}
-					seed_glob++;
-					delete args;
-				}
-			}
-		}
-	}
-	std::cout << "seed_glob end " << seed_glob - 1 << std::endl;
-	return;
 }
-void test_generate_random_clustering(int start, int end)
+void test_clustering_quad(int start, int end)
 {
-	const int NUM_REP = 1000;
-	const int
-		num_clust_poss = 8,
-		num_pts_num_poss = 26, // 9
-		num_algo = 2;
-	const int clust[num_clust_poss] = {2, 4, 8, 16, 32, 64, 128, 256};
-	const int num_pts[num_pts_num_poss] = {3, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000};
-	int seed_glob = 0;
-	Progress p(start, end);
-	for (int i_pt = 0; i_pt < num_pts_num_poss; i_pt++)
-	{
-		for (int i_clust = 0; i_clust < num_clust_poss; i_clust++)
-		{
-			for (int FI = 0; FI < 2; FI++)
-			{
-				for (int impr = 0; impr < 2; impr++)
-				{
-					for (int seed_clause = 0; seed_clause < NUM_REP; seed_clause++)
-					{
-						std::map<std::string, int> *args = new std::map<std::string, int>();
-						M_insert(DATASET, 0);
-						M_insert(NUM_POINTS, num_pts[i_pt]);
-						M_insert(NUM_CLUST, clust[i_clust]);
-						M_insert(FI_BI, FI);
-						M_insert(NUM_DIM, 2);
-						M_insert(IMPR, impr);
-						M_insert(SEED_GLOB, seed_glob);
-						M_insert(SEED_ASSIGN, seed_glob);
-						M_insert(SEED_PROBLEM, seed_glob);
-						if (seed_glob >= start && seed_glob <= end)
-						{
-							ClusteringConfig *conf = new ClusteringConfig(args);
-							CluteringFactory *f = new CluteringFactory(std::vector<AbstractClusteringFactoryObserver *>{});
-							f->run(conf);
-							delete conf;
-							delete f;
-							std::cout << "seed_glob: " << seed_glob << " ; ";
-							p.print(seed_glob);
-							std::cout << std::endl;
-						}
-						seed_glob++;
-						delete args;
-					}
-				}
-			}
-		}
-	}
-	std::cout << "seed_glob end " << seed_glob - 1 << std::endl;
-	return;
-}
-void test_clustering_quad(const int start, const int stop)
-{
-	const int NUM_REP = 1000;
-	const int
-		num_clust_poss = 8,
-		num_pts_num_poss = 26, // 9
-		num_algo = 2;
-	const int clust[num_clust_poss] = {2, 4, 8, 16, 32, 64, 128, 256};
-	const int num_pts[num_pts_num_poss] = {20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000};
-	int seed_glob = 0;
-	Progress p(start, stop);
-	for (int i_pt = 0; i_pt < num_pts_num_poss; i_pt++)
-	{
-		for (int i_clust = 0; i_clust < num_clust_poss; i_clust++)
-		{
-			for (int FI = 0; FI < 2; FI++)
-			{
-				for (int impr = 0; impr < 2; impr++)
-				{
-					for (int seed_clause = 0; seed_clause < NUM_REP; seed_clause++)
-					{
-						std::map<std::string, int> *args = new std::map<std::string, int>();
-						M_insert(DATASET, 0);
-						M_insert(NUM_POINTS, num_pts[i_pt]);
-						M_insert(NUM_CLUST, clust[i_clust]);
-						M_insert(FI_BI, FI);
-						M_insert(NUM_DIM, 2);
-						M_insert(IMPR, impr);
-						M_insert(SEED_GLOB, seed_glob);
-						M_insert(SEED_ASSIGN, seed_glob);
-						M_insert(SEED_PROBLEM, seed_glob);
-						if (seed_glob >= start && seed_glob <= stop)
-						{
-							ClusteringConfig *conf = new ClusteringConfig(args);
-							CluteringFactory *f = new CluteringFactory(std::vector<AbstractClusteringFactoryObserver *>{});
-							f->run(conf);
-							delete conf;
-							delete f;
-							std::cout << "seed_glob: " << seed_glob << " ; ";
-							p.print(seed_glob);
-							std::cout << std::endl;
-						}
-						seed_glob++;
-						delete args;
-					}
-				}
-			}
-		}
-	}
-}
+	P_SETUP
+	std::map<std::string, int> constants{{stringify(DATASET), 0},{stringify(NUM_DIM),2}};
 
+	const int NUM_REP = 1000;
+	std::vector<int> num_pts{20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000};
+	std::vector<int> clust{2, 4, 8, 16, 32, 64, 128, 256};
+	std::vector<int> fi_bi{0, 1 };
+	std::vector<int> impr{0, 1 };
+	std::vector<int> seed_problem;
+	P_FILL_RANGE(seed_problem, 1000)
+
+	P_REGISTER_PARAMS(stringify(NUM_POINTS), num_pts);
+	P_REGISTER_PARAMS(stringify(NUM_CLUST), clust);
+	P_REGISTER_PARAMS(stringify(FI_BI),  fi_bi);
+	P_REGISTER_PARAMS(stringify(IMPR), impr);
+	P_REGISTER_PARAMS(stringify(SEED_PROBLEM), seed_problem);
+	
+	auto set_seed_assign = [](std::map<std::string, int>& args)
+	{
+		args[stringify(SEED_ASSIGN)] = args[stringify(SEED_PROBLEM)];
+	};
+	Runner<ClusteringConfig, CluteringFactory, AbstractClusteringFactoryObserver> runner(params_poss, params_order, constants, set_seed_assign);
+	runner.run(start, stop);
+}
 void test_tsp_quad(const int start, const int stop)
 {
+	P_SETUP
+	std::map<std::string, int> constants{{stringify(DATASET), 0},{stringify(NUM_DIM),2}};
+
 	const int NUM_REP = 1000;
-	const int num_pts_num_poss = 26,
-			  num_algo = 2;
-	const int num_pts[num_pts_num_poss] = {20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000};
+	std::vector<int> num_pts{20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000};
+	std::vector<int> fi_bi{0, 1 };
+	std::vector<int> impr{0, 1 };
+	std::vector<int> seed_problem;
+	P_FILL_RANGE(seed_problem, 1000)
 
-	int seed_glob = 0;
-	Progress p(start, stop);
-	for (int i_pt = 0; i_pt < num_pts_num_poss; i_pt++)
+	P_REGISTER_PARAMS(stringify(NUM_TOWNS), num_pts);
+	P_REGISTER_PARAMS(stringify(FI_BI),  fi_bi);
+	P_REGISTER_PARAMS(stringify(IMPR), impr);
+	P_REGISTER_PARAMS(stringify(SEED_PROBLEM), seed_problem);
+	
+	auto set_seed_assign = [](std::map<std::string, int>& args)
 	{
-
-		for (int FI = 0; FI < 2; FI++)
-		{
-			for (int impr = 0; impr < 2; impr++)
-			{
-				for (int seed_clause = 0; seed_clause < NUM_REP; seed_clause++)
-				{
-					std::map<std::string, int> *args = new std::map<std::string, int>();
-					M_insert(DATASET, 0);
-					M_insert(NUM_TOWNS, num_pts[i_pt]);
-					M_insert(FI_BI, FI);
-					M_insert(NUM_DIM, 2);
-					M_insert(IMPR, impr);
-					M_insert(SEED_GLOB, seed_glob);
-					M_insert(SEED_ASSIGN, seed_glob);
-					M_insert(SEED_PROBLEM, seed_glob);
-					if (seed_glob >= start && seed_glob <= stop)
-					{
-						TSPConfig *conf = new TSPConfig(args);
-						TSPFactory *f = new TSPFactory(std::vector<AbstractTSPFactoryObserver *>{});
-						f->run(conf);
-						delete conf;
-						delete f;
-						std::cout << "seed_glob: " << seed_glob << " ; ";
-						p.print(seed_glob);
-						std::cout << std::endl;
-					}
-					seed_glob++;
-					delete args;
-				}
-			}
-		}
-	}
+		args[stringify(SEED_ASSIGN)] = args[stringify(SEED_PROBLEM)];
+	};
+	Runner<ClusteringConfig, CluteringFactory, AbstractClusteringFactoryObserver> runner(params_poss, params_order, constants, set_seed_assign);
+	runner.run(start, stop);
 }
 std::pair<int, int> parse_interval(int argc, char **argv)
 {
