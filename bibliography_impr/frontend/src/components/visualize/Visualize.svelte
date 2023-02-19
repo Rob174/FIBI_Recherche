@@ -6,7 +6,7 @@
   // Make a fetch request to backend to get the papers every 5 seconds
   let interval = 5000;
   let graph;
-  let selectedNode = null;
+  let selectedNodeObj = {selectedNode: null};
   let papers;
   let updating = false;
   async function update() {
@@ -14,12 +14,12 @@
       const {newPapers, newGraph} = await requests();
       papers = newPapers;
       graph = newGraph;
-      updateSVG(papers, selectedNode);
+      updateSVG(newPapers, selectedNodeObj);
       updating = false;
   }
-  onMount(() => {
+  onMount(async () => {
     updating = true;
-    update();
+    await update();
     setInterval(update, interval);
   });
 </script>
@@ -31,11 +31,11 @@
     {/if}
   </div>
 </div>
-{#if selectedNode}
-  {#key selectedNode.id}
+{#if selectedNodeObj.selectedNode}
+  {#key selectedNodeObj.selectedNode.id}
     <DialogDetail
-      element={selectedNode}
-      on:close={() => (selectedNode = null)}
+      element={selectedNodeObj.selectedNode}
+      on:close={() => (selectedNodeObj.selectedNode = null)}
       open={true}
     />
   {/key}

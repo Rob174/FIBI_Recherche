@@ -1,16 +1,13 @@
 import * as d3 from "d3";
-let called = false;
-export function updateSVG(papers, selectedNode) {
-  console.log("updating svg");
+export function updateSVG(papers, selectedNodeObj) {
   const svg = document.querySelector(".graph svg");
   // Check if svg exists, if not wait for it to exist
-  if (!svg) {
+  if (!svg || !papers) {
     setTimeout(() => {
-      updateSVG();
+      updateSVG(papers,selectedNodeObj);
     }, 100);
     return;
   }
-  if(called) return;
   // Set the size of the svg
   svg.setAttribute("width", "100%");
   svg.setAttribute("height", "100%");
@@ -37,7 +34,7 @@ export function updateSVG(papers, selectedNode) {
       parent.style.cursor = "pointer";
       parent.addEventListener("click", () => {
         console.log("clicked", parentData);
-        selectedNode = parentData;
+        selectedNodeObj.selectedNode = parentData;
       });
       parent.addEventListener("mouseover", () => {
         // get the polygon inside parent and change the fill to red
@@ -57,7 +54,6 @@ export function updateSVG(papers, selectedNode) {
   });
   // Make the pointer be a hand when hovering over the svg
   d3.select("svg").style("cursor", "grab");
-  called = true;
 }
 export async function requests() {
   // Make a fetch request to backend to get the papers
