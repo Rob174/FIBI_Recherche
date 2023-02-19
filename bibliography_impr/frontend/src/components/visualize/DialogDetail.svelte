@@ -17,6 +17,7 @@
         break;
     }
   }
+  console.log(open,element);
 </script>
 
 <Dialog

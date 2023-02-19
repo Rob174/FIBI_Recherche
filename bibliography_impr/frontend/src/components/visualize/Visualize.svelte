@@ -2,23 +2,27 @@
   import { onMount } from "svelte";
   import DialogDetail from "./DialogDetail.svelte";
   import CircularProgress from "@smui/circular-progress";
-  import { updateSVG, requests } from "./svgUpdate";
+  import { updateSVG, requests, selectedNode } from "./svgUpdate";
   // Make a fetch request to backend to get the papers every 5 seconds
   let interval = 5000;
   let graph;
-  let selectedNodeObj = {selectedNode: null};
+  let selNode;
+  selectedNode.subscribe((value) => (selNode = value));
   let papers;
   let updating = false;
   async function update() {
-      updating = true;
-      const {newPapers, newGraph} = await requests();
-      papers = newPapers;
-      graph = newGraph;
-      updateSVG(newPapers, selectedNodeObj);
-      updating = false;
+    updating = true;
+    const { newPapers, newGraph } = await requests();
+    papers = newPapers;
+    graph = newGraph;
+    updateSVG(newPapers);
+    updating = false;
   }
   onMount(async () => {
     updating = true;
+    selectedNode.update((value) => {
+      return { selectedNode: null, id: value.id };
+    });
     await update();
     setInterval(update, interval);
   });
@@ -31,14 +35,17 @@
     {/if}
   </div>
 </div>
-{#if selectedNodeObj.selectedNode}
-  {#key selectedNodeObj.selectedNode.id}
-    <DialogDetail
-      element={selectedNodeObj.selectedNode}
-      on:close={() => (selectedNodeObj.selectedNode = null)}
-      open={true}
-    />
-  {/key}
+{#if selNode.selectedNode}
+{#key selNode.id}
+  <DialogDetail
+    element={selNode.selectedNode}
+    on:close={() =>
+      selectedNode.update((value) => {
+        return { selectedNode: null, id: value.id };
+      })}
+    open={true}
+  />
+{/key}
 {/if}
 {#if updating}
   <div

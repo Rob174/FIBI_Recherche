@@ -1,10 +1,12 @@
 import * as d3 from "d3";
-export function updateSVG(papers, selectedNodeObj) {
+import { writable } from "svelte/store";
+export let selectedNode = writable({selectedNode: null, id: 0});
+export function updateSVG(papers) {
   const svg = document.querySelector(".graph svg");
   // Check if svg exists, if not wait for it to exist
   if (!svg || !papers) {
     setTimeout(() => {
-      updateSVG(papers,selectedNodeObj);
+      updateSVG(papers);
     }, 100);
     return;
   }
@@ -34,7 +36,9 @@ export function updateSVG(papers, selectedNodeObj) {
       parent.style.cursor = "pointer";
       parent.addEventListener("click", () => {
         console.log("clicked", parentData);
-        selectedNodeObj.selectedNode = parentData;
+        selectedNode.update((selectedNodeObj) => {
+          return {selectedNode: parentData, id: selectedNodeObj.id + 1};
+        });
       });
       parent.addEventListener("mouseover", () => {
         // get the polygon inside parent and change the fill to red
