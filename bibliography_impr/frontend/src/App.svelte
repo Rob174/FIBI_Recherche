@@ -3,7 +3,6 @@
   import Tab, { Label } from "@smui/tab";
   import NewPaper from "./components/new_paper/NewPaper.svelte";
   import Visualize from "./components/visualize/Visualize.svelte";
-  import DialogDetail from "./components/visualize/DialogDetail.svelte";
   const tabPossibilities = ["New paper", "Visualize"];
   let active = "New paper";
 </script>
@@ -45,7 +44,6 @@
     <NewPaper />
   {:else if active === "Visualize"}
     <Visualize />
-    <!-- <DialogDetail /> -->
   {/if}
 </main>
 

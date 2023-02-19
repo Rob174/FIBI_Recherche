@@ -1,7 +1,8 @@
 import * as d3 from "d3";
+let called = false;
 export function updateSVG(papers, selectedNode) {
   console.log("updating svg");
-  const svg = document.querySelector("svg");
+  const svg = document.querySelector(".graph svg");
   // Check if svg exists, if not wait for it to exist
   if (!svg) {
     setTimeout(() => {
@@ -9,6 +10,7 @@ export function updateSVG(papers, selectedNode) {
     }, 100);
     return;
   }
+  if(called) return;
   // Set the size of the svg
   svg.setAttribute("width", "100%");
   svg.setAttribute("height", "100%");
@@ -55,6 +57,7 @@ export function updateSVG(papers, selectedNode) {
   });
   // Make the pointer be a hand when hovering over the svg
   d3.select("svg").style("cursor", "grab");
+  called = true;
 }
 export async function requests() {
   // Make a fetch request to backend to get the papers
@@ -65,15 +68,10 @@ export async function requests() {
       console.log("updating21");
       return data;
     });
-  console.log("updating3");
   await fetch(`http://localhost:3000/graph`)
     .then((response) => response.json())
     .then((data) => {
-      console.log("updating31");
       graph = data.svg;
-      console.log("updating32");
-      // updateSVG();
-      console.log("updating33");
     })
     .catch((error) => {
       console.error("Error visualize:", error);

@@ -9,22 +9,18 @@
   let selectedNode = null;
   let papers;
   let updating = false;
-  
-  onMount(() => {
-    console.log("updating");
-    updating = true;
-    console.log("updating1");
-    // Get the current time for profiling
-    const start = new Date().getTime();
-    setInterval(() => {
-      console.log("updating2", (new Date().getTime() - start) / 1000, "s");
+  async function update() {
       updating = true;
-      // const {newPapers, newGraph} = await requests();
-      // papers = newPapers;
-      // graph = newGraph;
-      console.log("updating4");
+      const {newPapers, newGraph} = await requests();
+      papers = newPapers;
+      graph = newGraph;
+      updateSVG(papers, selectedNode);
       updating = false;
-    }, interval);
+  }
+  onMount(() => {
+    updating = true;
+    update();
+    setInterval(update, interval);
   });
 </script>
 
