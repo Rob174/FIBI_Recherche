@@ -34,7 +34,7 @@ class DefaultProgressBar(Progress):
     def set_total_steps(self,n: int):
         """Set the total number of times the next method will be called. Maximum progress"""
         self.task = self.add_task("[green]{task.description}", total=n)
-    def next(self,description: str):
+    def next(self,description: str, advance: int = 1):
         """Indicates that one step has been completed. The description is updated with the provided string"""
-        self.update(self.task, description=f"[green]{description} ...", advance=1)
+        self.update(self.task, description=f"[green]{description} ...", advance=advance)
     

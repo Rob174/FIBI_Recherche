@@ -22,3 +22,20 @@ class InitDistrShape(Aggregator):
             name= "Init distr",
             classes= [initialization],
         )]
+
+class TestUsed(InitDistrShape):
+    def aggregate(self, keys: dict, dfs: List[DfExtract]) -> List[AggregatedData]:
+        [init_distr] =  super().aggregate(keys, dfs)
+        if init_distr['data'] == 'ng':
+            test_used = "signTest"
+            classes = ['signtest', init_distr['data']]
+        else:
+            test_used = "ztest"
+            classes = ['ztest', init_distr['data']]
+        return [AggregatedData(
+            type= "test_used",
+            data= test_used,
+            query= keys,
+            name= "Stat. test",
+            classes= classes,
+        )]

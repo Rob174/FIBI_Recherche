@@ -4,23 +4,31 @@ from FIBI.analyse_results.visualization.local_analysis.__init__ import *
 from FIBI.analyse_results.data_extractor.data_extractor import SingleInstanceVisualization
 from FIBI.analyse_results.visualization.local_analysis.components.histograms import HistoFIBI, HistoFIBIDiff
 from FIBI.analyse_results.visualization.local_analysis.components.qqplot import QQPlot
+from FIBI.analyse_results.visualization.local_analysis.components.register_seeds import RegisterSeeds
 from FIBI.analyse_results.visualization.local_analysis.components.tables import TableAttrFIBI
 from FIBI.analyse_results.visualization.local_analysis.components.test_viewer import TestViewer
 
 
-def analyse_attr(attr: str) -> List:
+def analyse_attr(attr: str, folder_out: Path) -> List:
+    folder_script = str(Path('../../../').as_posix()+ '/'+ 'scripts' +'/'+ 'show_hovertext.js')
+    folder_script = "C:/Users/robin/Documents/Cours/Poly/Recherche/FIBI_Recherche/data/analysis_results/scripts/show_hovertext.js"
     return [
         TableAttrFIBI(attr),
         HistoFIBI(attr),
-        HistoFIBIDiff(attr)
+        HistoFIBIDiff(attr, postscript_path=folder_script)
     ]
+
 class PageInstance(SingleInstanceVisualization):
     def __init__(self, folder_out: Path, fixed_attrs: List[str], 
                  query_to_path: DicoPathConverter):
         self.components = [
-            *analyse_attr('init_cost'),
-            *analyse_attr('final_cost'),
-            *analyse_attr('ratio'),
+            RegisterSeeds(),
+            *analyse_attr('num_iter',folder_out=folder_out),
+            *analyse_attr('num_iter_glob',folder_out=folder_out),
+            *analyse_attr('duration',folder_out=folder_out),
+            *analyse_attr('init_cost',folder_out=folder_out),
+            *analyse_attr('final_cost',folder_out=folder_out),
+            *analyse_attr('ratio',folder_out=folder_out),
             QQPlot('ratio'),
             TestViewer('ratio')
         ]

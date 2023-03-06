@@ -21,29 +21,32 @@ class TestViewer:
         except Exception as e:
             init = 'ng'
         if init in ["ng"]:
-            test = SignTest()
+            first_test = SignTest()
+            second_test = ZTest()
         elif init in ["g", "gh"]:
-            test = ZTest()
+            first_test = ZTest()
+            second_test = SignTest()
         else:
             raise ValueError("Unknown initialization: %s" % init)
-        test_res = test(diff)
         s = bs4.BeautifulSoup("<div><div/>", features="html.parser")
-        title = s.new_tag("h3")
-        title.string = "Test statistique: " + test.name
-        s.append(title)
-        txt = s.new_tag("p")
-        for k, v in test_res.items():
-            span = s.new_tag("span")
-            span.string = k + ":" + str(v)
-            txt.append(span)
-        s.append(txt)
-        div_detail = s.new_tag("div")
-        title = s.new_tag("h4")
-        title.string = "Details"
-        div_detail.append(title)
-        for e in test.explain_to_text(diff):
-            div_detail.append(e)
-        s.append(div_detail)
+        for test,name in zip([first_test, second_test], ["used", "not used"]):
+            test_res = test(diff)
+            title = s.new_tag("h3")
+            title.string = f"Test {name}: " + test.name
+            s.append(title)
+            txt = s.new_tag("p")
+            for k, v in test_res.items():
+                span = s.new_tag("span")
+                span.string = k + ":" + str(v)
+                txt.append(span)
+            s.append(txt)
+            div_detail = s.new_tag("div")
+            title = s.new_tag("h4")
+            title.string = "Details"
+            div_detail.append(title)
+            for e in test.explain_to_text(diff):
+                div_detail.append(e)
+            s.append(div_detail)
         return HTMLDataOut(
             query=keys,
             data=s,
