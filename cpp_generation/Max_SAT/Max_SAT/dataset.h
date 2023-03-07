@@ -89,6 +89,9 @@ void create_dataset(ResultType* res, bool clean = false)
         error.printErrorStack();
         THROW_EXC1("Error writing dataset: DataSpace operations", 502);
     }
+    catch (GenericException e) {
+        THROW_EXC1(e.what(), 7);
+    }
     catch (const std::exception& exc)
     {
         THROW_EXC2("Other exception ", exc.what(), 503);

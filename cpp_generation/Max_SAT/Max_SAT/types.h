@@ -14,6 +14,7 @@ using quality_delta_t = double;
 using quality_t = double;
 using dim_id_t = int;
 /*************TSP*********************/
+// namespace TSP {
 using town_id_t = int;
 using town_in_tour_id_t = int;
 using tour_t = std::vector<town_id_t>;
@@ -32,7 +33,9 @@ public:
         return dict;
     };
 };
+//}
 /*************Clustering*********************/
+// namespace Clustering {
 using point_id_t = int;
 using cluster_id_t = int;
 using point_t = std::vector<double>;
@@ -40,7 +43,7 @@ using cluster_assignment_t = std::vector<int>;
 class ClusteringSwap : public SwapChoice
 {
 public:
-    ClusteringSwap() : point_id(-1), cluster_src(-1), cluster_dst(cluster_dst){};
+    ClusteringSwap() : point_id(-1), cluster_src(-1), cluster_dst(-1){};
     ClusteringSwap(point_id_t point_id, cluster_id_t cluster_src, cluster_id_t cluster_dst) : point_id(point_id), cluster_src(cluster_src), cluster_dst(cluster_dst), SwapChoice(){};
     point_id_t point_id;
     cluster_id_t cluster_src;
@@ -54,8 +57,10 @@ public:
         return dict;
     };
 };
-/*************Max_SAT*********************/
+//};
 
+/*************Max_SAT*********************/
+// namespace MAXSAT {
 using var_id_t = int;
 using clause_id_t = int;
 using var_negation_t = bool;
@@ -63,6 +68,8 @@ using clause_elem_t = std::pair<var_id_t, var_negation_t>;
 using clause_t = std::vector<clause_elem_t>;
 using var_assignment_t = bool;
 using vars_assignments_t = std::vector<var_assignment_t>;
+using weight_t = double;
+using n_vars_t = int;
 
 class MAXSATSwap : public SwapChoice
 {
@@ -77,5 +84,5 @@ public:
         return dict;
     };
 };
-
+//}
 #endif

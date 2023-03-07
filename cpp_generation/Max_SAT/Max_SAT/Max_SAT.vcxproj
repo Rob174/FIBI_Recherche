@@ -239,6 +239,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>hdf5.lib;hdf5_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='outNon|x64'">
     <ClCompile>
@@ -333,6 +337,7 @@
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="AlgorithmObservable.h" />
     <ClInclude Include="AlgorithmObserver.h" />
+    <ClInclude Include="argParser.hpp" />
     <ClInclude Include="ClusteringGenerator.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="Container.h" />

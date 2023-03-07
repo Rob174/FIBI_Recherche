@@ -13,7 +13,6 @@
 #include "AbstractWritable.h"
 #include "utils.h"
 
-
 /*
  BEFORE PROBLEM GENERATION
 
@@ -22,7 +21,7 @@
                           │
                      ┌────┴───────┐               ┌─────────────┐                          ┌─────────────┐
                      │SEED_GLOB   │               │ SEED_GLOB   │                          │ SEED_GLOB   │
-                     │SEED_PROBLEM│               │ SEED_PROBLEM│                          │ SEED_PROBLEM│
+                     │SEED_PROBLEMLEM│               │ SEED_PROBLEMLEM│                          │ SEED_PROBLEMLEM│
                      │SEED_ASSIGN │               │ SEED_ASSIGN │                          │ SEED_ASSIGN │
                      │DATASET     │               │ DATASET     │                          │ DATASET     │
                      │IMPR        │               │ IMPR        │                          │ IMPR        │
@@ -44,7 +43,7 @@
                           x                            xx                                 x
 AFTER      ┌──────────────┐                  ┌────────────┐                       ┌────────────┐
            │ SEED_GLOB    │                  │SEED_GLOB   │                       │SEED_GLOB   │
-           │ SEED_PROBLEM │                  │SEED_PROBLEM│                       │SEED_PROBLEM│
+           │ SEED_PROBLEMLEM │                  │SEED_PROBLEMLEM│                       │SEED_PROBLEMLEM│
            │ SEED_ASSIGN  │                  │SEED_ASSIGN │                       │SEED_ASSIGN │
            │ DATASET      │                  │DATASET     │                       │DATASET     │
            │ IMPR         │                  │IMPR        │                       │IMPR        │
@@ -55,99 +54,193 @@ AFTER      ┌──────────────┐                  ┌
                                              └────────────┘
 */
 
-
-
 #define stringify(name) #name
-#define M_cst_frc(name) conf->get(stringify(name),true)
-#define M_cst(name) conf->get(stringify(name))
-#define M_insert_cst(name,v) args.insert(std::make_pair(to_string(stringify(name)), v))
-enum GlobalConst {
-    SEED_GLOB,
-    SEED_PROBLEM,
-    SEED_ASSIGN,
-    DATASET,
-    FI_BI,
-    IMPR
-};
-enum ClusteringConstantsNames
+class UninitializedInt
 {
-    NUM_POINTS,
-    NUM_DIM,
-    NUM_CLUST
-};
-enum MAXSATConstantsNames
-{
-    NUM_VARIABLES,
-    NUM_CLAUSES
-};
+private:
+    int value;
+    bool initialized = false;
 
+public:
+    UninitializedInt(int value) : value(value), initialized(true) {};
+    UninitializedInt() : value(-1), initialized(false) {};
+    int get()
+    {
+        if (!initialized)
+        {
+            throw std::runtime_error("Uninitialized variable accessed");
+        }
+        return value;
+    }
+
+    void set(int v)
+    {
+        value = v;
+        initialized = true;
+    }
+};
 class AbstractConfig : public AbstractWritable<double>
 {
-protected:
-    std::map<std::string, int> *constants;
-    std::set<std::string> possible_values;
-    std::map<std::string,std::string> description;
-    bool checked;
 
 public:
-    AbstractConfig(std::map<std::string, int> *args);
-
-    void checkConstList(std::vector<std::string> vals, std::set<std::string> &keys_not_seen, std::string infos = "");
-    void check_initialized(bool bypass_secur = false);
-    virtual void check_keys_before_load_instance() = 0;
-    virtual void check_keys_after_load_instance() = 0;
-    void check_and_fill_keys_after_load_instance();
-
-    void update_keys(std::map<std::string, int>);
-    int get(std::string, bool bypass_secur = false);
+    AbstractConfig() {};
 
     virtual int num_choices() = 0;
-    std::string get_key();
-    std::vector<int> get_values();
-    std::map<std::string, int> * get_constants(){return this->constants;};
-    std::vector<std::string> get_values_names();
+    virtual std::string get_key() = 0;
+    virtual std::vector<int> get_values() = 0;
+    virtual std::map<std::string, int> get_constants() = 0;
 
 public:
-    void print();
+    virtual void print() = 0;
     std::vector<std::string> get_group();
     std::vector<std::vector<double>> get_data();
 };
 class ClusteringConfig : public AbstractConfig
 {
+public:
+    UninitializedInt SEED_GLOB,
+        SEED_PROBLEM,
+        SEED_ASSIGN,
+        DATASET,
+        FI_BI,
+        IMPR,
+        NUM_POINTS,
+        NUM_DIM,
+        NUM_CLUST;
 
 public:
-    ClusteringConfig(std::map<std::string, int> *args);
+    ClusteringConfig(std::map<std::string, int> args)
+    {
+        SEED_GLOB = UninitializedInt(args["SEED_GLOB"]);
+        SEED_PROBLEM = UninitializedInt(args["SEED_PROBLEM"]);
+        SEED_ASSIGN = UninitializedInt(args["SEED_ASSIGN"]);
+        DATASET = UninitializedInt(args["DATASET"]);
+        FI_BI = UninitializedInt(args["FI_BI"]);
+        IMPR = UninitializedInt(args["IMPR"]);
+        try
+        {
+            NUM_POINTS = UninitializedInt(args["NUM_POINTS"]);
+        }
+        catch (std::exception e)
+        {
+            // No problem, will be set later
+        }
+        try
+        {
+            NUM_DIM = UninitializedInt(args["NUM_DIM"]);
+        }
+        catch (std::exception e)
+        {
+            // No problem, will be set later
+        }
+        try
+        {
+            NUM_CLUST = UninitializedInt(args["NUM_CLUST"]);
+        }
+        catch (std::exception e)
+        {
+            // No problem, will be set later
+        }
+    }
     int num_choices()
     {
-        return this->constants->at(stringify(NUM_POINTS));
-    }
-    void check_keys_before_load_instance();
-    void check_keys_after_load_instance();
+        return this->NUM_POINTS.get();
+    };
+    std::string get_key();
+    std::vector<int> get_values();
+    std::map<std::string, int> get_constants();
+    void print();
 };
 class TSPConfig : public AbstractConfig
 {
 public:
-    TSPConfig(std::map<std::string, int> *args);
+    UninitializedInt SEED_GLOB,
+        SEED_PROBLEM,
+        SEED_ASSIGN,
+        DATASET,
+        FI_BI,
+        IMPR,
+        NUM_TOWNS,
+        NUM_DIM;
+
+public:
+    TSPConfig(std::map<std::string, int> args)
+    {
+        SEED_GLOB = UninitializedInt(args["SEED_GLOB"]);
+        SEED_PROBLEM = UninitializedInt(args["SEED_PROBLEM"]);
+        SEED_ASSIGN = UninitializedInt(args["SEED_ASSIGN"]);
+        DATASET = UninitializedInt(args["DATASET"]);
+        FI_BI = UninitializedInt(args["FI_BI"]);
+        IMPR = UninitializedInt(args["IMPR"]);
+        try
+        {
+            NUM_TOWNS = UninitializedInt(args["NUM_TOWNS"]);
+        }
+        catch (std::exception e)
+        {
+            // No problem, will be set later
+        }
+        try
+        {
+            NUM_DIM = UninitializedInt(args["NUM_DIM"]);
+        }
+        catch (std::exception e)
+        {
+            // No problem, will be set later
+        }
+    }
     int num_choices()
     {
-        return this->constants->at(stringify(NUM_POINTS));
+        return this->NUM_TOWNS.get();
     }
-    void check_keys_before_load_instance();
-    void check_keys_after_load_instance();
+    std::string get_key();
+    std::vector<int> get_values();
+    std::map<std::string, int> get_constants();
+    void print();
 };
 class MAXSATConfig : public AbstractConfig
 {
 public:
-    MAXSATConfig(std::map<std::string, int> *args);
+    UninitializedInt SEED_GLOB,
+        SEED_PROBLEM,
+        SEED_ASSIGN,
+        DATASET,
+        FI_BI,
+        IMPR,
+        NUM_VARIABLES,
+        NUM_CLAUSES;
+    MAXSATConfig(std::map<std::string, int> args)
+    {
+        SEED_GLOB = UninitializedInt(args["SEED_GLOB"]);
+        SEED_PROBLEM = UninitializedInt(args["SEED_PROBLEM"]);
+        SEED_ASSIGN = UninitializedInt(args["SEED_ASSIGN"]);
+        DATASET = UninitializedInt(args["DATASET"]);
+        FI_BI = UninitializedInt(args["FI_BI"]);
+        IMPR = UninitializedInt(args["IMPR"]);
+        try
+        {
+            NUM_VARIABLES = UninitializedInt(args["NUM_VARIABLES"]);
+        }
+        catch (std::exception e)
+        {
+            // No problem, will be set later
+        }
+        try
+        {
+            NUM_CLAUSES = UninitializedInt(args["NUM_CLAUSES"]);
+        }
+        catch (std::exception e)
+        {
+            // No problem, will be set later
+        }
+    }
     int num_choices()
     {
-        if (!checked)
-        {
-            throw GenericException(std::vector<std::string>{"Constants must be checked before usage of any function"});
-        }
-        return this->constants->at(stringify(NUM_VARIABLES));
+        return this->NUM_VARIABLES.get();
     }
-    void check_keys_before_load_instance();
-    void check_keys_after_load_instance();
+    std::string get_key();
+    std::vector<int> get_values();
+    std::map<std::string, int> get_constants();
+    void print();
 };
 #endif

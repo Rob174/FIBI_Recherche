@@ -1,89 +1,92 @@
 #include "factories.h"
 
-void MAXSATFactory::run(MAXSATConfig *conf, bool dump_mapping, const int min_var_per_clause, const int max_var_per_clause)
+void MAXSATFactory::run(MAXSATConfig *conf, bool dump_mapping, bool debug, const int min_var_per_clause, const int max_var_per_clause)
 {
 	// setup
-	conf->check_keys_before_load_instance();
 	MAXSATContainer *cont;
-	if (M_cst_frc(DATASET) == 0)
+	if (conf->DATASET.get() == 0)
 	{
 		/* Generated dataset */
 		std::pair<std::vector<clause_t> *, double *> clauses = generate_random_clauses(
-			M_cst_frc(NUM_VARIABLES),
-			M_cst_frc(NUM_CLAUSES),
-			M_cst_frc(SEED_PROBLEM),
+			conf->NUM_VARIABLES.get(),
+			conf->NUM_CLAUSES.get(),
+			conf->SEED_PROBLEM.get(),
 			min_var_per_clause, max_var_per_clause);
-		bool *init_assign = generate_random_var_assign(M_cst_frc(NUM_VARIABLES), M_cst_frc(SEED_ASSIGN));
-		cont = new MAXSATContainer(clauses.second, M_cst_frc(NUM_VARIABLES), init_assign, *clauses.first, conf);
+		bool *init_assign = generate_random_var_assign(conf->NUM_VARIABLES.get(), conf->SEED_ASSIGN.get());
+		cont = new MAXSATContainer(clauses.second, conf->NUM_VARIABLES.get(), init_assign, *clauses.first, conf);
 		delete[] init_assign;
 		delete[] clauses.second;
 		delete clauses.first;
 	}
-	else if (M_cst_frc(DATASET) == 1)
+	else if (conf->DATASET.get() == 1)
 	{
-		int *data = load_points<int, true>("maxsat_benchmarks.hdf5", M_cst_frc(SEED_PROBLEM));
+		double *data = load_points<double, false>("maxsat_benchmark.hdf5", conf->SEED_PROBLEM.get());
 		// std::tuple<std::vector<clause_t>*, weight_t*, n_vars_t>
-		auto values = parse_maxsat(data);
+		auto values = parse_maxsat<double>(data);
 		delete[] data;
-		conf->update_keys(std::map<std::string, int>{{"NUM_VARIABLES", std::get<2>(values)}, {"NUM_CLAUSES", (*std::get<0>(values)).size()}});
-		bool *init_assign = generate_random_var_assign(M_cst_frc(NUM_VARIABLES), M_cst_frc(SEED_ASSIGN));
-		cont = new MAXSATContainer(std::get<1>(values), M_cst_frc(NUM_VARIABLES), init_assign, *std::get<0>(values), conf);
+		conf->NUM_VARIABLES.set(std::get<2>(values));
+		conf->NUM_CLAUSES.set((*std::get<0>(values)).size());
+		bool *init_assign = generate_random_var_assign(conf->NUM_VARIABLES.get(), conf->SEED_ASSIGN.get());
+		cont = new MAXSATContainer(std::get<1>(values), conf->NUM_VARIABLES.get(), init_assign, *std::get<0>(values), conf);
 		delete[] std::get<1>(values);
 		delete[] init_assign;
 		delete std::get<0>(values);
 	}
-	else if (M_cst_frc(DATASET) == 2)
+	else if (conf->DATASET.get() == 2)
 	{
-		int *data = load_fixed_clauses();
-		auto values = parse_maxsat(data);
+		double *data = load_fixed_clauses();
+		auto values = parse_maxsat<double>(data);
 		delete[] data;
 		bool *init_assign = load_fixed_assign();
-		conf->update_keys(std::map<std::string, int>{{"NUM_VARIABLES", std::get<2>(values)}, {"NUM_CLAUSES", (*std::get<0>(values)).size()}});
-		cont = new MAXSATContainer(std::get<1>(values), M_cst_frc(NUM_VARIABLES), init_assign, *std::get<0>(values), conf);
+		conf->NUM_VARIABLES.set(std::get<2>(values));
+		conf->NUM_CLAUSES.set((*std::get<0>(values)).size());
+		cont = new MAXSATContainer(std::get<1>(values), conf->NUM_VARIABLES.get(), init_assign, *std::get<0>(values), conf);
 		delete[] std::get<1>(values);
 		delete[] init_assign;
 		delete std::get<0>(values);
 	}
-	else if (M_cst_frc(DATASET) == 3)
+	else if (conf->DATASET.get() == 3)
 	{
-		int *data = load_points<int, true>("maxsat_benchmark2.hdf5", M_cst_frc(SEED_PROBLEM));
+		int *data = load_points<int, true>("maxsat_benchmark2.hdf5", conf->SEED_PROBLEM.get());
 		// std::tuple<std::vector<clause_t>*, weight_t*, n_vars_t>
-		auto values = parse_maxsat(data, true);
+		auto values = parse_maxsat<int>(data, true);
 		delete[] data;
-		conf->update_keys(std::map<std::string, int>{{"NUM_VARIABLES", std::get<2>(values)}, {"NUM_CLAUSES", (*std::get<0>(values)).size()}});
-		bool *init_assign = generate_random_var_assign(M_cst_frc(NUM_VARIABLES), M_cst_frc(SEED_ASSIGN));
-		cont = new MAXSATContainer(std::get<1>(values), M_cst_frc(NUM_VARIABLES), init_assign, *std::get<0>(values), conf);
+		conf->NUM_VARIABLES.set(std::get<2>(values));
+		conf->NUM_CLAUSES.set((*std::get<0>(values)).size());
+		bool *init_assign = generate_random_var_assign(conf->NUM_VARIABLES.get(), conf->SEED_ASSIGN.get());
+		cont = new MAXSATContainer(std::get<1>(values), conf->NUM_VARIABLES.get(), init_assign, *std::get<0>(values), conf);
 		delete[] std::get<1>(values);
 		delete[] init_assign;
 		delete std::get<0>(values);
 	}
-	else if (M_cst_frc(DATASET) == 4)
+	else if (conf->DATASET.get() == 4)
 	{
-		int *data = load_points<int, true>("maxsat_benchmark3.hdf5", M_cst_frc(SEED_PROBLEM));
+		int *data = load_points<int, true>("maxsat_benchmark3.hdf5", conf->SEED_PROBLEM.get());
 		// std::tuple<std::vector<clause_t>*, weight_t*, n_vars_t>
 		auto values = parse_maxsat(data, true);
 		delete[] data;
-		conf->update_keys(std::map<std::string, int>{{"NUM_VARIABLES", std::get<2>(values)}, {"NUM_CLAUSES", (*std::get<0>(values)).size()}});
-		bool *init_assign = generate_random_var_assign(M_cst_frc(NUM_VARIABLES), M_cst_frc(SEED_ASSIGN));
-		cont = new MAXSATContainer(std::get<1>(values), M_cst_frc(NUM_VARIABLES), init_assign, *std::get<0>(values), conf);
+		conf->NUM_VARIABLES.set(std::get<2>(values));
+		conf->NUM_CLAUSES.set((*std::get<0>(values)).size());
+		bool *init_assign = generate_random_var_assign(conf->NUM_VARIABLES.get(), conf->SEED_ASSIGN.get());
+		cont = new MAXSATContainer(std::get<1>(values), conf->NUM_VARIABLES.get(), init_assign, *std::get<0>(values), conf);
 		delete[] std::get<1>(values);
 		delete[] init_assign;
 		delete std::get<0>(values);
 	}
 	else
 	{
-		THROW_EXC1("Invalid DATASET argument, Valid values are 0,1,2,3", 8);
+		THROW_EXC1("Invalid DATASET argument, Valid values are 0,1,2,3,4", 8);
 	}
+	conf->print();
 	// Choose if make improvement
-	if (M_cst_frc(IMPR) == 1)
+	if (conf->IMPR.get() == 1)
 	{
-		improve(cont, M_cst_frc(SEED_ASSIGN));
+		improve(cont, conf->SEED_ASSIGN.get());
 	}
-	else if (M_cst_frc(IMPR) > 1)
+	else if(conf->IMPR.get() > 1)
 	{
 		THROW_EXC1("Invalid CLAUSE_IMPR argument, Valid values are 0->1", 9);
 	}
-	conf->check_and_fill_keys_after_load_instance();
 	cont->on_improvement_done();
 	Metrics *metrics = new Metrics();
 	MAXSATResult *res = new MAXSATResult(conf, metrics);
@@ -92,66 +95,92 @@ void MAXSATFactory::run(MAXSATConfig *conf, bool dump_mapping, const int min_var
 	std::vector<AlgorithmObserver<MAXSATContainer,MAXSATSwap> *> observers;
 	observers.push_back(res);
 	MAXSATAlgorithm *alg = new MAXSATAlgorithm(observers);
-	alg->run(cont, conf, (bool)M_cst(FI_BI));
+	alg->run(cont, conf, (bool)conf->FI_BI.get());
 
+	JSONStorage storage;
+	MAXSATLogger logger(&storage, true);
+	if (debug)
+	{
+		observers.push_back(&logger);
+	}
 	// writing the results
 	if (dump_mapping)
 	{
 		res->save_mapping();
 	}
 	create_dataset<MAXSATResult>(res);
-
+	if (debug) {
+		storage.save_json("actions.json");
+	}
 	// cleaning
-	const int seed = conf->get(stringify(SEED_GLOB));
+	const int seed = conf->SEED_GLOB.get();
 	delete metrics;
 	delete res;
 	delete cont;
 	delete alg;
 }
 
-void CluteringFactory::run(ClusteringConfig *conf, bool dump_mapping)
+void CluteringFactory::run(ClusteringConfig *conf, bool dump_mapping, bool debug)
 {
 	// setup
-	conf->check_keys_before_load_instance();
 	ClusteringContainer *cont;
-	if (M_cst_frc(DATASET) == 0)
+	if (conf->DATASET.get() == 0)
 	{
 		/* Uniformly distrbuted points */
 		cont = new ClusteringContainer(
-			uniform_points(M_cst_frc(NUM_POINTS),
-						   M_cst_frc(NUM_DIM),
-						   M_cst_frc(SEED_PROBLEM)),
+			uniform_points(conf->NUM_POINTS.get(),
+						   conf->NUM_DIM.get(),
+						   conf->SEED_PROBLEM.get()),
 			random_clust(conf), conf);
 	}
-	else if (M_cst_frc(DATASET) == 1)
+	else if (conf->DATASET.get() == 1)
 	{
 		/* Franti et al benchmark */
+		// WARNING: works because of here: do not touch ! Need to set the constant NUM_POINTS first
+		const double* p = open_points_1(conf->SEED_PROBLEM.get(), "franti_benchmark.hdf5", conf, true);
 		cont = new ClusteringContainer(
-			open_points_1(M_cst_frc(SEED_PROBLEM), "franti_benchmark.hdf5", conf, true),
+			p,
 			random_clust(conf),
 			conf);
 	}
-	else if (M_cst_frc(DATASET) == 2)
+	else if (conf->DATASET.get() == 2)
 	{
 		/* Aloise et al benchmark */
+		// WARNING: works because of here: do not touch ! Need to set the constant NUM_POINTS first
+		const double* p = open_points_1(conf->SEED_PROBLEM.get(), "aloise_benchmark.hdf5", conf, false);
 		cont = new ClusteringContainer(
-			open_points_1(M_cst_frc(SEED_PROBLEM), "aloise_benchmark.hdf5", conf, false),
+			p,
 			random_clust(conf),
 			conf);
+	}
+	else if(conf->DATASET.get() == 3) {
+		/* Normally distributed points */
+		cont = new ClusteringContainer(
+			normal_points(conf->NUM_POINTS.get(),
+				conf->NUM_DIM.get(),
+				conf->SEED_PROBLEM.get()),
+			random_clust(conf), conf);
 	}
 	else
 	{
 		THROW_EXC1("Invalid DATASET argument, Valid values are 0->2", 10);
 	}
-	if (M_cst_frc(IMPR) == 1)
+	if (conf->NUM_CLUST.get() >= conf->NUM_POINTS.get()) {
+		std::cout << "Stopping because of num_clust>=num_points with NUM_CLUST:" << conf->NUM_CLUST.get() << " and NUM_POINTS:" << conf->NUM_POINTS.get() << std::endl;
+		return;
+	}
+	conf->print();
+	if (conf->IMPR.get() == 1)
 	{
 		kmeansPlusPlus(cont, conf);
 	}
-	else if (M_cst_frc(IMPR) > 1)
+	else if (conf->IMPR.get() == 2) {
+		kmeansPlusPlusSuperGlutton(cont, conf);
+	}
+	else if (conf->IMPR.get() > 1)
 	{
 		THROW_EXC1("Invalid IMPR argument, Valid values are 0->1", 11);
 	}
-	conf->check_and_fill_keys_after_load_instance();
 	cont->on_improvement_done();
 	Metrics *metrics = new Metrics();
 	ClusteringResult *res = new ClusteringResult(conf, metrics);
@@ -163,10 +192,19 @@ void CluteringFactory::run(ClusteringConfig *conf, bool dump_mapping)
 	{
 		res->save_mapping();
 	}
-	ClusteringAlgorithm *alg = new ClusteringAlgorithm(observers);
-	alg->run(cont, conf, conf->get("FI_BI"));
+	JSONStorage storage;
+	ClusteringLogger logger(&storage, true);
+	if (debug)
+	{
+		observers.push_back(&logger);
+	}
+	ClusteringAlgorithm *alg = new ClusteringAlgorithm(observers,1000);
+	alg->run(cont, conf, conf->FI_BI.get());
 	// writing the results
 	create_dataset<ClusteringResult>(res);
+	if (debug) {
+		storage.save_json("actions.json");
+	}
 	// cleaning
 	delete alg;
 	delete metrics;
@@ -176,40 +214,58 @@ void CluteringFactory::run(ClusteringConfig *conf, bool dump_mapping)
 
 void TSPFactory::run(TSPConfig *conf, bool dump_mapping, bool debug)
 {
+	using namespace std;
 	// setup
-	conf->check_keys_before_load_instance();
-	const double *towns_pos;
-	if (M_cst_frc(DATASET) == 0)
+	vector<double> towns_pos;
+	if (conf->DATASET.get() == 0)
 	{
 		/* Uniformly distrbuted points */
-		towns_pos = uniform_points(M_cst_frc(NUM_TOWNS),
-								   M_cst_frc(NUM_DIM),
-								   M_cst_frc(SEED_PROBLEM));
+		towns_pos = uniform_points(conf->NUM_TOWNS.get(),
+								   conf->NUM_DIM.get(),
+								   conf->SEED_PROBLEM.get());
 	}
-	else if (M_cst_frc(DATASET) == 1)
+	else if (conf->DATASET.get() == 1)
 	{
 		/* TSPLIB */
-		towns_pos = open_file("tsplib.hdf5", M_cst_frc(SEED_PROBLEM));
+		towns_pos = open_file("tsplib.hdf5", conf->SEED_PROBLEM.get(), conf);
+	}
+	else if(conf->DATASET.get() == 2) {
+		/* Normally distributed points */
+		towns_pos = normal_points(conf->NUM_TOWNS.get(),
+			conf->NUM_DIM.get(),
+			conf->SEED_PROBLEM.get());
 	}
 	else
 	{
-		THROW_EXC1("Invalid DATASET argument, Valid values are 0->2", 10);
+		THROW_EXC1("Invalid DATASET argument, Valid values are 0->3", 10);
 	}
-	DistanceMatrix m(M_cst_frc(NUM_TOWNS), M_cst_frc(NUM_DIM), towns_pos);
+	conf->print();
+	DistanceMatrix m(conf->NUM_TOWNS.get(), conf->NUM_DIM.get(), towns_pos);
 	int *tour;
-	if (M_cst_frc(IMPR) == 0)
+	if (conf->IMPR.get() == 0)
 	{
-		tour = random_tour(M_cst_frc(NUM_TOWNS), M_cst_frc(NUM_DIM));
+		tour = random_tour(conf->NUM_TOWNS.get(), conf->SEED_ASSIGN.get());
 	}
-	else if (M_cst_frc(IMPR) == 1)
+	else if (conf->IMPR.get() == 1)
 	{
-		tour = improved_tour(M_cst_frc(NUM_TOWNS), M_cst_frc(NUM_DIM), &m);
+		tour = improved_tour(conf->NUM_TOWNS.get(), conf->SEED_ASSIGN.get(), &m);
 	}
-	else if (M_cst_frc(IMPR) > 1)
+	else if (conf->IMPR.get() == 2)
 	{
-		THROW_EXC1("Invalid IMPR argument, Valid values are 0->1", 11);
+		tour = improved_rand_tour(conf->NUM_TOWNS.get(), conf->SEED_ASSIGN.get(), &m, 3);
 	}
-	conf->check_and_fill_keys_after_load_instance();
+	else if (conf->IMPR.get() == 3)
+	{
+		tour = improved_rand_tour(conf->NUM_TOWNS.get(), conf->SEED_ASSIGN.get(), &m, 4);
+	}
+	else if (conf->IMPR.get() == 4)
+	{
+		tour = improved_rand_tour(conf->NUM_TOWNS.get(), conf->SEED_ASSIGN.get(), &m, 5);
+	}
+	else
+	{
+		THROW_EXC1("Invalid IMPR argument, Valid values are 0->4", 11);
+	}
 	TSPContainer cont(tour, &m, conf);
 	cont.on_improvement_done();
 	Metrics *metrics = new Metrics();
@@ -223,16 +279,18 @@ void TSPFactory::run(TSPConfig *conf, bool dump_mapping, bool debug)
 		res->save_mapping();
 	}
 	JSONStorage storage;
-	TSPLogger logger(&storage);
+	TSPLogger logger(&storage, true);
 	if (debug)
 	{
 		observers.push_back(&logger);
 	}
 	TSPAlgorithm *alg = new TSPAlgorithm(observers);
-	alg->run(&cont, conf, conf->get("FI_BI"));
+	alg->run(&cont, conf, conf->FI_BI.get());
 	// writing the results
 	create_dataset<TSPResult>(res);
-	storage.save_json("actions.json");
+	if (debug) {
+		storage.save_json("actions.json");
+	}
 	// cleaning
 	delete alg;
 	delete metrics;

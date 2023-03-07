@@ -51,12 +51,9 @@ public:
     std::vector<std::vector<double>> data()
     {
         std::vector<double> data;
-        for (std::vector<double> values : this->config->get_data())
+        for (auto v : this->config->get_constants())
         {
-            for (double v : values)
-            {
-                data.push_back(v);
-            }
+            data.push_back((double)v.second);
         }
         for (std::vector<double> values : this->metrics->get_data())
         {
@@ -74,7 +71,10 @@ public:
     };
     void save_mapping()
     {
-        std::vector<std::string> v1 = this->config->get_values_names();
+        std::vector<std::string> v1;
+        for (auto const &e : this->config->get_constants()) {
+            v1.push_back(e.first);
+        }
         std::vector<std::string> v2 = this->metrics->get_data_names();
         v1.insert(v1.end(), v2.begin(), v2.end());
 
@@ -103,8 +103,8 @@ class MAXSATResult : public AlgorithmObserver<MAXSATContainer, MAXSATSwap>, publ
 public:
     MAXSATResult(MAXSATConfig *config, Metrics *metrics) : AlgorithmObserver(), AbstractWritable<double>(), Result(config, metrics){};
     void on_start(MAXSATContainer *container) { return Result::start(container); };
-    void on_glob_iter_end(MAXSATContainer *container) { return Result::glob_iter_end(container); };
     static MAXSATSwap _dummy_swap;
+    void on_glob_iter_end(MAXSATContainer* container, quality_delta_t delta, const MAXSATSwap& s = _dummy_swap) { return Result::glob_iter_end(container); };
     void on_iter_end(MAXSATContainer *container, const MAXSATSwap &s = _dummy_swap) { return Result::iter_end(container); };
     void on_end(MAXSATContainer *container) { return Result::end(container); };
 
@@ -118,8 +118,8 @@ class ClusteringResult : public AlgorithmObserver<ClusteringContainer, Clusterin
 public:
     ClusteringResult(ClusteringConfig *config, Metrics *metrics) : AlgorithmObserver(), AbstractWritable<double>(), Result(config, metrics){};
     void on_start(ClusteringContainer *container) { return Result::start(container); };
-    void on_glob_iter_end(ClusteringContainer *container) { return Result::glob_iter_end(container); };
     static ClusteringSwap _dummy_swap;
+    void on_glob_iter_end(ClusteringContainer* container, quality_delta_t delta, const ClusteringSwap& s = _dummy_swap) { return Result::glob_iter_end(container); };
     void on_iter_end(ClusteringContainer *container, const ClusteringSwap &s = _dummy_swap) { return Result::iter_end(container); };
     void on_end(ClusteringContainer *container) { return Result::end(container); };
 
@@ -134,8 +134,8 @@ class TSPResult : public AlgorithmObserver<TSPContainer, TSPSwap>, public Abstra
 public:
     TSPResult(TSPConfig *config, Metrics *metrics) : AlgorithmObserver(), AbstractWritable<double>(), Result(config, metrics){};
     void on_start(TSPContainer *container) { return Result::start(container); };
-    void on_glob_iter_end(TSPContainer *container) { return Result::glob_iter_end(container); };
     static TSPSwap _dummy_swap;
+    void on_glob_iter_end(TSPContainer* container, quality_delta_t delta, const TSPSwap& s = _dummy_swap) { return Result::glob_iter_end(container); };
     void on_iter_end(TSPContainer *container, const TSPSwap &s = _dummy_swap) { return Result::iter_end(container); };
     void on_end(TSPContainer *container) { return Result::end(container); };
 

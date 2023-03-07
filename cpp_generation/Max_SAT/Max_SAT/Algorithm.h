@@ -38,13 +38,15 @@ public:
 class MAXSATAlgorithm : public Algorithm<AlgorithmObserver<MAXSATContainer, MAXSATSwap>, MAXSATContainer, MAXSATConfig, MAXSATSwap>
 {
 public:
-	MAXSATAlgorithm(std::vector<AlgorithmObserver<MAXSATContainer, MAXSATSwap>*> observers) : Algorithm(observers){};
+	MAXSATAlgorithm(std::vector<AlgorithmObserver<MAXSATContainer, MAXSATSwap>*> observers) : Algorithm(observers) {};
+	MAXSATAlgorithm(std::vector<AlgorithmObserver<MAXSATContainer, MAXSATSwap>*> observers, const int num_iter_max) : Algorithm(observers,num_iter_max){};
 	bool explore_flips(MAXSATContainer *container, MAXSATConfig *config, bool FI);
 };
 class ClusteringAlgorithm : public Algorithm<AlgorithmObserver<ClusteringContainer, ClusteringSwap>, ClusteringContainer, ClusteringConfig, ClusteringSwap>
 {
 public:
 	ClusteringAlgorithm(std::vector<AlgorithmObserver<ClusteringContainer, ClusteringSwap>*> observers) : Algorithm(observers){};
+	ClusteringAlgorithm(std::vector<AlgorithmObserver<ClusteringContainer, ClusteringSwap>*> observers, const int num_iter_max) : Algorithm(observers, num_iter_max) {};
 	bool explore_flips(ClusteringContainer *container, ClusteringConfig *config, bool FI);
 };
 class TSPAlgorithm : public Algorithm<AlgorithmObserver<TSPContainer, TSPSwap>, TSPContainer, TSPConfig,TSPSwap>

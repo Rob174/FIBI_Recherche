@@ -10,6 +10,7 @@
 #include "constants.h"
 #include "types.h"
 
+
 template <typename T_Swap>
 class AbstractContainer
 {
@@ -50,6 +51,14 @@ private:
 public:
     MAXSATConfig *config;
     MAXSATContainer(const double *weights, const int num_variables, bool *init_variables_val, std::vector<clause_t> clauses, MAXSATConfig *config);
+    MAXSATContainer(MAXSATContainer& other) : num_variables(other.get_num_variables()), num_clauses(other.get_clauses().size()) {
+        this->weights = copy_array<const double,double>(other.get_weights(), other.get_clauses().size());
+        this->variables_val = copy_array<const bool,bool>(other.get_variables_val(), other.get_num_variables());
+        this->clauses = other.get_clauses();
+        this->var_in_clauses = other.get_var_in_clauses();
+        this->sat_clauses = copy_array<bool,bool>(other.get_sat_clause(),other.get_clauses().size());
+        this->config = other.config;
+    }
     ~MAXSATContainer()
     {
         delete[] sat_clauses;
@@ -63,6 +72,7 @@ public:
     double compute_quality_metric();
     // Getters
     const int get_num_variables() { return num_variables; }
+    bool* get_sat_clause() { return sat_clauses; }
     const double *get_weights();
     const std::vector<clause_t> get_clauses();
     const bool *get_variables_val() { return variables_val; }
@@ -86,6 +96,14 @@ public:
 
 public:
     ClusteringContainer(const double *points, int *assignements, ClusteringConfig *conf);
+    ClusteringContainer(ClusteringContainer& other) {
+        this->p_c = copy_array<const double,double>(other.p_c, other.conf->NUM_POINTS.get() * other.conf->NUM_DIM.get());
+        this->c_a = copy_array<int,int>(other.c_a, other.conf->NUM_POINTS.get());
+        this->n_p_p_c = copy_array<int,int>(other.n_p_p_c, other.conf->NUM_CLUST.get());
+        this->c_c = copy_array<double,double>(other.c_c, other.conf->NUM_CLUST.get()* other.conf->NUM_DIM.get());
+        this->cost = other.cost;
+        this->conf = other.conf;
+    }
     ~ClusteringContainer()
     {
         delete[] c_a;
@@ -105,11 +123,11 @@ class DistanceMatrix
 {
 private:
     const int num_towns;
-    const double *towns_pos;
+    const double* towns_pos;
     double **distances;
 
 public:
-    DistanceMatrix(const int num_towns, const int num_dim, const double *towns_pos);
+    DistanceMatrix(const int num_towns, const int num_dim, const double* towns_pos);
     ~DistanceMatrix();
     double get(const town_in_tour_id_t i, const town_in_tour_id_t j);
     const double *get_town_pos() { return towns_pos; }
@@ -117,15 +135,23 @@ public:
 class TSPContainer : public AbstractContainer<TSPSwap>
 {
 public:
-    town_in_tour_id_t *tour;
+    std::vector<town_in_tour_id_t> tour;
     TSPConfig *conf;
     DistanceMatrix *dist;
 
 public:
-    TSPContainer(int *tour, DistanceMatrix *m, TSPConfig *conf) : conf(conf), tour(tour), dist(m), AbstractContainer<TSPSwap>() {};
+    TSPContainer(int* tour, DistanceMatrix* m, TSPConfig* conf) : conf(conf), dist(m), AbstractContainer<TSPSwap>() {
+        for (int i = 0; i < this->conf->NUM_TOWNS.get(); i++) {
+            this->tour.push_back(tour[i]);
+        }
+    };
+    TSPContainer(TSPContainer& other) {
+        this->tour = other.tour;
+        this->conf = other.conf;
+        this->dist = other.dist;
+    }
     ~TSPContainer()
     {
-        delete[] tour;
     }
     // Flips
     quality_delta_t test_flip(const TSPSwap& test_swap);
@@ -134,12 +160,12 @@ public:
     double compute_quality_metric();
     const double compute_delta(const TSPSwap & test_swap);
     // Getters
-    int *get_tour() { return this->tour; }
+    int *get_tour() { return this->tour.data(); }
     const double *get_towns_pos() { return this->dist->get_town_pos(); }
     // Utility
     town_in_tour_id_t cycle_id(const town_in_tour_id_t i)
     {
-        const int num_towns = this->conf->get("NUM_TOWNS");
+        const int num_towns = this->conf->NUM_TOWNS.get();
         town_in_tour_id_t a = i < 0 ? num_towns + i : i;
         return a % num_towns;
     }

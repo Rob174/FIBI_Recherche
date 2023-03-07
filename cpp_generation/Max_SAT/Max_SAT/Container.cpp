@@ -304,38 +304,38 @@ void MAXSATContainer::print()
 }
 ClusteringContainer::ClusteringContainer(const double *points, int *assignements, ClusteringConfig *conf) : p_c(points), c_a(assignements), conf(conf), AbstractContainer<ClusteringSwap>()
 {
-    double *c_c = new double[conf->get(stringify(NUM_CLUST), true) * conf->get(stringify(NUM_DIM), true)];
-    for (int i = 0; i < conf->get(stringify(NUM_CLUST), true) * conf->get(stringify(NUM_DIM), true); i++)
+    double *c_c = new double[conf->NUM_CLUST.get() * conf->NUM_DIM.get()];
+    for (int i = 0; i < conf->NUM_CLUST.get() * conf->NUM_DIM.get(); i++)
     {
         c_c[i] = 0;
     }
-    int *n_p_p_c = new int[conf->get(stringify(NUM_CLUST), true)];
-    for (int i = 0; i < conf->get(stringify(NUM_CLUST), true); i++)
+    int *n_p_p_c = new int[conf->NUM_CLUST.get()];
+    for (int i = 0; i < conf->NUM_CLUST.get(); i++)
     {
         n_p_p_c[i] = 0;
     }
-    for (int i = 0; i < conf->get(stringify(NUM_POINTS), true); i++)
+    for (int i = 0; i < conf->NUM_POINTS.get(); i++)
     {
         n_p_p_c[assignements[i]]++;
-        for (int d = 0; d < conf->get(stringify(NUM_DIM), true); d++)
+        for (int d = 0; d < conf->NUM_DIM.get(); d++)
         {
-            const double v = points[i * conf->get(stringify(NUM_DIM), true) + d];
-            c_c[assignements[i] * conf->get(stringify(NUM_DIM), true) + d] += v;
+            const double v = points[i * conf->NUM_DIM.get() + d];
+            c_c[assignements[i] * conf->NUM_DIM.get() + d] += v;
         }
     }
-    for (int a = 0; a < conf->get(stringify(NUM_CLUST), true) * conf->get(stringify(NUM_DIM), true); a++)
+    for (int a = 0; a < conf->NUM_CLUST.get() * conf->NUM_DIM.get(); a++)
     {
-        c_c[a] /= n_p_p_c[a / conf->get(stringify(NUM_DIM), true)];
+        c_c[a] /= n_p_p_c[a / conf->NUM_DIM.get()];
     }
     this->c_c = c_c;
     this->n_p_p_c = n_p_p_c;
 }
-#define DEBUG
+//#define DEBUG
 #define EPSILON 1e-5
 void ClusteringContainer::flip(const ClusteringSwap& swap, quality_delta_t delta)
 {
 #ifdef DEBUG
-    for (int i = 0; i < this->conf->get("NUM_POINTS"); i++)
+    for (int i = 0; i < this->conf->NUM_POINTS.get(); i++)
     {
         std::cout << this->c_a[i] << ",";
     }
@@ -345,15 +345,15 @@ void ClusteringContainer::flip(const ClusteringSwap& swap, quality_delta_t delta
     // f: source cluster
     // t: destination cluster
     // update centroids
-    const double *point = &(this->p_c[swap.point_id * this->conf->get("NUM_DIM")]);
-    for (int dim = 0; dim < this->conf->get("NUM_DIM"); dim++)
+    const double *point = &(this->p_c[swap.point_id * this->conf->NUM_DIM.get()]);
+    for (int dim = 0; dim < this->conf->NUM_DIM.get(); dim++)
     {
         if (this->n_p_p_c[swap.cluster_src] <= 1) // If we had one point
-            this->c_c[swap.cluster_src * this->conf->get("NUM_DIM") + dim] = 0.;
+            this->c_c[swap.cluster_src * this->conf->NUM_DIM.get() + dim] = 0.;
         else
-            this->c_c[swap.cluster_src * this->conf->get("NUM_DIM") + dim] = (double)(this->n_p_p_c[swap.cluster_src] * this->c_c[swap.cluster_src * this->conf->get("NUM_DIM") + dim] - point[dim]) /
+            this->c_c[swap.cluster_src * this->conf->NUM_DIM.get() + dim] = (double)(this->n_p_p_c[swap.cluster_src] * this->c_c[swap.cluster_src * this->conf->NUM_DIM.get() + dim] - point[dim]) /
                                                               (double)(this->n_p_p_c[swap.cluster_src] - 1);
-        this->c_c[swap.cluster_dst * this->conf->get("NUM_DIM") + dim] = (double)(this->n_p_p_c[swap.cluster_dst] * this->c_c[swap.cluster_dst * this->conf->get("NUM_DIM") + dim] + point[dim]) /
+        this->c_c[swap.cluster_dst * this->conf->NUM_DIM.get() + dim] = (double)(this->n_p_p_c[swap.cluster_dst] * this->c_c[swap.cluster_dst * this->conf->NUM_DIM.get() + dim] + point[dim]) /
                                                           (double)(this->n_p_p_c[swap.cluster_dst] + 1);
     }
     // update num_pts_per_clust
@@ -371,13 +371,13 @@ void ClusteringContainer::flip(const ClusteringSwap& swap, quality_delta_t delta
     {
         this->test_flip(swap);
         this->compute_quality_metric();
-        for (int i = 0; i < this->conf->get("NUM_POINTS") * this->conf->get("NUM_DIM"); i++)
+        for (int i = 0; i < this->conf->NUM_POINTS.get() * this->conf->NUM_DIM.get(); i++)
         {
             std::cout << this->p_c[i] << ",";
         }
         std::cout << std::endl;
         std::cout << "After" << std::endl;
-        for (int i = 0; i < this->conf->get("NUM_POINTS"); i++)
+        for (int i = 0; i < this->conf->NUM_POINTS.get(); i++)
         {
             // If we are at the point_id change color
             if (i == swap.point_id)
@@ -401,11 +401,11 @@ quality_t ClusteringContainer::compute_quality_metric()
 {
     // compute cost
     double cost = 0;
-    for (int i = 0; i < this->conf->get("NUM_POINTS", true); i++)
+    for (int i = 0; i < this->conf->NUM_POINTS.get(); i++)
     {
-        const double *point = &(this->p_c[i * this->conf->get("NUM_DIM", true)]);
-        double *centroid = &(this->c_c[this->c_a[i] * this->conf->get("NUM_DIM", true)]);
-        const double d = dist_squared(point, centroid, this->conf->get("NUM_DIM", true));
+        const double *point = &(this->p_c[i * this->conf->NUM_DIM.get()]);
+        double *centroid = &(this->c_c[this->c_a[i] * this->conf->NUM_DIM.get()]);
+        const double d = dist_squared(point, centroid, this->conf->NUM_DIM.get());
         cost += d;
     }
     return cost;
@@ -415,12 +415,12 @@ quality_delta_t ClusteringContainer::test_flip(const ClusteringSwap & test_swap)
     // f: source cluster
     // t: destination cluster
     ClusteringConfig *conf = this->conf;
-    const double * point = &(this->p_c[test_swap.point_id * conf->get("NUM_DIM")]);
-    double part1 = (double)(this->n_p_p_c[test_swap.cluster_dst]) / (double)(this->n_p_p_c[test_swap.cluster_dst] + 1) * dist_squared(&(this->c_c[test_swap.cluster_dst * M_cst(NUM_DIM)]), point, M_cst(NUM_DIM));
+    const double * point = &(this->p_c[test_swap.point_id * this->conf->NUM_DIM.get()]);
+    double part1 = (double)(this->n_p_p_c[test_swap.cluster_dst]) / (double)(this->n_p_p_c[test_swap.cluster_dst] + 1) * dist_squared(&(this->c_c[test_swap.cluster_dst * conf->NUM_DIM.get()]), point, conf->NUM_DIM.get());
     double part2 = 0;
     if (this->n_p_p_c[test_swap.cluster_src] > 1)
     {
-        part2 = (double)(this->n_p_p_c[test_swap.cluster_src]) / (double)(this->n_p_p_c[test_swap.cluster_src] - 1) * dist_squared(&(this->c_c[test_swap.cluster_src * M_cst(NUM_DIM)]), point, M_cst(NUM_DIM));
+        part2 = (double)(this->n_p_p_c[test_swap.cluster_src]) / (double)(this->n_p_p_c[test_swap.cluster_src] - 1) * dist_squared(&(this->c_c[test_swap.cluster_src * conf->NUM_DIM.get()]), point, conf->NUM_DIM.get());
     }
     return part1 - part2;
 }
@@ -428,25 +428,25 @@ void ClusteringContainer::print()
 {
     std::cout << "----------------------------------------" << std::endl;
     std::cout << "\tPoints: " << std::endl;
-    for (int i = 0; i < this->conf->get("NUM_POINTS", true); i++)
+    for (int i = 0; i < this->conf->NUM_POINTS.get(); i++)
     {
-        for (int j = 0; j < this->conf->get("NUM_DIM", true); j++)
+        for (int j = 0; j < this->conf->NUM_DIM.get(); j++)
         {
-            std::cout << this->p_c[i * this->conf->get("NUM_DIM", true) + j] << ",";
+            std::cout << this->p_c[i * this->conf->NUM_DIM.get() + j] << ",";
         }
         std::cout << std::endl;
     }
     std::cout << "\tCentroids: " << std::endl;
-    for (int i = 0; i < this->conf->get("NUM_CLUST", true); i++)
+    for (int i = 0; i < this->conf->NUM_CLUST.get(); i++)
     {
-        for (int j = 0; j < this->conf->get("NUM_DIM", true); j++)
+        for (int j = 0; j < this->conf->NUM_DIM.get(); j++)
         {
-            std::cout << this->c_c[i * this->conf->get("NUM_DIM", true) + j] << ",";
+            std::cout << this->c_c[i * this->conf->NUM_DIM.get() + j] << ",";
         }
         std::cout << std::endl;
     }
     std::cout << "\tAssignements: " << std::endl;
-    for (int i = 0; i < this->conf->get("NUM_POINTS", true); i++)
+    for (int i = 0; i < this->conf->NUM_POINTS.get(); i++)
     {
         std::cout << this->c_a[i] << ",";
     }
@@ -476,12 +476,8 @@ DistanceMatrix::~DistanceMatrix()
     delete[] distances;
 }
 
-double DistanceMatrix::get(const town_in_tour_id_t pt1_idx, const town_in_tour_id_t pt2_idx)
+double DistanceMatrix::get(const town_id_t pt1_idx, const town_id_t pt2_idx)
 {
-    if (pt1_idx == pt2_idx)
-    {
-        return 0;
-    }
     int id1, id2;
     if (pt2_idx == pt1_idx)
         return 0;
@@ -499,34 +495,38 @@ double DistanceMatrix::get(const town_in_tour_id_t pt1_idx, const town_in_tour_i
     id1--;
     return this->distances[id1][id2];
 }
-#define DETAILS
+//#define DETAILS
 quality_delta_t TSPContainer::test_flip(const TSPSwap & test_swap)
 {
-    const town_in_tour_id_t pi = test_swap.i,
-              pj = test_swap.j,
-              pi_1 = this->cycle_id(test_swap.i + 1),
-              pj_1 = this->cycle_id(test_swap.j + 1);
+    const town_id_t pi = this->tour.at(test_swap.i),
+              pj = this->tour.at(test_swap.j),
+              pi_1 = this->tour.at(this->cycle_id(test_swap.i + 1)),
+              pj_1 = this->tour.at(this->cycle_id(test_swap.j + 1));
 #ifdef DETAILS
-    const double new1 = this->dist->get(this->tour[pi], this->tour[pj]),
-                 new2 = this->dist->get(this->tour[pi_1], this->tour[pj_1]),
-                 past1 = this->dist->get(this->tour[pi], this->tour[pi_1]),
-                 past2 = this->dist->get(this->tour[pj], this->tour[pj_1]);
+    const double new1 = this->dist->get(pi, pj),
+                 new2 = this->dist->get(pi_1, pj_1),
+                 past1 = this->dist->get(pi, pi_1),
+                 past2 = this->dist->get(pj, pj_1);
     return new1 + new2 - past1 - past2;
 #else
     return this->dist->get(pi, pj) + this->dist->get(pi_1, pj_1) - this->dist->get(pi, pi_1) - this->dist->get(pj, pj_1);
 #endif
 }
-#define DEBUG_COST
+//#define DEBUG_COST
 void TSPContainer::flip(const TSPSwap& swap, const quality_delta_t delta)
 {
-    const int num_towns = this->conf->get("NUM_TOWNS");
+#ifdef DEBUG_COST
+    const double delta_cmpt = test_flip(swap);
+    const double past_cost = this->compute_quality_metric();
+#endif
+    const int num_towns = this->conf->NUM_TOWNS.get();
     int buffer;
-    if (swap.i >= conf->get("NUM_TOWNS") || swap.i < 0)
+    if (swap.i >= this->conf->NUM_TOWNS.get() || swap.i < 0)
     {
         std::cout << "Wrong i with :" << swap.i << std::endl;
         exit(1);
     }
-    if (swap.j >= conf->get("NUM_TOWNS") || swap.j < 0)
+    if (swap.j >= this->conf->NUM_TOWNS.get() || swap.j < 0)
     {
         std::cout << "Wrong j with :" << swap.j << std::endl;
         exit(1);
@@ -536,11 +536,11 @@ void TSPContainer::flip(const TSPSwap& swap, const quality_delta_t delta)
         std::cout << "Wrong ids with :i:" << swap.i << ";j:" << swap.j << std::endl;
         exit(1);
     }
-    const int length = swap.j > swap.i ? abs(swap.j - swap.i) : conf->get("NUM_TOWNS") - swap.i + swap.j;
+    const int length = swap.j > swap.i ? abs(swap.j - swap.i) : this->conf->NUM_TOWNS.get() - swap.i + swap.j;
     for (int l = 1; l <= length / 2; l++)
     {
-        buffer = this->tour[cycle_id((swap.i + l))];
-        this->tour[cycle_id((swap.i + l))] = this->tour[cycle_id(swap.j - l + 1)];
+        buffer = this->tour.at(cycle_id((swap.i + l)));
+        this->tour[cycle_id((swap.i + l))] = this->tour.at(cycle_id(swap.j - l + 1));
         this->tour[cycle_id(swap.j - l + 1)] = buffer;
     }
 #ifdef DEBUG_COST
@@ -559,10 +559,10 @@ void TSPContainer::flip(const TSPSwap& swap, const quality_delta_t delta)
 quality_t TSPContainer::compute_quality_metric()
 {
     double cost = 0;
-    for (town_in_tour_id_t i = 0; i < this->conf->get("NUM_TOWNS"); i++)
+    for (town_in_tour_id_t i = 0; i < this->conf->NUM_TOWNS.get(); i++)
     {
-        const town_in_tour_id_t p = this->cycle_id(i), pnext = this->cycle_id(i + 1);
-        cost += this->dist->get(this->tour[p], this->tour[pnext]);
+        const town_id_t p = this->cycle_id(i), pnext = this->cycle_id(i + 1);
+        cost += this->dist->get(this->tour.at(p), this->tour.at(pnext));
     }
     return cost;
 }
@@ -571,7 +571,7 @@ void TSPContainer::print()
 {
     std::cout << "----------------------------------------" << std::endl;
     std::cout << "\tTour: " << std::endl;
-    for (int i = 0; i < this->conf->get("NUM_TOWNS"); i++)
+    for (int i = 0; i < this->conf->NUM_TOWNS.get(); i++)
     {
         std::cout << this->tour[i] << ",";
     }

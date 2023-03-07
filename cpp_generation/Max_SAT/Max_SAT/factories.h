@@ -25,13 +25,13 @@ class MAXSATFactory : public AbstractMAXSATFactory
 {
 public:
 	MAXSATFactory(std::vector<AbstractMAXSATFactoryObserver *> obs) : AbstractMAXSATFactory(obs){};
-	void run(MAXSATConfig *conf, bool dump_mapping = false, const int min_var_per_clause = 1, const int max_var_per_clause = 25);
+	void run(MAXSATConfig *conf, bool dump_mapping = false, bool debug = false, const int min_var_per_clause = 1, const int max_var_per_clause = 25);
 };
 class CluteringFactory : public AbstractClusteringFactoryObservable
 {
 public:
 	CluteringFactory(std::vector<AbstractClusteringFactoryObserver *> obs) : AbstractClusteringFactoryObservable(obs){};
-	void run(ClusteringConfig *conf, bool dump_mapping = false);
+	void run(ClusteringConfig *conf, bool dump_mapping = false, bool debug = false);
 };
 
 class AbsstractClusteringFactory : public AbstractClusteringFactoryObservable

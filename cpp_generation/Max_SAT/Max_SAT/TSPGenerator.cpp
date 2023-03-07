@@ -1,6 +1,6 @@
 #include "TSPGenerator.h"
 
-double *open_file(std::string filename, const int instance_idx)
+double *open_file(std::string filename, const int instance_idx, TSPConfig* conf)
 {
     double *points;
     std::string dataset_name = std::to_string(instance_idx);
@@ -18,6 +18,7 @@ double *open_file(std::string filename, const int instance_idx)
         hsize_t dims[1];
         rank = dataspace.getSimpleExtentDims(dims);
         points = new double[dims[0]];
+        conf->NUM_TOWNS.set(dims[0] / conf->NUM_DIM.get());
         dataset.read(points, PredType::NATIVE_DOUBLE);
     }
     catch (FileIException error)
@@ -87,9 +88,9 @@ int *improved_tour(const int num_towns, const int seed, DistanceMatrix *distance
     }
     return tour;
 }
-int *improved_rand_tour(const int num_towns, const int seed, DistanceMatrix *distances)
+int *improved_rand_tour(const int num_towns, const int seed, DistanceMatrix *distances,const int topk)
 {
-    const int N = 4;
+    const int N = topk;
     int *tour = new int[num_towns];
     // Add a set to avoid duplicates (a points can be the nearest one for two different points)
     std::set<int> available_points;

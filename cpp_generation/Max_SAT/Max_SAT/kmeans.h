@@ -15,6 +15,7 @@
 #include "utils.h"
 
 void kmeansPlusPlus(ClusteringContainer *clustering, ClusteringConfig *config);
+void kmeansPlusPlusSuperGlutton(ClusteringContainer *clustering, ClusteringConfig *config);
 void compKmeansCentroids(ClusteringContainer *clustering, ClusteringConfig *config);
 bool affectToNearestCluster(ClusteringContainer *clustering, ClusteringConfig *config);
 #endif

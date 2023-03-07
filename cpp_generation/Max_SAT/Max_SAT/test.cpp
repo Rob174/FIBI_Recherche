@@ -60,15 +60,16 @@ void test_clustering()
 		M_insert(SEED_GLOB, 0);
 		M_insert(SEED_ASSIGN, 0);
 		M_insert(SEED_PROBLEM, 0);
-		ClusteringConfig *conf = new ClusteringConfig(args);
-		conf->update_keys(std::map<std::string, int>{{"NUM_POINTS", 4}, {"NUM_DIM", 2}, {"NUM_CLUST", 2}});
+		ClusteringConfig *conf = new ClusteringConfig(*args);
+		conf->NUM_POINTS.set(4);
+		conf->NUM_CLUST.set(2);
+		conf->NUM_DIM.set(2);
 		double *p = test_points();
 		int *c = test_clusters();
 		ClusteringContainer *cont = new ClusteringContainer(
 			p,
 			c,
 			conf);
-		conf->check_and_fill_keys_after_load_instance();
 		cont->on_improvement_done();
 		Metrics *metrics = new Metrics();
 		ClusteringResult *res = new ClusteringResult(conf, metrics);
@@ -77,7 +78,7 @@ void test_clustering()
 		ClusteringLogger logger(&storage);
 		observers.push_back(&logger);
 		ClusteringAlgorithm *alg = new ClusteringAlgorithm(observers);
-		alg->run(cont, conf, conf->get("FI_BI"));
+		alg->run(cont, conf, conf->FI_BI.get());
 		cost_found.push_back(metrics->final_cost);
 		delete alg;
 		delete metrics;
@@ -107,24 +108,25 @@ void test_clustering_50points()
 			M_insert(SEED_GLOB, 0);
 			M_insert(SEED_ASSIGN, 0);
 			M_insert(SEED_PROBLEM, 0);
-			ClusteringConfig *conf = new ClusteringConfig(args);
-			conf->update_keys(std::map<std::string, int>{{"NUM_POINTS", 50}, {"NUM_DIM", 2}, {"NUM_CLUST", 4}});
+			ClusteringConfig *conf = new ClusteringConfig(*args);
+			conf->NUM_POINTS.set(50);
+			conf->NUM_CLUST.set(4);
+			conf->NUM_DIM.set(2);
 			ClusteringContainer *cont;
 			/* Uniformly distrbuted points */
 			cont = new ClusteringContainer(
-			uniform_points(M_cst_frc(NUM_POINTS),
-						   M_cst_frc(NUM_DIM),
-						   M_cst_frc(SEED_PROBLEM)),
+			uniform_points(conf->NUM_POINTS.get(),
+						   conf->NUM_DIM.get(),
+						   conf->SEED_PROBLEM.get()),
 			random_clust(conf), conf);
-			if (M_cst_frc(IMPR) == 1)
+			if (conf->IMPR.get() == 1)
 			{
 				kmeansPlusPlus(cont, conf);
 			}
-			else if (M_cst_frc(IMPR) > 1)
+			else if (conf->IMPR.get() > 1)
 			{
 				THROW_EXC1("Invalid IMPR argument, Valid values are 0->1", 11);
 			}
-			conf->check_and_fill_keys_after_load_instance();
 			cont->on_improvement_done();
 			Metrics *metrics = new Metrics();
 			ClusteringResult *res = new ClusteringResult(conf, metrics);
@@ -134,7 +136,7 @@ void test_clustering_50points()
 			ClusteringLogger logger(&storage);
 			observers.push_back(&logger);
 			ClusteringAlgorithm *alg = new ClusteringAlgorithm(observers);
-			alg->run(cont,conf,conf->get("FI_BI"));
+			alg->run(cont,conf,conf->FI_BI.get());
 			// cleaning
 			delete alg;
 			delete metrics;
@@ -156,11 +158,10 @@ void test_tsp()
 	M_insert(SEED_GLOB, 0);
 	M_insert(SEED_ASSIGN, 0);
 	M_insert(SEED_PROBLEM, 0);
-	TSPConfig *conf = new TSPConfig(args);
+	TSPConfig *conf = new TSPConfig(*args);
 	const double *p = test_towns();
 	int *c = test_tour();
-	DistanceMatrix m(conf->get("NUM_TOWNS", true), conf->get("NUM_DIM", true), p);
-	conf->check_and_fill_keys_after_load_instance();
+	DistanceMatrix m(conf->NUM_TOWNS.get(), conf->NUM_DIM.get(), p);
 	TSPContainer *cont = new TSPContainer(
 		c, &m, conf);
 	cont->on_improvement_done();
@@ -173,7 +174,7 @@ void test_tsp()
 	observers.push_back(&logger);
 
 	TSPAlgorithm *alg = new TSPAlgorithm(observers, 20);
-	alg->run(cont, conf, conf->get("FI_BI"));
+	alg->run(cont, conf, conf->FI_BI.get());
 	storage.save_json("test_tsp.json");
 	delete alg;
 	delete metrics;
@@ -192,13 +193,12 @@ void test_tsp_50towns_rand()
 	M_insert(SEED_GLOB, 0);
 	M_insert(SEED_ASSIGN, 0);
 	M_insert(SEED_PROBLEM, 0);
-	TSPConfig *conf = new TSPConfig(args);
-	const double *p = uniform_points(M_cst_frc(NUM_TOWNS),
-									 M_cst_frc(NUM_DIM),
-									 M_cst_frc(SEED_PROBLEM));
-	int *c = random_tour(M_cst_frc(NUM_TOWNS), M_cst_frc(NUM_DIM));
-	DistanceMatrix m(conf->get("NUM_TOWNS", true), conf->get("NUM_DIM", true), p);
-	conf->check_and_fill_keys_after_load_instance();
+	TSPConfig *conf = new TSPConfig(*args);
+	const double *p = uniform_points(conf->NUM_TOWNS.get(),
+									 conf->NUM_DIM.get(),
+									 conf->SEED_PROBLEM.get());
+	int *c = random_tour(conf->NUM_TOWNS.get(), conf->NUM_DIM.get());
+	DistanceMatrix m(conf->NUM_TOWNS.get(), conf->NUM_DIM.get(), p);
 	TSPContainer *cont = new TSPContainer(
 		c, &m, conf);
 	cont->on_improvement_done();
@@ -211,7 +211,7 @@ void test_tsp_50towns_rand()
 	observers.push_back(&logger);
 
 	TSPAlgorithm *alg = new TSPAlgorithm(observers, 100);
-	alg->run(cont, conf, conf->get("FI_BI"));
+	alg->run(cont, conf, conf->FI_BI.get());
 	storage.save_json("test_tsp_50towns_rand.json");
 	delete alg;
 	delete metrics;
@@ -230,13 +230,12 @@ void test_tsp_50towns_impr()
 	M_insert(SEED_GLOB, 0);
 	M_insert(SEED_ASSIGN, 0);
 	M_insert(SEED_PROBLEM, 0);
-	TSPConfig *conf = new TSPConfig(args);
-	const double *p = uniform_points(M_cst_frc(NUM_TOWNS),
-									 M_cst_frc(NUM_DIM),
-									 M_cst_frc(SEED_PROBLEM));
-	DistanceMatrix m(conf->get("NUM_TOWNS", true), conf->get("NUM_DIM", true), p);
-	int *c = improved_tour(M_cst_frc(NUM_TOWNS), M_cst_frc(NUM_DIM), &m);
-	conf->check_and_fill_keys_after_load_instance();
+	TSPConfig *conf = new TSPConfig(*args);
+	const double *p = uniform_points(conf->NUM_TOWNS.get(),
+									 conf->NUM_DIM.get(),
+									 conf->SEED_PROBLEM.get());
+	DistanceMatrix m(conf->NUM_TOWNS.get(), conf->NUM_DIM.get(), p);
+	int *c = improved_tour(conf->NUM_TOWNS.get(), conf->NUM_DIM.get(), &m);
 	TSPContainer *cont = new TSPContainer(
 		c, &m, conf);
 	cont->on_improvement_done();
@@ -249,7 +248,7 @@ void test_tsp_50towns_impr()
 	observers.push_back(&logger);
 
 	TSPAlgorithm *alg = new TSPAlgorithm(observers, 100);
-	alg->run(cont, conf, conf->get("FI_BI"));
+	alg->run(cont, conf, conf->FI_BI.get());
 	delete alg;
 	delete metrics;
 	delete res;
@@ -268,25 +267,24 @@ void test_maxsat_50clauses_50vars(){
 	M_insert(SEED_GLOB, 0);
 	M_insert(SEED_ASSIGN, 0);
 	M_insert(SEED_PROBLEM, 0);
-	MAXSATConfig *conf = new MAXSATConfig(args);
+	MAXSATConfig *conf = new MAXSATConfig(*args);
 	MAXSATContainer *cont;
 	const int min_num_var_per_clause = 1;
 	const int max_num_var_per_clause = 25;
 	std::pair<std::vector<clause_t> *, double *> clauses = generate_random_clauses(
-		M_cst_frc(NUM_VARIABLES),
-		M_cst_frc(NUM_CLAUSES),
-		M_cst_frc(SEED_PROBLEM),
+		conf->NUM_VARIABLES.get(),
+		conf->NUM_CLAUSES.get(),
+		conf->SEED_PROBLEM.get(),
 		min_num_var_per_clause, max_num_var_per_clause);
-	bool *init_assign = generate_random_var_assign(M_cst_frc(NUM_VARIABLES), M_cst_frc(SEED_ASSIGN));
-	cont = new MAXSATContainer(clauses.second, M_cst_frc(NUM_VARIABLES), init_assign, *clauses.first, conf);
+	bool *init_assign = generate_random_var_assign(conf->NUM_VARIABLES.get(), conf->SEED_ASSIGN.get());
+	cont = new MAXSATContainer(clauses.second, conf->NUM_VARIABLES.get(), init_assign, *clauses.first, conf);
 	delete[] init_assign;
 	delete[] clauses.second;
 	delete clauses.first;
-	if (M_cst_frc(IMPR) == 1)
+	if (conf->IMPR.get() == 1)
 	{
-		improve(cont, M_cst_frc(SEED_ASSIGN));
+		improve(cont, conf->SEED_ASSIGN.get());
 	}
-	conf->check_and_fill_keys_after_load_instance();
 	cont->on_improvement_done();
 	Metrics *metrics = new Metrics();
 	MAXSATResult *res = new MAXSATResult(conf, metrics);
@@ -294,10 +292,10 @@ void test_maxsat_50clauses_50vars(){
 	std::vector<AlgorithmObserver<MAXSATContainer,MAXSATSwap> *> observers;
 	observers.push_back(res);
 	JSONStorage storage;
-	MAXSATLogger logger(&storage);
+	MAXSATLogger logger(&storage, true);
 	observers.push_back(&logger);
 	MAXSATAlgorithm *alg = new MAXSATAlgorithm(observers);
-	alg->run(cont, conf, (bool)M_cst(FI_BI));
+	alg->run(cont, conf, (bool)conf->FI_BI.get());
 	delete alg;
 	delete metrics;
 	delete res;

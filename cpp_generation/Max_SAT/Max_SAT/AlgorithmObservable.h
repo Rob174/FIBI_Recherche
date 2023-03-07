@@ -22,11 +22,11 @@ public:
 			o->on_start(container);
 		}
 	};
-	void on_glob_iter_end(T_Container *container)
+	void on_glob_iter_end(T_Container *container, quality_delta_t delta, const T_Swap& s)
 	{
 		for (T_Observer*o : this->obs)
 		{
-			o->on_glob_iter_end(container);
+			o->on_glob_iter_end(container, delta, s);
 		}
 	};
 	void on_iter_end(T_Container *container, const T_Swap& s)
