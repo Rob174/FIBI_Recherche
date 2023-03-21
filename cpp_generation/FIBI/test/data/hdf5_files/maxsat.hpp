@@ -33,7 +33,7 @@ void test_maxsat_benchmark() {
 		MAXSATConfig c(m);
 
 		// Get the data
-		const vector<double> *data = open_maxsat_benchmark(instance, path_hdf5, &c);
+		unique_ptr<const vector<double>> data(open_maxsat_benchmark(instance, path_hdf5, &c));
 		auto [clauses, weights, n_vars] = parse_maxsat(*data);
 
 		// Check number of clauses
@@ -49,5 +49,4 @@ void test_maxsat_benchmark() {
 			throw runtime_error("Number of weights does not match for instance " + to_string(instance) + " with expected " + to_string(num_weights) + " but seen " + to_string(weights.size()));
 		}
 	}
-
 }

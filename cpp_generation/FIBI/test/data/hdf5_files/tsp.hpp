@@ -15,7 +15,7 @@ void test_tsplib() {
 	// Check if opening the file was successful
 	if (!json_file.is_open()) {
 		string abs_path_json = filesystem::absolute(path_json).string();
-		throw runtime_error("Could not open the json file at path " + path_json + " with current folder dir " + filesystem::current_path().string() + " = "+ abs_path_json);
+		throw runtime_error("Could not open the json file at path " + path_json + " with current folder dir " + filesystem::current_path().string() + " = " + abs_path_json);
 	}
 	string content((istreambuf_iterator<char>(json_file)), istreambuf_iterator<char>());
 	json_file.close();
@@ -33,12 +33,11 @@ void test_tsplib() {
 		TSPConfig c(m);
 
 		// Get the data
-		const vector<double> *data = open_tsplib(instance, path_hdf5, &c);
+		unique_ptr<const vector<double>> data(open_tsplib(instance, path_hdf5, &c));
 
 		// Check that the number of points is correct
-		if (data->size() != exp_n_points*2) {
-			throw runtime_error("The number of points is not correct: expected " + to_string(exp_n_points*2) + " elements but got " + to_string(data->size()));
+		if (data->size() != exp_n_points * 2) {
+			throw runtime_error("The number of points is not correct: expected " + to_string(exp_n_points * 2) + " elements but got " + to_string(data->size()));
 		}
 	}
-
 }

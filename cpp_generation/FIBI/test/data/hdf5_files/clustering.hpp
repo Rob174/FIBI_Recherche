@@ -33,7 +33,7 @@ void test_clustering_aloise() {
 		ClusteringConfig c(m);
 
 		// Get the data
-		const vector<double> *data = open_clustering(instance, path_hdf5, &c, false);
+		unique_ptr<const vector<double>> data(open_clustering(instance, path_hdf5, &c, false));
 
 		// Check that the number of dimensions is correct
 		if (c.NUM_DIM.get() != num_dims) {
@@ -82,7 +82,7 @@ void test_clustering_franti() {
 		ClusteringConfig c(m);
 
 		// Get the data
-		const vector<double> *data = open_clustering(instance, path_hdf5, &c, true);
+		const vector<double>* data = open_clustering(instance, path_hdf5, &c, true);
 
 		// Check that the number of dimensions is correct
 		if (c.NUM_DIM.get() != num_dims) {
@@ -106,5 +106,4 @@ void test_clustering_franti() {
 			throw runtime_error("The number of data is not correct: expected " + to_string(num_points * num_dims) + " elements but got " + to_string(data->size()));
 		}
 	}
-
 }
