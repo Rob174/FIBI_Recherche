@@ -15,4 +15,17 @@ public:
 		dict["var_id"] = var_id;
 		return dict;
 	};
+	bool operator==(const MAXSATSwap& other) const
+	{
+		return var_id == other.var_id;
+	};
+	bool operator!=(const MAXSATSwap& other) const
+	{
+		return !(*this == other);
+	};
+	// Overload the string operator
+	string str() const
+	{
+		return "MAXSATSwap(var:" + to_string(var_id) + ")";
+	};
 };

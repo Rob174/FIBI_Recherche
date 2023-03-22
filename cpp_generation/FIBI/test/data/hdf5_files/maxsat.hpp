@@ -34,19 +34,20 @@ void test_maxsat_benchmark() {
 
 		// Get the data
 		unique_ptr<const vector<double>> data(open_maxsat_benchmark(instance, path_hdf5, &c));
-		auto [clauses, weights, n_vars] = parse_maxsat(*data);
-
+		auto [clauses_ptr, weights_ptr, n_vars] = parse_maxsat(*data);
+		unique_ptr<vector<clause_t>> clauses(clauses_ptr);
+		unique_ptr<vector<double>> weights(weights_ptr);
 		// Check number of clauses
-		if (num_clauses != clauses.size()) {
-			throw runtime_error("Number of clauses does not match for instance " + to_string(instance) + " with expected " + to_string(num_clauses) + " but seen " + to_string(clauses.size()));
+		if (num_clauses != clauses->size()) {
+			throw runtime_error("Number of clauses does not match for instance " + to_string(instance) + " with expected " + to_string(num_clauses) + " but seen " + to_string(clauses->size()));
 		}
 		// check number of variables
 		if (num_vars != n_vars) {
 			throw runtime_error("Number of variables does not match for instance " + to_string(instance) + " with expected " + to_string(num_vars) + " but seen " + to_string(n_vars));
 		}
 		// check number of weights
-		if (num_weights != weights.size()) {
-			throw runtime_error("Number of weights does not match for instance " + to_string(instance) + " with expected " + to_string(num_weights) + " but seen " + to_string(weights.size()));
+		if (num_weights != weights->size()) {
+			throw runtime_error("Number of weights does not match for instance " + to_string(instance) + " with expected " + to_string(num_weights) + " but seen " + to_string(weights->size()));
 		}
 	}
 }

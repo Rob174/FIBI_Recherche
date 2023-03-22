@@ -17,6 +17,11 @@
 #include "./data/solution_container/clustering.hpp"
 #include "./data/solution_container/maxsat.hpp"
 #include "./algorithms/localSearch/tsp.hpp"
+#include "./algorithms/localSearch/clustering.hpp"
+#include "./algorithms/localSearch/maxsat.hpp"
+#include "./factories/tsp.hpp"
+#include "./factories/clustering.hpp"
+#include "./factories/maxsat.hpp"
 
 using namespace std;
 #define TEST_MACRO(name) \
@@ -29,7 +34,6 @@ void run_tests()
 {
 	vector<void (*)()> functions_to_run;
 	vector<string> functions_names;
-
 	/*
 	REGISTER(test_uniform_points);
 	REGISTER(test_uniform_points_repetability);
@@ -61,8 +65,23 @@ void run_tests()
 	REGISTER(test_ClusteringSolutionContainer_compute_quality_metric_2);
 	REGISTER(test_MAXSATSolutionContainer_compute_quality_metric);
 	REGISTER(test_MAXSATSolutionContainer_test_flip);
+
+	REGISTER(test_LocalSearch_TSP_flips_explored);
+	REGISTER(test_LocalSearch_TSP_flips_explored_detail_BI);
+	REGISTER(test_LocalSearch_TSP_flips_explored_detail_FI);
+	REGISTER(test_LocalSearch_Clust_flips_explored);
+	REGISTER(test_LocalSearch_Clust_flips_explored_detail_BI);
+	REGISTER(test_LocalSearch_Clust_flips_explored_detail_FI);
+
+	REGISTER(test_LocalSearch_MAXSAT_flips_explored);
+	REGISTER(test_LocalSearch_MAXSAT_flips_explored_detail_BI);
+	REGISTER(test_LocalSearch_MAXSAT_flips_explored_detail_FI);
 	*/
-	REGISTER(test_LocalSearch_flips_explored);
+	/*
+	REGISTER(test_TSPFactory);
+	REGISTER(test_ClusteringFactory);
+	*/
+	REGISTER(test_MAXSATFactory);
 #define DEBUG
 	for (int i = 0; i < functions_names.size(); i++)
 	{

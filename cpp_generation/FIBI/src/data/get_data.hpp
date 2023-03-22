@@ -9,6 +9,7 @@
 #include <random>
 #include <cmath>
 #include <numeric>
+#include <algorithm>
 #include "./open_hdf5.hpp"
 #include "../types.h"
 #include "../utils.h"
@@ -69,6 +70,18 @@ const vector<double>* normal_points(const unsigned long num_points, const unsign
 	normal_distribution<> dis(minV, maxV);
 	return fill_vector_with<double>(dis, num_points * num_dims, seed);
 }
+/** @brief Generate a permutation of the numbers 0 to num_towns - 1
+* @param num_towns Number of towns
+* @seed Seed for the random number generator
+*/
+vector<int>* random_tour(const unsigned long num_towns, const unsigned int seed)
+{
+	// Make a vector of all towns and shuffle it
+	vector<int>* tour = new vector<int>(num_towns);
+	iota(tour->begin(), tour->end(), 0);
+	shuffle(tour->begin(), tour->end(), mt19937(seed));
+	return tour;
+}
 /** @brief Generate a vector of random clusters
 * * @param num_clust Number of clusters possible
 * * @param num_points Number of points to assign a clusters
@@ -80,9 +93,19 @@ vector<int>* random_clust(const unsigned long num_clust, const unsigned long num
 	uniform_int_distribution<> distr(0, num_clust - 1);
 	return fill_vector_with<int>(distr, num_points, seed);
 }
+/** @brief Generate a vector of random weights
+* * @param num_clauses Number of clauses to assign a weight to
+* * @param seed Seed for the random number generator
+* * @return vector of random weights in the range [0, 1000]
+*/
+vector<double>* random_weights(const unsigned long num_clauses, const unsigned int seed)
+{
+	uniform_real_distribution<> distr(0, 1000);
+	return fill_vector_with<double>(distr, num_clauses, seed);
+}
 
-/** @brief Generate a vector of random clusters
- * * @param num_clust Number of clusters possible
+/** @brief Generate a vector of random variables
+ * * @param num_variables Number of variables to assign a value to
  */
 vector<bool>* random_assignements(const unsigned long num_variables, const unsigned int seed) {
 	uniform_int_distribution<> distr(0, 1);
@@ -166,7 +189,7 @@ vector<clause_t>* random_clauses(
 * * @param load_num_clust If true, it will load the number of clusters
 * * @return const vector<double>* Vector of points
 * */
-const vector<double>* open_clustering(const int instance, string filename, ClusteringConfig* conf, bool load_num_clust)
+const vector<double>* open_clustering(const int instance, string filename, ClusteringConfig* conf, bool load_num_clust = false)
 {
 
 	auto process_file = [conf, load_num_clust, instance](H5File& f) -> vector<double>*
@@ -227,15 +250,36 @@ const vector<double>* open_maxsat_benchmark(const int instance, string filename,
 		filename,
 		process_file);
 }
+/** @brief Compute for each variables in which clauses it appears
+* * @param clauses List of clauses
+* * @return map<const var_id_t, vector<clause_id_t>>* Map of variables to clauses where it appears
+* */
+map<const var_id_t, vector<clause_id_t>>* get_var_to_clauses(const vector<clause_t>& clauses)
+{
+	map<const var_id_t, vector<clause_id_t>>* var_to_clauses = new map<const var_id_t, vector<clause_id_t>>();
+	for (int i = 0; i < clauses.size(); i++)
+	{
+		for (int j = 0; j < clauses[i].size(); j++)
+		{
+			var_id_t var = clauses[i][j].first;
+			if (var_to_clauses->count(var) == 0)
+			{
+				(*var_to_clauses)[var] = vector<clause_id_t>();
+			}
+			(*var_to_clauses)[var].push_back(i);
+		}
+	}
+	return var_to_clauses;
+}
 /** @brief Parse data from the maxsat benchmark hdf5 files into clauses, weights and compute the number of variables (with the observed variables in clauses)
 * * @param data Data from the hdf5 file
 * * @return tuple<vector<clause_t>, vector<weight_t>, n_vars_t> Clauses, weights and number of variables
 */
-tuple<vector<clause_t>, vector<weight_t>, n_vars_t> parse_maxsat(const vector<double>& data)
+tuple<vector<clause_t>*, vector<weight_t>*, n_vars_t> parse_maxsat(const vector<double>& data)
 {
 	// parse data
-	vector<double> weights;
-	vector<clause_t> clauses;
+	vector<double>* weights = new vector<double>();
+	vector<clause_t>* clauses = new vector<clause_t>();
 	int i_clause = 0;
 	int clause_size = 0; // to avoid 0%0 error
 
@@ -248,19 +292,19 @@ tuple<vector<clause_t>, vector<weight_t>, n_vars_t> parse_maxsat(const vector<do
 		{
 			taille = data.at(i);
 			skipNext = true;
-			clauses.push_back(clause_t());
+			clauses->push_back(clause_t());
 		}
 		else if (skipNext)
 		{
 			taille--;
 			skipNext = false;
-			weights.push_back(data.at(i));
+			weights->push_back(data.at(i));
 		}
 		else
 		{
 			const int variable = (int)abs(data.at(i)) - 1;
 			variables.insert(variable);
-			clauses.at(clauses.size() - 1).push_back(make_pair(variable, sgn<double>(data.at(i)) == 1));
+			clauses->at(clauses->size() - 1).push_back(make_pair(variable, sgn<double>(data.at(i)) == 1));
 			taille--;
 		}
 	}

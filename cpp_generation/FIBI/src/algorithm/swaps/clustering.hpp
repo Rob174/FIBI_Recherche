@@ -19,4 +19,16 @@ public:
 		dict["cluster_dst"] = cluster_dst;
 		return dict;
 	};
+	bool operator==(const ClusteringSwap& other) const {
+		return this->point_id == other.point_id && this->cluster_src == other.cluster_src && this->cluster_dst == other.cluster_dst;
+	};
+	bool operator!=(const ClusteringSwap& other) const
+	{
+		return !(*this == other);
+	};
+	// Overload the string operator
+	string str() const
+	{
+		return "ClusteringSwap(point:" + to_string(point_id) + ", src:" + to_string(cluster_src) + ", dst:" + to_string(cluster_dst) + ")";
+	};
 };

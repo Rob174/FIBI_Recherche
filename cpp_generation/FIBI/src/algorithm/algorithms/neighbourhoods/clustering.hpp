@@ -1,17 +1,38 @@
-#pragma once
+﻿#pragma once
 
 #include <cmath>
 #include "abstract.hpp"
 #include "../../../data/solution_container/clustering.hpp"
 #include "../../../data/constants/clustering.hpp"
 
-template <bool FI = false, const double EPSILON = 1e-5>
+template <const double EPSILON = 1e-5>
 class ClusteringNeighbourhoodExplorer
 {
 private:
 	AlgorithmObservable<ClusteringSwap, ClusteringSolutionContainer<>>* o;
+	bool FI;
 public:
-	ClusteringNeighbourhoodExplorer(AlgorithmObservable<ClusteringSwap, ClusteringSolutionContainer<>>* o) : o(o) {};
+	ClusteringNeighbourhoodExplorer(AlgorithmObservable<ClusteringSwap, ClusteringSolutionContainer<>>* o, bool FI = false) : o(o), FI(FI) {};
+	/** @brief Explore all possible flips and choose the best one
+	(first clustering with improving cost if @tparam FI = true, best solution otherwise).
+	Explores for each point, each possibility of destination cluster}
+	* * Note: the destination cluster must be different from the origin cluster (explains the k-1)
+	* * Expecting number of moves with n point and k clusters
+	*
+		   n
+		______
+		╲
+		 ╲     ⎛    k         ⎞
+		  ╲    ⎜   ___        ⎟
+		   ╲   ⎜   ╲          ⎟
+		   ╱   ⎜   ╱     1 - 1⎟ = (k - 1) ⋅ n
+		  ╱    ⎜   ‾‾‾        ⎟
+		 ╱     ⎜c    = 1      ⎟
+		╱      ⎝ dst          ⎠
+		‾‾‾‾‾‾
+		 p = 1
+
+	*/
 	bool explore_flips(ClusteringSolutionContainer<>& co, const ClusteringConfig& cf) const
 	{
 		double delta = 0;
@@ -24,12 +45,13 @@ public:
 				const cluster_id_t to_clust_id = i % cf.NUM_CLUST.get();
 				ClusteringSwap tmp_swap(point_moving_id, from_cluster_id, to_clust_id);
 				double delta_ij = co.test_flip(tmp_swap);
+				o->on_test_end(co, delta_ij, tmp_swap);
 				if (delta_ij < -EPSILON && delta_ij < delta)
 				{
 					delta = delta_ij;
 					chosen_swap = tmp_swap;
 					o->on_glob_iter_end(co, delta, tmp_swap);
-					if constexpr (FI)
+					if (FI)
 					{
 						co.flip(chosen_swap, delta);
 						o->on_iter_end(co, chosen_swap);

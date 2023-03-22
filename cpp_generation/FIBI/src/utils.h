@@ -5,6 +5,9 @@
 #include <vector>
 #include <math.h>
 #include <sstream>
+#include <fstream>
+#include "../libs/json.hpp"
+#include "algorithm/stats/metrics.hpp"
 
 
 template <typename T>
@@ -58,17 +61,22 @@ int sgn(T val)
 {
 	return (T(0) < val) - (val < T(0));
 }
-template <typename T>
+template <typename T_data = double, typename T_cont = const std::vector<double>&, bool safeAccess = false>
 class Slice {
 private:
-	const T* data;
+	const T_cont data;
 	const unsigned int offset;
 public:
-	Slice(const T* data, const unsigned int offet) : offset(offset) {
-		this->data = data;
+	Slice(const T_cont data, const unsigned int offset) : offset(offset), data(data) {
 	}
-	T operator[](const unsigned int index) const {
-		return data[offset + index];
+	T_data operator[](const unsigned int index) const {
+		if constexpr (safeAccess) {
+			return data.at(offset + index);
+		}
+		else
+		{
+			return data[offset + index];
+		}
 	}
 };
 template <typename T>
@@ -116,4 +124,29 @@ T between(T start, T end, T value) {
 	else {
 		return value;
 	}
+}
+using namespace std;
+using json = nlohmann::json;
+template <typename T_Config, typename T_Swap, typename T_Container>
+void save_mapping(const Metrics < T_Swap, T_Container>* m, const AbstractConfig* c, const string filename = "mapping.json") {
+
+	int i = 0;
+	json mapping = vector<pair<string, double>>{};
+	for (pair<string, double> p : m->get_data()) {
+		const auto k = p.first;
+		mapping.push_back({ {"index", i}, {"name", k} });
+		i++;
+	}
+	for (pair<string, double> p : c->get_json()) {
+		const auto k = p.first;
+		mapping.push_back({ {"index", i}, {"name", k} });
+		i++;
+	}
+	std::ofstream o(filename);
+	if (!o)
+	{
+		throw std::runtime_error("Could not open file " + filename);
+	}
+	o << mapping.dump() << std::endl;
+	o.close();
 }
