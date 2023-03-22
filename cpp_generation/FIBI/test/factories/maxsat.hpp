@@ -5,7 +5,7 @@
 #include "../../src/data/constants/maxsat.hpp"
 using namespace std;
 void test_MAXSATFactory() {
-	string root_data = "../../../data/";
+	const string root_data = "../../../data/folder/";
 	int i = 0;
 	for (int dataset = 0; dataset < 2; dataset++) {
 		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {

@@ -16,6 +16,7 @@ public:
 	{
 		// setup
 		const vector<double>* towns_pos_ptr;
+		string dataset_name;
 		switch (cf.DATASET.get())
 		{
 		case 0:
@@ -25,7 +26,13 @@ public:
 				cf.SEED_PROBLEM.get());
 			break;
 		case 1:
-			towns_pos_ptr = open_tsplib(cf.SEED_PROBLEM.get(), root_data + "tsplib.hdf5", &cf);
+
+#if HDF5save
+			dataset_name = "tsplib.hdf5";
+#else
+			dataset_name = "tsplib/";
+#endif
+			towns_pos_ptr = open_tsplib(cf.SEED_PROBLEM.get(), root_data + dataset_name, &cf);
 			break;
 		case 2:
 			towns_pos_ptr = normal_points(cf.NUM_TOWNS.get(),

@@ -16,6 +16,7 @@ public:
 	{
 		// setup
 		const vector<double>* points_pos_ptr;
+		string dataset_name;
 		switch (cf.DATASET.get())
 		{
 		case 0:
@@ -25,10 +26,21 @@ public:
 				cf.SEED_PROBLEM.get());
 			break;
 		case 1:
-			points_pos_ptr = open_clustering(cf.SEED_PROBLEM.get(), root_data + "franti_benchmark.hdf5", &cf, true);
+
+#if HDF5save
+			dataset_name = "franti_benchmark.hdf5";
+#else
+			dataset_name = "franti_benchmark/";
+#endif
+			points_pos_ptr = open_clustering(cf.SEED_PROBLEM.get(), root_data + dataset_name, &cf, true);
 			break;
 		case 2:
-			points_pos_ptr = open_clustering(cf.SEED_PROBLEM.get(), root_data + "aloise_benchmark.hdf5", &cf, false);
+#if HDF5save
+			dataset_name = "aloise_benchmark.hdf5";
+#else
+			dataset_name = "aloise_benchmark/";
+#endif
+			points_pos_ptr = open_clustering(cf.SEED_PROBLEM.get(), root_data + dataset_name, &cf, false);
 			break;
 		case 3:
 			points_pos_ptr = normal_points(cf.NUM_POINTS.get(),

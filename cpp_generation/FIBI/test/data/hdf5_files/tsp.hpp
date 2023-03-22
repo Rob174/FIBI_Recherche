@@ -7,7 +7,7 @@
 using namespace std;
 using json = nlohmann::json;
 void test_tsplib() {
-	const string path_hdf5 = "../../../data/tsplib.hdf5";
+	const string path_hdf5 = "../../../data/folder/tsplib";
 	const string path_json = "../../../data/tsplib.json";
 
 	// Read the json file

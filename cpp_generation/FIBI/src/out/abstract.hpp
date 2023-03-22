@@ -3,12 +3,16 @@
 #include <string>
 #include <filesystem>
 #include <exception>
-#include "H5Cpp.h"
 #include <cstdio>
-#include <mutex>
+#include <fstream>
 
 
 using namespace std;
+
+#ifdef HDF5save
+
+
+#include "H5Cpp.h"
 using namespace H5;
 
 /** @brief Remove the dataset file
@@ -25,14 +29,12 @@ void clean_dataset(string filename = "dataset.hdf5") {
 * */
 template <bool debug = false>
 void save_metadata(const unsigned long seed_glob, const vector < pair<string, double>>& values, string filename = "dataset.hdf5") {
-	static mutex my_mutex;
 	// Save current absolute path
 	string current_path = filesystem::current_path().string();
 	if constexpr (debug) {
 		// print current folder
 		cout << "Current folder: " << current_path << endl;
 	}
-	lock_guard<mutex> my_lock(my_mutex);
 	Exception::dontPrint();
 	try
 	{
@@ -94,3 +96,46 @@ void save_metadata(const unsigned long seed_glob, const vector < pair<string, do
 		throw runtime_error("Error writing dataset: " + string(exc.what()));
 	}
 }
+#else
+
+/** @brief Remove the dataset folder
+* */
+void clean_dataset(string foldername = "dataset/") {
+	// Remove the folder and all its content
+	filesystem::remove_all(foldername);
+}
+/** @brief Save the metadata of the algorithm
+* * @param seed_glob The seed of the algorithm
+* * @param values The values to save
+* * @param filename The name of the file to save the data
+* * @tparam debug If true, print debug information (current folder)
+* * @return void
+* */
+template <bool debug = false>
+void save_metadata(const unsigned long seed_glob, const vector < pair<string, double>>& values, string foldername = "dataset/") {
+	// Save current absolute path
+	string current_path = filesystem::current_path().string();
+	if constexpr (debug) {
+		// print current folder
+		cout << "Current folder: " << current_path << endl;
+	}
+	// filename is foldername + seed_glob converted to string
+	string filename = foldername + to_string(seed_glob) + ".json";
+	// Create the folder if it does not exist
+	if (!filesystem::exists(foldername)) {
+		filesystem::create_directory(foldername);
+	}
+	// Create the file and dump the values in the json format
+	ofstream file(filename);
+	file << "{";
+	for (size_t i = 0; i < values.size(); i++) {
+		file << "\"" << values.at(i).first << "\": " << values.at(i).second;
+		if (i != values.size() - 1) {
+			file << ", ";
+		}
+	}
+	file << "}";
+	file.close();
+}
+
+#endif // HDF5save

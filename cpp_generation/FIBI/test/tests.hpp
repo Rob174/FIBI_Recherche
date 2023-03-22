@@ -77,13 +77,16 @@ void run_tests()
 	REGISTER(test_LocalSearch_MAXSAT_flips_explored);
 	REGISTER(test_LocalSearch_MAXSAT_flips_explored_detail_BI);
 	REGISTER(test_LocalSearch_MAXSAT_flips_explored_detail_FI);
-	*/
-	/*
+
 	REGISTER(test_TSPFactory);
 	REGISTER(test_ClusteringFactory);
 	REGISTER(test_MAXSATFactory);
-	*/
+
 	REGISTER(test_thread_pool);
+	REGISTER(test_thread_pool_hdf5_read);
+	REGISTER(test_thread_pool_hdf5_write);
+	*/
+	REGISTER(test_thread_pool_TSPFactory);
 #define DEBUG
 	for (int i = 0; i < functions_names.size(); i++)
 	{

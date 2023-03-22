@@ -5,7 +5,7 @@
 #include "../../src/data/constants/tsp.hpp"
 using namespace std;
 void test_TSPFactory() {
-	string root_data = "../../../data/";
+	string root_data = "../../../data/folder/";
 	TSPFactory f;
 	int i = 0;
 	for (int dataset = 0; dataset < 3; dataset++) {

@@ -7,7 +7,7 @@
 
 
 void test_maxsat_benchmark() {
-	const string path_hdf5 = "../../../data/maxsat_benchmark.hdf5";
+	const string path_hdf5 = "../../../data/folder/maxsat_benchmark/";
 	const string path_json = "../../../data/maxsat_benchmark.json";
 
 	// Read the json file
@@ -33,7 +33,7 @@ void test_maxsat_benchmark() {
 		MAXSATConfig c(m);
 
 		// Get the data
-		unique_ptr<const vector<double>> data(open_maxsat_benchmark(instance, path_hdf5, &c));
+		unique_ptr<const vector<double>> data(open_maxsat_benchmark(instance, path_hdf5));
 		auto [clauses_ptr, weights_ptr, n_vars] = parse_maxsat(*data);
 		unique_ptr<vector<clause_t>> clauses(clauses_ptr);
 		unique_ptr<vector<double>> weights(weights_ptr);

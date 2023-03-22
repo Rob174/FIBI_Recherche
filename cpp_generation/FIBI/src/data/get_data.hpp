@@ -1,7 +1,6 @@
 #pragma once
 #include <random>
 #include <math.h>
-#include "H5Cpp.h"
 #include <string>
 #include <list>
 #include <iostream>
@@ -17,10 +16,11 @@
 #include "./constants/tsp.hpp"
 #include "./constants/maxsat.hpp"
 
-using namespace H5;
 using namespace std;
-
-
+#ifdef HDF5save
+#include "H5Cpp.h"
+using namespace H5;
+#endif
 /** @brief Fill a vector with random numbers
 * * @tparam T_return Type of the vector
 * * @tparam T_distr Type of the distribution
@@ -182,6 +182,7 @@ vector<clause_t>* random_clauses(
 }
 
 
+#ifdef HDF5save
 /** @brief Open the clustering town positions from the hdf5 file, set the number of points and dimensions. If load_num_clust is true, it will also load the number of clusters
 * * @param instance Instance number
 * * @param filename File name
@@ -211,6 +212,30 @@ const vector<double>* open_clustering(const int instance, string filename, Clust
 		filename,
 		process_file);
 }
+#else
+/** @brief Open the clustering town positions from the hdf5 file, set the number of points and dimensions. If load_num_clust is true, it will also load the number of clusters
+* * @param instance Instance number
+* * @param foldername Folder name:
+* *		@param -> under subfolder points the points ;
+* *		@param -> under subfolder dims the dimensions ;
+* *		@param -> under subfolder num_clusters the number of clusters (if load_num_clust is true)
+* * @param conf Clustering configuration that will be modified with the number of points and dimensions (and number of clusters if load_num_clust is true)
+* * @param load_num_clust If true, it will load the number of clusters
+* * @return const vector<double>* Vector of points
+* */
+const vector<double>* open_clustering(const int instance, string foldername, ClusteringConfig* conf, bool load_num_clust = false) {
+	vector<double>* points = read_file_txt_multiprocessing(instance, foldername + "/points/");
+	unique_ptr<vector<double>> dims(read_file_txt_multiprocessing(instance, foldername + "/dims/"));
+	conf->NUM_DIM.set(dims->at(dims->size() - 1));
+	conf->NUM_POINTS.set(points->size() / conf->NUM_DIM.get());
+	if (load_num_clust) {
+		unique_ptr<vector<double>> num_clust(read_file_txt_multiprocessing(instance, foldername + "/num_clusters/"));
+		conf->NUM_CLUST.set(num_clust->at(0));
+	}
+	return points;
+}
+#endif
+#ifdef HDF5save
 /** @brief Open the tsp, tsplib town positions from the hdf5 file, set the number of points and dimensions
 * * @param instance Instance number
 * * @param filename File name
@@ -231,15 +256,28 @@ const vector<double>* open_tsplib(const int instance, string filename, TSPConfig
 		filename,
 		process_file);
 }
+#else
+/** @brief Open the tsp, tsplib town positions from the files under foldername set the number of points and dimensions
+* * @param instance Instance number
+* * @param foldername Folder name: under foldername/instances we have one txt file for each instance ; the file name is the instance number ; the file contains the double to read separated by a space
+* * @param conf TSP configuration that will be modified with the number of points and dimensions
+* * @return const vector<double>* Vector of points
+* */
+const vector<double>* open_tsplib(const int instance, string foldername, TSPConfig* conf) {
+	vector<double>* points = read_file_txt_multiprocessing(instance, foldername);
+	conf->NUM_TOWNS.set(points->size() / conf->NUM_DIM.get());
+	return points;
+}
+#endif
+#ifdef HDF5save
 /** @brief Open the maxsat benchmark from the hdf5 file
 * * @param instance Instance number
 * * @param filename File name
-* * @param conf MAXSAT configuration that will be modified with the number of points and dimensions
 * * @return const vector<double>& Vector of points
 * */
-const vector<double>* open_maxsat_benchmark(const int instance, string filename, MAXSATConfig* conf)
+const vector<double>* open_maxsat_benchmark(const int instance, string filename)
 {
-	auto process_file = [conf, instance](H5File& f) -> vector<double>*
+	auto process_file = [instance](H5File& f) -> vector<double>*
 	{
 		using namespace std;
 		H5std_string DATASET_NAME(to_string(instance));
@@ -250,6 +288,18 @@ const vector<double>* open_maxsat_benchmark(const int instance, string filename,
 		filename,
 		process_file);
 }
+#else
+/** @brief Open the maxsat benchmark from the hdf5 file
+* * @param instance Instance number
+* * @param foldername Folder name: under foldername/instances we have one hdf5 file for each instance ; the file name is the instance number ; the file contains the double to read separated by a space
+* * @return const vector<double>& Vector of points
+* */
+const vector<double>* open_maxsat_benchmark(const int instance, string foldername)
+{
+	vector<double>* data = read_file_txt_multiprocessing(instance, foldername);
+	return data;
+}
+#endif // HDF5save
 /** @brief Compute for each variables in which clauses it appears
 * * @param clauses List of clauses
 * * @return map<const var_id_t, vector<clause_id_t>>* Map of variables to clauses where it appears

@@ -5,7 +5,7 @@
 #include "../../src/data/constants/clustering.hpp"
 using namespace std;
 void test_ClusteringFactory() {
-	string root_data = "../../../data/";
+	string root_data = "../../../data/folder/";
 	ClusteringFactory f;
 	int i = 0;
 	for (int dataset = 0; dataset < 4; dataset++) {

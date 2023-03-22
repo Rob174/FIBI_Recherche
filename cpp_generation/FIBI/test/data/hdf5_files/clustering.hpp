@@ -7,7 +7,7 @@
 using namespace std;
 using json = nlohmann::json;
 void test_clustering_aloise() {
-	const string path_hdf5 = "../../../data/aloise_benchmark.hdf5";
+	const string path_hdf5 = "../../../data/folder/aloise_benchmark/";
 	const string path_json = "../../../data/aloise_benchmark.json";
 
 	// Read the json file
@@ -56,7 +56,7 @@ void test_clustering_aloise() {
 
 
 void test_clustering_franti() {
-	const string path_hdf5 = "../../../data/franti_benchmark.hdf5";
+	const string path_hdf5 = "../../../data/folder/franti_benchmark/";
 	const string path_json = "../../../data/franti_benchmark.json";
 
 	// Read the json file
@@ -86,24 +86,24 @@ void test_clustering_franti() {
 
 		// Check that the number of dimensions is correct
 		if (c.NUM_DIM.get() != num_dims) {
-			throw runtime_error("The number of dimensions is not correct: expected " + to_string(num_dims) + " but got " + to_string(c.NUM_DIM.get()));
+			throw runtime_error("The number of dimensions is not correct: expected " + to_string(num_dims) + " but got " + to_string(c.NUM_DIM.get()) + " for instance " + to_string(instance));
 		}
 
 		// Check that the number of points is correct
 		if (c.NUM_POINTS.get() != num_points)
 		{
-			throw runtime_error("The number of points is not correct: expected " + to_string(num_points) + " but got " + to_string(c.NUM_POINTS.get()));
+			throw runtime_error("The number of points is not correct: expected " + to_string(num_points) + " but got " + to_string(c.NUM_POINTS.get()) + " for instance " + to_string(instance));
 		}
 
 		// Check that the number of clusters is correct
 		if (c.NUM_CLUST.get() != num_clust)
 		{
-			throw runtime_error("The number of clusters is not correct: expected " + to_string(num_clust) + " but got " + to_string(c.NUM_CLUST.get()));
+			throw runtime_error("The number of clusters is not correct: expected " + to_string(num_clust) + " but got " + to_string(c.NUM_CLUST.get()) + " for instance " + to_string(instance));
 		}
 
 		// Check that the number of points is correct
 		if (data->size() != num_points * num_dims) {
-			throw runtime_error("The number of data is not correct: expected " + to_string(num_points * num_dims) + " elements but got " + to_string(data->size()));
+			throw runtime_error("The number of data is not correct: expected " + to_string(num_points * num_dims) + " elements but got " + to_string(data->size()) + " for instance " + to_string(instance));
 		}
 	}
 }

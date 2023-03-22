@@ -19,6 +19,7 @@ public:
 		vector<bool>* assignements_ptr = nullptr;
 		vector<double>* weights_ptr = nullptr;
 		int n_vars = 0;
+		string dataset_name;
 		if (cf.DATASET.get() == 0)
 		{
 			/* Uniformly distributed points */
@@ -26,13 +27,18 @@ public:
 			weights_ptr = random_weights(cf.NUM_CLAUSES.get(), cf.SEED_PROBLEM.get());
 		}
 		else if (cf.DATASET.get() == 1) {
-			unique_ptr<const vector<double>> data(open_maxsat_benchmark(cf.SEED_PROBLEM.get(), root_data + "maxsat_benchmark.hdf5", &cf));
+#if HDF5save
+			dataset_name = "maxsat_benchmark.hdf5";
+#else
+			dataset_name = "maxsat_benchmark/";
+#endif
+			unique_ptr<const vector<double>> data(open_maxsat_benchmark(cf.SEED_PROBLEM.get(), root_data + dataset_name));
 			auto [clauses_ptr_tmp, weights_ptr_tmp, n_vars] = parse_maxsat(*data);
 			cf.NUM_VARIABLES.set(n_vars);
 			cf.NUM_CLAUSES.set(clauses_ptr_tmp->size());
 			clauses_ptr = clauses_ptr_tmp;
 			weights_ptr = weights_ptr_tmp;
-		}
+	}
 		else {
 			throw invalid_argument("Invalid DATASET argument, Valid values are 0->1");
 		}
@@ -68,5 +74,5 @@ public:
 			clean_dataset("dataset_maxsat.hdf5");
 		}
 		save_metadata<>(cf.SEED_GLOB.get(), res, "dataset_maxsat.hdf5");
-	}
+}
 };
