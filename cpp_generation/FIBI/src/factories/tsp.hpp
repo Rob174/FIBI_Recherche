@@ -6,12 +6,13 @@
 #include "../algorithm/stats/metrics.hpp"
 #include "../algorithm/factories.hpp"
 #include "../utils.h"
+#include "../out/abstract.hpp"
 
 using namespace std;
 
 class TSPFactory : public AbstractFactory<TSPConfig> {
 public:
-	void run(TSPConfig& cf, bool dump_mapping = false, string root_data = "./") override
+	void run(TSPConfig& cf, bool dump_mapping = false, string root_data = "./", bool clean = false) override
 	{
 		// setup
 		const vector<double>* towns_pos_ptr;
@@ -77,15 +78,10 @@ public:
 		unique_ptr<typename tsp_ls_t<>::ls_t> ls(getTSPLocalSearch<>(obs));
 		ls->run(co, cf);
 		// writing the results
-		/*create_dataset<TSPResult>(res);
-		if (debug) {
-			storage.save_json("actions.json");
-		}*/
-		// cleaning
-		/*
-		delete alg;
-		delete metrics;
-		delete res;
-		*/
+		vector<pair<string, double>> res = get_results<TSPSwap, TSPSolutionContainer<>>(&metrics, &cf);
+		if (clean) {
+			clean_dataset("dataset_tsp.hdf5");
+		}
+		save_metadata<>(cf.SEED_GLOB.get(), res, "dataset_tsp.hdf5");
 	}
 };

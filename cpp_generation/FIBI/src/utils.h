@@ -127,6 +127,20 @@ T between(T start, T end, T value) {
 }
 using namespace std;
 using json = nlohmann::json;
+
+
+template <typename T_Swap, typename T_Container>
+vector<pair<string, double>> get_results(const Metrics < T_Swap, T_Container>* m, const AbstractConfig* c) {
+	int i = 0;
+	vector<pair<string, double>>res{};
+	for (pair<string, double> p : m->get_data()) {
+		res.push_back(p);
+	}
+	for (pair<string, double> p : c->get_json()) {
+		res.push_back(p);
+	}
+	return res;
+}
 template <typename T_Config, typename T_Swap, typename T_Container>
 void save_mapping(const Metrics < T_Swap, T_Container>* m, const AbstractConfig* c, const string filename = "mapping.json") {
 

@@ -6,12 +6,13 @@
 #include "../algorithm/stats/metrics.hpp"
 #include "../algorithm/factories.hpp"
 #include "../utils.h"
+#include "../out/abstract.hpp"
 
 using namespace std;
 
 class MAXSATFactory : public AbstractFactory<MAXSATConfig> {
 public:
-	void run(MAXSATConfig& cf, bool dump_mapping = false, string root_data = "./") override
+	void run(MAXSATConfig& cf, bool dump_mapping = false, string root_data = "./", bool clean = false) override
 	{
 		// setup
 		vector<clause_t>* clauses_ptr = nullptr;
@@ -62,16 +63,10 @@ public:
 		}
 		unique_ptr<typename maxsat_ls_t<>::ls_t> ls(getMAXSATLocalSearch<>(obs));
 		ls->run(co, cf);
-		// writing the results
-		/*create_dataset<MAXSATResult>(res);
-		if (debug) {
-			storage.save_json("actions.json");
-		}*/
-		// cleaning
-		/*
-		delete alg;
-		delete metrics;
-		delete res;
-		*/
+		vector<pair<string, double>> res = get_results<MAXSATSwap, MAXSATSolutionContainer>(&metrics, &cf);
+		if (clean) {
+			clean_dataset("dataset_maxsat.hdf5");
+		}
+		save_metadata<>(cf.SEED_GLOB.get(), res, "dataset_maxsat.hdf5");
 	}
 };

@@ -22,6 +22,7 @@
 #include "./factories/tsp.hpp"
 #include "./factories/clustering.hpp"
 #include "./factories/maxsat.hpp"
+#include "./launch/threadpool.hpp"
 
 using namespace std;
 #define TEST_MACRO(name) \
@@ -80,8 +81,9 @@ void run_tests()
 	/*
 	REGISTER(test_TSPFactory);
 	REGISTER(test_ClusteringFactory);
-	*/
 	REGISTER(test_MAXSATFactory);
+	*/
+	REGISTER(test_thread_pool);
 #define DEBUG
 	for (int i = 0; i < functions_names.size(); i++)
 	{

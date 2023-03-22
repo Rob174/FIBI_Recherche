@@ -6,12 +6,13 @@
 #include "../algorithm/stats/metrics.hpp"
 #include "../algorithm/factories.hpp"
 #include "../utils.h"
+#include "../out/abstract.hpp"
 
 using namespace std;
 
 class ClusteringFactory : public AbstractFactory<ClusteringConfig> {
 public:
-	void run(ClusteringConfig& cf, bool dump_mapping = false, string root_data = "./") override
+	void run(ClusteringConfig& cf, bool dump_mapping = false, string root_data = "./", bool clean = false) override
 	{
 		// setup
 		const vector<double>* points_pos_ptr;
@@ -73,16 +74,10 @@ public:
 		}
 		unique_ptr<typename clust_ls_t<>::ls_t> ls(getClusteringLocalSearch<>(obs));
 		ls->run(co, cf);
-		// writing the results
-		/*create_dataset<ClusteringResult>(res);
-		if (debug) {
-			storage.save_json("actions.json");
-		}*/
-		// cleaning
-		/*
-		delete alg;
-		delete metrics;
-		delete res;
-		*/
+		vector<pair<string, double>> res = get_results<ClusteringSwap, ClusteringSolutionContainer<>>(&metrics, &cf);
+		if (clean) {
+			clean_dataset("dataset_clustering.hdf5");
+		}
+		save_metadata<>(cf.SEED_GLOB.get(), res, "dataset_clustering.hdf5");
 	}
 };
