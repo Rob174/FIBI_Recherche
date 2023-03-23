@@ -115,33 +115,55 @@ void test_thread_pool_hdf5_write() {
 }
 void tspfactory_run(const map<string, int>& args, int thread_id) {
 	string root_data = "../../../data/folder/";
+	string out_data = "../../../data/out/";
 	TSPFactory f;
 	TSPConfig cf(args);
-	f.run(cf, true, root_data, args.at("SEED_GLOB") == 0);
+	f.run(cf, root_data, out_data, args.at("SEED_GLOB") == 0);
 
 	cout << "\x1B[32m \tOK ";
 	cf.print();
 	cout << "\033[0m " << endl;
 }
 void test_thread_pool_TSPFactory() {
-	const int num_threads = 4;
+	const int num_threads = 10;
 	ThreadPool pool(num_threads);
+	vector<int> range_0_26(26);
+	iota(range_0_26.begin(), range_0_26.end(), 0);
+	vector<int> range_0_49(49);
+	iota(range_0_49.begin(), range_0_49.end(), 0);
+	map<int, vector<int>> seeds_problem{
+		{0,range_0_26},
+		{1,range_0_49},
+		{2,range_0_26}
+	};
+	// map num_towns map for each dataset a function that takes the seed_problem and returns the number of towns
+	vector <int> num_towns{ 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000 };
+	map<int, function<int(int)>> num_towns_map{
+		{0, [&num_towns](int seed_problem) {return num_towns.at(seed_problem); }},
+		{1, [](int seed_problem) {return -1; }},
+		{2, [&num_towns](int seed_problem) {return num_towns.at(seed_problem); }}
+	};
 	int i = 0;
 	for (int dataset = 0; dataset < 3; dataset++) {
 		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 2; impr++) {
-				map<string, int> args{
-					{"DATASET",dataset},
-					{"SEED_GLOB",i},
-					{"SEED_PROBLEM",0},
-					{"SEED_ASSIGN",0},
-					{"FI_BI",FI_BI},
-					{"IMPR",impr},
-					{"NUM_TOWNS",20},
-					{"NUM_DIM",2}
-				};
-				pool.submit(tspfactory_run, args);
-				i++;
+			for (int impr = 0; impr < 5; impr++) {
+				for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+					for (int seed_problem : seeds_problem.at(dataset)) {
+						map<string, int> args{
+							{"DATASET",dataset},
+							{"SEED_GLOB",i},
+							{"SEED_PROBLEM",seed_problem},
+							{"SEED_ASSIGN",seed_assign},
+							{"FI_BI",FI_BI},
+							{"IMPR",impr},
+							{"NUM_TOWNS",num_towns_map.at(dataset)(seed_problem)},
+							{"NUM_DIM",2}
+						};
+						//tspfactory_run(args, 0);
+						pool.submit(tspfactory_run, args);
+						i++;
+					}
+				}
 			}
 		}
 	}

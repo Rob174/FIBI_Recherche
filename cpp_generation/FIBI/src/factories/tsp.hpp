@@ -12,7 +12,7 @@ using namespace std;
 
 class TSPFactory : public AbstractFactory<TSPConfig> {
 public:
-	void run(TSPConfig& cf, bool dump_mapping = false, string root_data = "./", bool clean = false) override
+	void run(TSPConfig& cf, string root_data = "./", string out_folder = "./", bool clean = false) override
 	{
 		// setup
 		const vector<double>* towns_pos_ptr;
@@ -78,17 +78,13 @@ public:
 		// algorithms execution
 		vector<tsp_obs_t* > obs;
 		obs.push_back(&metrics);
-		if (dump_mapping)
-		{
-			save_mapping<TSPConfig, TSPSwap, TSPSolutionContainer<>>(&metrics, &cf, "mapping_tsp.json");
-		}
 		unique_ptr<typename tsp_ls_t<>::ls_t> ls(getTSPLocalSearch<>(obs));
 		ls->run(co, cf);
 		// writing the results
 		vector<pair<string, double>> res = get_results<TSPSwap, TSPSolutionContainer<>>(&metrics, &cf);
 		if (clean) {
-			clean_dataset("dataset_tsp.hdf5");
+			clean_dataset(out_folder+"dataset_tsp/");
 		}
-		save_metadata<>(cf.SEED_GLOB.get(), res, "dataset_tsp.hdf5");
+		save_metadata<>(cf.SEED_GLOB.get(), res, out_folder+"dataset_tsp/");
 	}
 };

@@ -6,6 +6,7 @@
 using namespace std;
 void test_ClusteringFactory() {
 	string root_data = "../../../data/folder/";
+	string out_data = "../../../data/out/";
 	ClusteringFactory f;
 	int i = 0;
 	for (int dataset = 0; dataset < 4; dataset++) {
@@ -23,7 +24,7 @@ void test_ClusteringFactory() {
 					{"NUM_DIM",2}
 				};
 				ClusteringConfig cf(args);
-				f.run(cf, true, root_data,i==0);
+				f.run(cf, root_data, out_data, i == 0);
 				cout << "\x1B[32m \tOK ";
 				cf.print();
 				cout << "\033[0m " << endl;

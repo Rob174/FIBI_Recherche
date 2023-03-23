@@ -6,6 +6,7 @@
 using namespace std;
 void test_TSPFactory() {
 	string root_data = "../../../data/folder/";
+	string out_data = "../../../data/out/";
 	TSPFactory f;
 	int i = 0;
 	for (int dataset = 0; dataset < 3; dataset++) {
@@ -22,7 +23,7 @@ void test_TSPFactory() {
 					{"NUM_DIM",2}
 				};
 				TSPConfig cf(args);
-				f.run(cf, true, root_data, i == 0);
+				f.run(cf, root_data, out_data, i == 0);
 
 				cout << "\x1B[32m \tOK ";
 				cf.print();

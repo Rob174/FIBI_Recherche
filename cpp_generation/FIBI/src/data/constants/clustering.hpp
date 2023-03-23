@@ -34,6 +34,7 @@ public:
 	};
 	vector<pair<string, double>> get_json()  const override {
 		return vector<pair<string, double>>{
+			jMk(SEED_GLOB),
 			jMk(SEED_PROBLEM),
 			jMk(SEED_ASSIGN),
 			jMk(DATASET),

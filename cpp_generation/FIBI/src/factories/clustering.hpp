@@ -12,7 +12,7 @@ using namespace std;
 
 class ClusteringFactory : public AbstractFactory<ClusteringConfig> {
 public:
-	void run(ClusteringConfig& cf, bool dump_mapping = false, string root_data = "./", bool clean = false) override
+	void run(ClusteringConfig& cf, string root_data = "./", string out_folder = "./", bool clean = false) override
 	{
 		// setup
 		const vector<double>* points_pos_ptr;
@@ -80,16 +80,12 @@ public:
 		// algorithms execution
 		vector<clustering_obs_t* > obs;
 		obs.push_back(&metrics);
-		if (dump_mapping)
-		{
-			save_mapping<ClusteringConfig, ClusteringSwap, ClusteringSolutionContainer<>>(&metrics, &cf, "mapping_clustering.json");
-		}
 		unique_ptr<typename clust_ls_t<>::ls_t> ls(getClusteringLocalSearch<>(obs));
 		ls->run(co, cf);
 		vector<pair<string, double>> res = get_results<ClusteringSwap, ClusteringSolutionContainer<>>(&metrics, &cf);
 		if (clean) {
-			clean_dataset("dataset_clustering.hdf5");
+			clean_dataset(out_folder + "dataset_clustering/");
 		}
-		save_metadata<>(cf.SEED_GLOB.get(), res, "dataset_clustering.hdf5");
+		save_metadata<>(cf.SEED_GLOB.get(), res, out_folder + "dataset_clustering/");
 	}
 };

@@ -68,6 +68,9 @@ public:
 				throw std::runtime_error("submit on stopped ThreadPool");
 			}
 			tasks_.emplace(bound_task);
+			while (tasks_.size() > 50) {
+				condition_.wait(lock);
+			}
 		}
 		condition_.notify_one();
 	}

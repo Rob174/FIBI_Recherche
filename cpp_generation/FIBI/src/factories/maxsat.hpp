@@ -12,7 +12,7 @@ using namespace std;
 
 class MAXSATFactory : public AbstractFactory<MAXSATConfig> {
 public:
-	void run(MAXSATConfig& cf, bool dump_mapping = false, string root_data = "./", bool clean = false) override
+	void run(MAXSATConfig& cf, string root_data = "./", string out_folder = "./", bool clean = false) override
 	{
 		// setup
 		vector<clause_t>* clauses_ptr = nullptr;
@@ -38,7 +38,7 @@ public:
 			cf.NUM_CLAUSES.set(clauses_ptr_tmp->size());
 			clauses_ptr = clauses_ptr_tmp;
 			weights_ptr = weights_ptr_tmp;
-	}
+		}
 		else {
 			throw invalid_argument("Invalid DATASET argument, Valid values are 0->1");
 		}
@@ -63,16 +63,12 @@ public:
 		// algorithms execution
 		vector<maxsat_obs_t* > obs;
 		obs.push_back(&metrics);
-		if (dump_mapping)
-		{
-			save_mapping<MAXSATConfig, MAXSATSwap, MAXSATSolutionContainer>(&metrics, &cf, "mapping_clustering.json");
-		}
 		unique_ptr<typename maxsat_ls_t<>::ls_t> ls(getMAXSATLocalSearch<>(obs));
 		ls->run(co, cf);
 		vector<pair<string, double>> res = get_results<MAXSATSwap, MAXSATSolutionContainer>(&metrics, &cf);
 		if (clean) {
-			clean_dataset("dataset_maxsat.hdf5");
+			clean_dataset(out_folder + "dataset_maxsat/");
 		}
-		save_metadata<>(cf.SEED_GLOB.get(), res, "dataset_maxsat.hdf5");
-}
+		save_metadata<>(cf.SEED_GLOB.get(), res, out_folder+"dataset_maxsat/");
+	}
 };
