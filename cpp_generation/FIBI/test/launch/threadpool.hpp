@@ -13,6 +13,10 @@
 #include <map>
 #include "../../src/factories/tsp.hpp"
 #include "../../src/data/constants/tsp.hpp"
+#include <iostream>
+#include <iomanip>
+#include <chrono>
+#include <ctime>
 
 using namespace std;
 void print_map(const map<string, int>& my_map, int thread_id) {
@@ -118,11 +122,15 @@ void tspfactory_run(const map<string, int>& args, int thread_id) {
 	string out_data = "../../../data/out/";
 	TSPFactory f;
 	TSPConfig cf(args);
+	cf.print();
+	cout << endl;
 	f.run(cf, root_data, out_data, args.at("SEED_GLOB") == 0);
 
 	cout << "\x1B[32m \tOK ";
 	cf.print();
 	cout << "\033[0m " << endl;
+
+
 }
 void test_thread_pool_TSPFactory() {
 	const int num_threads = 10;
@@ -149,6 +157,19 @@ void test_thread_pool_TSPFactory() {
 			for (int impr = 0; impr < 5; impr++) {
 				for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
 					for (int seed_problem : seeds_problem.at(dataset)) {
+						i++;
+					}
+				}
+			}
+		}
+	}
+	const int num_poss = i;
+	i = 0;
+	for (int dataset = 0; dataset < 3; dataset++) {
+		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
+			for (int impr = 0; impr < 5; impr++) {
+				for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+					for (int seed_problem : seeds_problem.at(dataset)) {
 						map<string, int> args{
 							{"DATASET",dataset},
 							{"SEED_GLOB",i},
@@ -161,6 +182,18 @@ void test_thread_pool_TSPFactory() {
 						};
 						//tspfactory_run(args, 0);
 						pool.submit(tspfactory_run, args);
+						cout << "Queued " << i << " of " << num_poss << " (" << (i * 100.0 / num_poss) << "%)";
+						// Show current time in format HH:MM:SS
+						auto now = chrono::system_clock::now();
+						time_t time_now = chrono::system_clock::to_time_t(now);
+
+						tm* now_tm = localtime(&time_now);
+
+						cout << setfill('0') << setw(2) << now_tm->tm_hour << ":"
+							<< setfill('0') << setw(2) << now_tm->tm_min << ":"
+							<< setfill('0') << setw(2) << now_tm->tm_sec << endl;
+
+
 						i++;
 					}
 				}

@@ -36,6 +36,8 @@ public:
 						tasks_.pop();
 					}
 					task(thread_id);
+					cout << "Size of queue: " << tasks_.size() << endl;
+					condition_.notify_all();
 				}
 				});
 		}
@@ -69,7 +71,7 @@ public:
 			}
 			tasks_.emplace(bound_task);
 			while (tasks_.size() > 50) {
-				condition_.wait(lock);
+				condition_.wait(lock, [this] { return tasks_.size() <= 50; });
 			}
 		}
 		condition_.notify_one();
