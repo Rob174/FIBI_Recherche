@@ -1,3 +1,4 @@
+from io import TextIOWrapper
 from FIBI.analyse_results.parser.__init__ import *
 from FIBI.analyse_results.parser.modifiers import AbstractModifier
 from FIBI.analyse_results.utils.progressBars import DefaultProgressBar
@@ -8,8 +9,16 @@ class AbstractBaseParser(abc.ABC):
     def call(self, key: str, filename: str, values: np.ndarray) -> dict:
         """Convert one run output (array of metedata and metrics) and converts it to a dictionnary."""
         pass
-    def __call__(self, key: str, filename: str, values: np.ndarray) -> dict:
-        return self.call(key, filename, values)
+    def __call__(self, filename: str, data: Any) -> dict:
+        return self.call(filename, data)
+    @abc.abstractmethod
+    def open_file(self, path: Path) -> File:
+        """Open a file and return the file object"""
+        pass
+    @abc.abstractmethod
+    def get_data(self, file: Any) -> Iterable:
+        """Return the data to parse"""
+        pass
 
 
 
@@ -34,8 +43,10 @@ class Parser(AbstractBaseParser):
         assert mapping is not None
         self.mapping:Dict[int,str] = {int(d['id']):d['name'] for d in mapping}
 
-    def call(self, key: str, filename: str, values: np.ndarray) -> dict:
+    def call(self, filename: str, key_values: Tuple) -> dict:
         """Convert one run output (array of metedata and metrics) and converts it to a dictionnary. Output contains at least the KEY field, the key in the hdf5 file"""
+        key, values = key_values
+        values = np.array(values)
         dico = {
             "KEY":key,"filename":filename}
         for i,v in enumerate(values):
@@ -43,7 +54,32 @@ class Parser(AbstractBaseParser):
             value = float(v)
             dico[name_metadata] = value
         return dico
+    def open_file(self, path: Path) -> File:
+        """Open a file and return the file object"""
+        return File(path, "r")
+    def get_data(self, file: File) -> Iterable:
+        """Return the data to parse"""
+        return file["metadata"].items()
 
+class JSONParser(AbstractBaseParser):
+    """Parser Responsability: convert an array of metrics and metadata to a dictionnary
+    """
+    def __init__(
+        self,
+        *args, **kwargs
+    ):
+        pass
+
+    def call(self, filename: str, dico: dict) -> dict:
+        """Convert one run output (array of metedata and metrics) and converts it to a dictionnary. Output contains at least the KEY field, the key in the hdf5 file"""
+        new_dico = {**dico, "filename":filename, "KEY": dico['SEED_GLOB']}
+        return new_dico
+    def open_file(self, path: Path) -> TextIOWrapper:
+        """Open a file and return the file object"""
+        return open(path, "r")
+    def get_data(self, file: TextIOWrapper) -> Iterable:
+        """Return the data to parse"""
+        return file
 class MainParser:
     """Main parser entry point: parse a list of hdf5 files and return a list of dictionnaries.
     Concretely iterate over the files, iterate over the runs in the files, parse the runs and apply modifiers to obtain the final list of dictionnaries.
@@ -67,14 +103,14 @@ class MainParser:
         total_size = 0
         for p in path_in:
             with File(p, "r") as f:
-                total_size += len(f['metadata']) # type: ignore
+                total_size += len(self.base_parser.get_data(f)) # type: ignore
         # Parse the runs
         with DefaultProgressBar() as progress:
             progress.set_total_steps(total_size)
             for p in path_in:
                 with File(p, "r") as f:
-                    for k, v in f["metadata"].items():# type: ignore
-                        dico = self.base_parser(k, p.stem, np.array(v))
+                    for d in self.base_parser.get_data(f):# type: ignore
+                        dico = self.base_parser(p.stem, d)
                         keep = True
                         for filter_run in filters:
                             keep = keep and filter_run.filter_before_modifiers(dico)
@@ -88,5 +124,5 @@ class MainParser:
                         if not keep:
                             continue
                         L.append(dico)
-                        progress.next(description=f"{p.stem}/{k}")
+                        progress.next(description=f"{p.stem}/{dico['SEED_GLOB']}")
         return L
