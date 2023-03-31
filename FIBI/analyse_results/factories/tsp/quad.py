@@ -12,33 +12,20 @@ def get_tsp_uniform_visualizations(
     query_to_path = DicoPathConverter(
         path_create(out_folder / "stats" / "dico_path_converter.json"), overwrite=True
     )
-    mapping_filename = {
-        "quad_rand": "RAND",
-        "quad_greedy": "GREEDY",
-        "quad_greedy_stoch_top3": "GREEDY TOP3",
-        "quad_greedy_stoch_top5": "GREEDY TOP5",
+    mapping_impr = {
+        0: "RAND",
+        1: "GREEDY",
+        2: "GREEDY TOP3",
+        3: "GREEDY TOP4",
+        4: "GREEDY TOP5",
     }
-    def make_map(d):
-        res = mapping_filename[d["filename"]]
-        if res == 'GREEDY TOP3':
-            b=0
-        return mapping_filename[d["filename"]]
     Ldata = stats(
         pathes_hdf5,
         modifiers=[
             ConvertToInteger(fields=["NUM_TOWNS"]),
-            ModifierOperation(
-                dst_name="IMPR",
-                operation=make_map,
-            ),
-            Glob_SEEEDMaker(
-                variating_params=[
-                    "IMPR",
-                    "SEED_PROBLEM",
-                    "FI_BI",
-                    "SEED_ASSIGN",
-                    "NUM_TOWNS",
-                ]
+            ModifierIntMapping(
+                name="IMPR",
+                mapping=mapping_impr,
             ),
             ModifierOperation(dst_name="DATASET", operation=lambda x: "uniform_points"),
             ModifierOperation(dst_name="init_meth", operation=lambda x: 'random' if x['IMPR'] == "RAND" else 'greedy'),
@@ -60,9 +47,7 @@ def get_tsp_uniform_visualizations(
             ),
         ],  # type: ignore
         filters=[
-            FilterDuplicatedKeys(),
             FilterAttrValueInt(attr="FI_BI", values_to_keep=[0, 1]),
-            FilterAttrValueInt(attr="IT_ORDER", values_to_keep=[1]),
         ],
     )
     # legend for the table

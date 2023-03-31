@@ -60,7 +60,7 @@ def get_tsp(
     if subproblem == "uniform_points":
         get_tsp_uniform_visualizations(
             path_mapping=(
-                Path(".") / "data" / "algorithms_out" / "tsp" / "quad" / "mapping.json"
+                Path(".") / "data" / "algorithms_out" / "tsp" / "quad" / "new" / "mapping.json"
             ),
             pathes_hdf5=[
                 existing_path(
@@ -69,31 +69,8 @@ def get_tsp(
                     / "algorithms_out"
                     / "tsp"
                     / "quad"
-                    / "quad_rand.hdf5"
-                ),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "tsp"
-                    / "quad"
-                    / "quad_greedy.hdf5"
-                ),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "tsp"
-                    / "quad"
-                    / "quad_greedy_stoch_top3.hdf5"
-                ),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "tsp"
-                    / "quad"
-                    / "quad_greedy_stoch_top5.hdf5"
+                    / "new"
+                    /"dataset.hdf5"
                 ),
             ],
             out_folder=existing_path(
@@ -121,6 +98,7 @@ def get_tsp(
                 / "algorithms_out"
                 / "tsp"
                 / "tsplib"
+                / "new"
                 / "mapping.json"
             ),
             mapping_inst=(
@@ -138,31 +116,8 @@ def get_tsp(
                     / "algorithms_out"
                     / "tsp"
                     / "tsplib"
-                    / "tsplib_rand.hdf5"
-                ),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "tsp"
-                    / "tsplib"
-                    / "tsplib_greedy_stoch_top3.hdf5"
-                ),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "tsp"
-                    / "tsplib"
-                    / "tsplib_greedy_stoch_top4.hdf5"
-                ),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "tsp"
-                    / "tsplib"
-                    / "tsplib_greedy_stoch_top5.hdf5"
+                    / "new"
+                    / "dataset.hdf5"
                 ),
             ],
             out_folder=existing_path(
@@ -246,7 +201,7 @@ def get_clustering(
                     / "profile.prof"
                 )
             )
-    elif subproblem == "uniform_points":
+    elif subproblem == "uniform_points": # TODO
         get_clustering_uniform_visualizations(
             path_mapping=(
                 Path(".")
@@ -286,7 +241,7 @@ def get_clustering(
                     / "profile.prof"
                 )
             )
-    elif subproblem == "uniform_points_norm":
+    elif subproblem == "uniform_points_norm": # TODO
         get_clustering_uniform_norm_visualizations(
             path_mapping=(
                 Path(".")
@@ -407,7 +362,8 @@ def get_maxsat_problem_visualization(
                     / "algorithms_out"
                     / "maxsat"
                     / "benchmark"
-                    / "new_dataset.hdf5"
+                    / "new"
+                    / "dataset.hdf5"
                 )
             ],
             mapping_inst=existing_path(
@@ -532,11 +488,11 @@ def get_maxsat_problem_visualization(
 
 
 if __name__ == "__main__":
-    # print("TSP")
+    print("TSP")
     # print("tsplib")
-    # get_tsp("tsplib", False)
-    # print("quad")
-    # get_tsp("uniform_points", False)
+    # get_tsp("tsplib", False) # WIP
+    print("quad")
+    get_tsp("uniform_points", False)
     # print("MAXSAT")
     # print("benchmark2021")
     # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
@@ -544,9 +500,9 @@ if __name__ == "__main__":
     # get_maxsat_problem_visualization("randomly_generated")
     # print("randomly_generated3")
     # get_maxsat_problem_visualization("randomly_generated3")
-    print("Clustering")
-    print("Aloise")
-    get_clustering("aloise_benchmark", profile=False)
+    # print("Clustering")
+    # print("Aloise")
+    # get_clustering("aloise_benchmark", profile=False)
     # print("Quad")
     # get_clustering("uniform_points", profile=False)
     # print("QuadNorm")

@@ -43,7 +43,7 @@ class Parser(AbstractBaseParser):
             value = float(v)
             dico[name_metadata] = value
         return dico
-        
+
 class MainParser:
     """Main parser entry point: parse a list of hdf5 files and return a list of dictionnaries.
     Concretely iterate over the files, iterate over the runs in the files, parse the runs and apply modifiers to obtain the final list of dictionnaries.
