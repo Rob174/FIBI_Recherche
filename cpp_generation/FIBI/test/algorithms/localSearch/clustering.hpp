@@ -68,7 +68,7 @@ void test_LocalSearch_Clust_flips_explored() {
 	ClusteringSolutionContainer<> c(*points, *assignements, conf);
 	unique_ptr<Clust1NeighbourhoodExplorLogger> logger(new Clust1NeighbourhoodExplorLogger());
 	vector<clustering_obs_t*> obs{ logger.get() };
-	unique_ptr<typename clust_ls_t<>::ls_t> ls(getClusteringLocalSearch(obs));
+	unique_ptr<typename clust_ls_t::ls_t> ls(getClusteringLocalSearch(obs));
 	const int n = num_points, k = num_clust;
 	const unsigned int expected_num_swaps = (k - 1) * n;
 	try {
@@ -165,7 +165,7 @@ void test_LocalSearch_Clust_flips_explored_detail_BI() {
 	ClusteringSolutionContainer<> c(points, assignements, conf);
 	unique_ptr<Clust1NeighbourhoodExplorLogger> logger(new Clust1NeighbourhoodExplorLogger());
 	vector<clustering_obs_t*> obs{ logger.get() };
-	unique_ptr<typename clust_ls_t<>::ls_t> ls(getClusteringLocalSearch(obs, false));
+	unique_ptr<typename clust_ls_t::ls_t> ls(getClusteringLocalSearch(obs, false));
 	try {
 		ls->run(c, conf);
 	}
@@ -261,7 +261,7 @@ void test_LocalSearch_Clust_flips_explored_detail_FI() {
 	ClusteringSolutionContainer<> c(points, assignements, conf);
 	unique_ptr<Clust1NeighbourhoodExplorLogger> logger(new Clust1NeighbourhoodExplorLogger());
 	vector<clustering_obs_t*> obs{ logger.get() };
-	unique_ptr<typename clust_ls_t<>::ls_t> ls(getClusteringLocalSearch<>(obs, true));
+	unique_ptr<typename clust_ls_t::ls_t> ls(getClusteringLocalSearch(obs, true));
 	try {
 		ls->run(c, conf);
 	}

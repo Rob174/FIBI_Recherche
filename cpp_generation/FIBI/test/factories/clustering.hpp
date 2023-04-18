@@ -24,7 +24,7 @@ void test_ClusteringFactory() {
 					{"NUM_DIM",2}
 				};
 				ClusteringConfig cf(args);
-				f.run(cf, root_data, out_data, i == 0);
+				f.run(cf, root_data);
 				cout << "\x1B[32m \tOK ";
 				cf.print();
 				cout << "\033[0m " << endl;

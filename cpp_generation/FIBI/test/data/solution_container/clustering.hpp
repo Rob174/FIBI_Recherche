@@ -113,7 +113,7 @@ void test_ClusteringSolutionContainer_compute_quality_metric_2() {
 	unique_ptr<const vector<double>> points(uniform_points(num_points, num_dims, seed));
 	unique_ptr<vector<int>> cluster_ids(random_clust(num_clust, num_points, seed));
 	ClusteringConfig conf({ {"NUM_CLUST", num_clust}, {"NUM_DIM", num_dims}, {"NUM_POINTS",num_points} });
-	ClusteringSolutionContainer<false, 1e-5> c(*points, *cluster_ids, conf);
+	ClusteringSolutionContainer<false> c(*points, *cluster_ids, conf);
 	const double quality = c.compute_quality_metric();
 	for (int i = 0; i < 100; i++) {
 		const int point_id = (uniform_int_distribution<>{ 0, num_points - 1 })(gen);

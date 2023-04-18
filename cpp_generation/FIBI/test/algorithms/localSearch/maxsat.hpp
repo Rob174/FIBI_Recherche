@@ -70,7 +70,7 @@ void test_LocalSearch_MAXSAT_flips_explored() {
 	MAXSATSolutionContainer c(weights, *assignements, *clause);
 	unique_ptr<MAXSAT1NeighbourhoodExplorLogger> logger(new MAXSAT1NeighbourhoodExplorLogger());
 	vector<maxsat_obs_t*> obs{ logger.get() };
-	unique_ptr<typename maxsat_ls_t<>::ls_t> ls(getMAXSATLocalSearch(obs));
+	unique_ptr<typename maxsat_ls_t::ls_t> ls(getMAXSATLocalSearch(obs));
 	const unsigned int expected_num_swaps = num_variables;
 	try {
 		ls->run(c, conf);
@@ -123,7 +123,7 @@ void test_LocalSearch_MAXSAT_flips_explored_detail_BI() {
 	MAXSATSolutionContainer c(weights, assignements, clauses);
 	unique_ptr<MAXSAT1NeighbourhoodExplorLogger> logger(new MAXSAT1NeighbourhoodExplorLogger());
 	vector<maxsat_obs_t*> obs{ logger.get() };
-	unique_ptr<typename maxsat_ls_t<>::ls_t> ls(getMAXSATLocalSearch(obs));
+	unique_ptr<typename maxsat_ls_t::ls_t> ls(getMAXSATLocalSearch(obs));
 	try {
 		ls->run(c, conf);
 	}
@@ -183,7 +183,7 @@ void test_LocalSearch_MAXSAT_flips_explored_detail_FI() {
 	MAXSATSolutionContainer c(weights, assignements, clauses);
 	unique_ptr<MAXSAT1NeighbourhoodExplorLogger> logger(new MAXSAT1NeighbourhoodExplorLogger());
 	vector<maxsat_obs_t*> obs{ logger.get() };
-	unique_ptr<typename maxsat_ls_t<>::ls_t> ls(getMAXSATLocalSearch<>(obs, true));
+	unique_ptr<typename maxsat_ls_t::ls_t> ls(getMAXSATLocalSearch(obs, true));
 	try {
 		ls->run(c, conf);
 	}

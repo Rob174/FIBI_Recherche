@@ -1,4 +1,5 @@
 from FIBI.analyse_results.factories.tsp.__init__ import *
+from FIBI.analyse_results.parser.parser import JSONParser
 from FIBI.analyse_results.visualization.global_analysis.components.averages import (
     AverageFIBIDiffTgt,
     MinimizationTgtDiff,
@@ -13,16 +14,17 @@ from FIBI.analyse_results.visualization.global_analysis.pie_chart_distr import (
 
 
 def get_tsplib_visualizations(
-    path_mapping: Path, pathes_hdf5: List[Path], out_folder: Path, mapping_inst: Path
+    pathes_hdf5: List[Path], out_folder: Path, mapping_inst: Path
 ):
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
         mapping_id_name = {int(k): v for k, v in json.load(f).items()}
-    stats = MainParser(Parser(path_mapping))
+    stats = MainParser(JSONParser())
     # mapping names index in hdf5 to names of the attributes=
     query_to_path = DicoPathConverter(
         path_create(out_folder / "stats" / "dico_path_converter.json"), overwrite=True
     )
+    mapping_points = {0: "Uniformly distributed towns", 1: "TSPLIB"}
     mapping_impr = {
         0: "RAND",
         1: "GREEDY",
@@ -38,10 +40,10 @@ def get_tsplib_visualizations(
                 name="IMPR",
                 mapping=mapping_impr,
             ),
+            ModifierIntMapping(name="DATASET", mapping=mapping_points),
             Glob_SEEEDMaker(
                 variating_params=["IMPR", "SEED_PROBLEM", "FI_BI", "SEED_ASSIGN"]
             ),
-            ModifierOperation(dst_name="DATASET", operation=lambda x: "TSPLIB"),
             ModifierOperation(
                 dst_name="init_meth",
                 operation=lambda x: "random" if x["IMPR"] == "RAND" else "greedy",
@@ -67,7 +69,7 @@ def get_tsplib_visualizations(
             ),
         ],  # type: ignore
         filters=[
-            FilterAttrValueInt(attr="FI_BI", values_to_keep=[0, 1]),
+            FilterAttrValueInt(attr="DATASET", values_to_keep=[1]),
         ],
     )
     # legend for the table

@@ -9,7 +9,7 @@
 #include "../libs/json.hpp"
 #include "algorithm/stats/metrics.hpp"
 
-
+const double EPSILON = 1e-5;
 template <typename T>
 class Uninitialized
 {
@@ -32,6 +32,7 @@ public:
 	}
 	T get() const {
 		if (!initialized) {
+			cout << "Uninitialized value" << endl;
 			throw std::runtime_error("Uninitialized value");
 		}
 		return value;
@@ -53,14 +54,14 @@ Tout* copy_array(T* array, int size)
 		new_array[i] = array[i];
 	}
 	return new_array;
-}
+};
 // equivalent of python join
 std::string join(std::vector<std::string> texts, std::string separator = " ");
 template <typename T>
 int sgn(T val)
 {
 	return (T(0) < val) - (val < T(0));
-}
+};
 template <typename T_data = double, typename T_cont = const std::vector<double>&, bool safeAccess = false>
 class Slice {
 private:
@@ -96,24 +97,6 @@ double dist(const T p1, const T p2, const int num_dim)
 	return sqrt(dist_squared(p1, p2, num_dim));
 };
 template <typename T>
-T max(T v1, T v2) {
-	if (v1 > v2) {
-		return v1;
-	}
-	else {
-		return v2;
-	}
-}
-template <typename T>
-T min(T v1, T v2) {
-	if (v1 < v2) {
-		return v1;
-	}
-	else {
-		return v2;
-	}
-}
-template <typename T>
 T between(T start, T end, T value) {
 	if (value < start) {
 		return start;
@@ -124,7 +107,7 @@ T between(T start, T end, T value) {
 	else {
 		return value;
 	}
-}
+};
 using namespace std;
 using json = nlohmann::json;
 

@@ -15,7 +15,8 @@ void save_to_hdf5(Result* res, Config* conf) {
         int IT_ORDER;
         int INIT_CHOICE;
         int TOUR_ALGO;
-        os << res->get_config()->NUM_POINTS << ","
+        os << res->get_config()->SEED_GLOB << "," 
+            << res->get_config()->NUM_POINTS << ","
             << res->get_config()->DATASET << ","
             << res->get_config()->NUM_CLUST << ","
             << res->get_config()->SEED_POINTS << ","
@@ -27,6 +28,7 @@ void save_to_hdf5(Result* res, Config* conf) {
 
         H5File file(FILE_NAME_OUT, H5F_ACC_RDWR);
         // Save input output of algorithm
+        // 1. Metadata
         Group group1(file.openGroup("metadata"));
         std::vector<double>* results = res->get_result();
         double* data = new double[results->size()];
@@ -40,6 +42,7 @@ void save_to_hdf5(Result* res, Config* conf) {
         DataSet dataset1 = group1.createDataSet(identifier, PredType::NATIVE_DOUBLE, dataspace1);
         dataset1.write(data, PredType::NATIVE_DOUBLE);
         delete results;
+
     }
     catch (FileIException error) {
         error.printErrorStack();

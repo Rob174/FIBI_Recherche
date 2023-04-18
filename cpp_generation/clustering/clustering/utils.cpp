@@ -1,5 +1,5 @@
 #include "utils.h"
-double dist(double* p1, double* p2, Config* config)
+double dist(const double* p1, const double* p2, Config* config)
 {
     double dist = 0.0;
     for (int i = 0; i < config->NUM_DIM; i++)
@@ -39,6 +39,30 @@ unsigned long mix(unsigned long a, unsigned long b, unsigned long c)
     c = c - a;  c = c - b;  c = c ^ (b >> 15);
     return c;
 }
-long get_seed(int loop_index) {
-    return mix(clock(), time(NULL)*100+loop_index, _getpid());
+
+double median(std::vector<double> values)
+{
+    const int size = values.size();
+    if (size % 2 == 0) {
+        nth_element(values.begin(),
+            values.begin() + size / 2,
+            values.end());
+        nth_element(values.begin(),
+            values.begin() + (size - 1) / 2,
+            values.end());
+        return (double)(values[(size - 1) / 2]
+            + values[size / 2])
+            / 2.0;
+    }
+    else {
+        nth_element(values.begin(),
+            values.begin() + size / 2,
+            values.end());
+        return (double)values[size / 2];
+    }
 }
+
+
+
+
+double binom_fn(int n, int k) { return 1 / ((n + 1) * std::beta(n - k + 1, k + 1)); }

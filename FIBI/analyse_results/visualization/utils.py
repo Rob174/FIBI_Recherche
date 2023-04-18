@@ -2,9 +2,9 @@ from FIBI.analyse_results.data_extractor.types import DfExtract
 from FIBI.analyse_results.visualization.__init__ import *
 
 
-def dicos_fibi_diff(dfs: List[DfExtract], attr: str, diff: bool = True) -> Dict[str,np.ndarray]:
+def dicos_fibi_diff(dfs: List[DfExtract], attr: str, diff: bool = True, expected_num: int = 1000) -> Dict[str,np.ndarray]:
     assert len(dfs) == 2
-    if len(dfs[0]['df']) != len(dfs[1]['df']):
+    if len(dfs[0]['df']) != expected_num or len(dfs[1]['df']) != expected_num:
         raise ValueError('The two dataframes must have the same length.')
     dico = {}
     for dfextract in dfs:

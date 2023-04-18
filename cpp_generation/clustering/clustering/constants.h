@@ -2,9 +2,10 @@
 #define CONSTANTS_H
 #include <string>
 #include <iostream>
-typedef struct _Config Config;
-typedef struct _Config
+#include <vector>
+class Config
 {
+public:
     int NUM_POINTS;//
     int NUM_DIM;//
     int POINTS_DISTR;//
@@ -15,6 +16,7 @@ typedef struct _Config
     long SEED_POINTS;//
     long SEED_ASSIGN;//
     long SEED_GLOB;
+    int ID;
     void print()
     {
         std::cout
@@ -26,8 +28,22 @@ typedef struct _Config
             << "IMPR_CLASS:" << IMPR_CLASS << ","
             << "IT_ORDER:" << IT_ORDER << ","
             << "SEED_POINTS:" << SEED_POINTS << ","
-            << "SEED_ASSIGN:" << SEED_ASSIGN << std::endl;
+            << "SEED_ASSIGN:" << SEED_ASSIGN << ","
+            << "ID:" << ID << std::endl;
     }
-} Config;
+    std::vector<int>* get_values() {
+        std::vector<int>* values = new std::vector<int>[9]; 
+        values->push_back((int)SEED_GLOB);
+        values->push_back((int)NUM_POINTS);
+        values->push_back((int)POINTS_DISTR);
+        values->push_back((int)NUM_CLUST);
+        values->push_back((int)CLUST_IMPR);
+        values->push_back((int)IMPR_CLASS);
+        values->push_back((int)IT_ORDER);
+        values->push_back((int)SEED_POINTS);
+        values->push_back((int)SEED_ASSIGN);
+        return values;
+    }
+};
 
 #endif

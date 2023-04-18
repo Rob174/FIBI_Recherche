@@ -100,10 +100,11 @@ int test_open_tsp_lib() {
 	Config conf;
 	conf.SEED_POINTS = 1;
 	conf.NUM_DIM = 2;
-	double *points = tsplib_sample_points(&conf);
+	const H5std_string FILE_NAME("tsplib.hdf5");
+	double *points = tsplib_sample_points(FILE_NAME ,&conf);
 	std::cout << conf.NUM_POINTS << " points charges" << std::endl;
 	conf.SEED_POINTS = 2;
-	points = tsplib_sample_points(&conf);
+	points = tsplib_sample_points(FILE_NAME ,&conf);
 	std::cout << conf.NUM_POINTS << " points charges" << std::endl;
 	return 0;
 }

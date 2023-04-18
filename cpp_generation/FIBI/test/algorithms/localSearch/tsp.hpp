@@ -72,7 +72,7 @@ void test_LocalSearch_TSP_flips_explored() {
 	TSPSolutionContainer<> c(tour, m);
 	unique_ptr<TSP1NeighbourhoodExplorLogger> logger(new TSP1NeighbourhoodExplorLogger());
 	vector<tsp_obs_t*> obs{ logger.get() };
-	unique_ptr<typename tsp_ls_t<>::ls_t> ls(getTSPLocalSearch(obs));
+	unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs));
 	TSPConfig conf(map<string, int>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims }});
 	// Compute 2 in n-1
 	const int n = num_towns;
@@ -168,7 +168,7 @@ void test_LocalSearch_TSP_flips_explored_detail_BI() {
 	TSPSolutionContainer<> c(tour, m);
 	unique_ptr<TSP1NeighbourhoodExplorLogger> logger(new TSP1NeighbourhoodExplorLogger());
 	vector<tsp_obs_t*> obs{ logger.get() };
-	unique_ptr<typename tsp_ls_t<false>::ls_t> ls(getTSPLocalSearch<false>(obs));
+	unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs));
 	TSPConfig conf(map<string, int>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims }});
 	try {
 		ls->run(c, conf);
@@ -263,7 +263,7 @@ void test_LocalSearch_TSP_flips_explored_detail_FI() {
 	TSPSolutionContainer<> c(tour, m);
 	unique_ptr<TSP1NeighbourhoodExplorLogger> logger(new TSP1NeighbourhoodExplorLogger());
 	vector<tsp_obs_t*> obs{ logger.get() };
-	unique_ptr<typename tsp_ls_t<>::ls_t> ls(getTSPLocalSearch<>(obs, true));
+	unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs, true));
 	TSPConfig conf(map<string, int>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims }});
 	try {
 		ls->run(c, conf);

@@ -48,7 +48,9 @@ from FIBI.analyse_results.factories.maxsat.benchmark import get_maxsat_instance_
 from FIBI.analyse_results.factories.maxsat.random_uniform import get_maxsat_uniformly_generated_visualizations, get_maxsat_uniformly_generated_visualizations2, get_maxsat_uniformly_generated_visualizations3
 from FIBI.analyse_results.factories.tsp.quad import get_tsp_uniform_visualizations
 from FIBI.analyse_results.factories.tsp.tsplib import get_tsplib_visualizations
+from FIBI.analyse_results.test.datasets import check_clustering, check_maxsat, check_tsp
 from FIBI.analyse_results.utils.conversions import path_create
+from FIBI.analyse_results.test.datasets import check_clustering, check_maxsat, check_tsp
 
 
 def get_tsp(
@@ -57,27 +59,18 @@ def get_tsp(
     if profile:
         profiler = cProfile.Profile()
         profiler.enable()
+    path_dataset = existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
+    folder_profiler = ""
     if subproblem == "uniform_points":
         get_tsp_uniform_visualizations(
-            path_mapping=(
-                Path(".") / "data" / "algorithms_out" / "tsp" / "quad" / "new" / "mapping.json"
-            ),
             pathes_hdf5=[
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "tsp"
-                    / "quad"
-                    / "new"
-                    /"dataset.hdf5"
-                ),
+                path_dataset,
             ],
             out_folder=existing_path(
                 path_create(Path(".") / "data" / "analysis_results" / "tsp" / "quad")
             ),
         )
-
+        folder_profiler = "quad"
         if profile:
             profiler.disable()
             profiler.dump_stats(
@@ -92,15 +85,6 @@ def get_tsp(
             )
     elif subproblem == "tsplib":
         get_tsplib_visualizations(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "tsp"
-                / "tsplib"
-                / "new"
-                / "mapping.json"
-            ),
             mapping_inst=(
                 Path(".")
                 / "data"
@@ -110,34 +94,28 @@ def get_tsp(
                 / "mapping_tsplib_less_than_1000.json"
             ),
             pathes_hdf5=[
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "tsp"
-                    / "tsplib"
-                    / "new"
-                    / "dataset.hdf5"
-                ),
+                path_dataset,
             ],
             out_folder=existing_path(
                 path_create(Path(".") / "data" / "analysis_results" / "tsp" / "tsplib")
             ),
         )
-        if profile:
-            profiler.disable()
-            profiler.dump_stats(
-                path_create(
-                    Path(".")
-                    / "data"
-                    / "analysis_results"
-                    / "clustering"
-                    / "tsplib"
-                    / "profile.prof"
-                )
-            )
+        folder_profiler = "tsplib"
     else:
         raise ValueError(f"Unknown subproblem {subproblem}")
+    
+    if profile:
+        profiler.disable()
+        profiler.dump_stats(
+            path_create(
+                Path(".")
+                / "data"
+                / "analysis_results"
+                / "clustering"
+                / folder_profiler
+                / "profile.prof"
+            )
+        )
 
 
 
@@ -166,8 +144,7 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "benchmark_aloise"
-                    / "dataset.hdf5"
+                    / "dataset.txt"
                 ),
             ],
             mapping_inst=existing_path(
@@ -218,9 +195,7 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "quad"
-                    / "new"
-                    / "dataset.hdf5"
+                    / "dataset.txt"
                 ),
             ],
             out_folder=existing_path(
@@ -257,8 +232,7 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "quadNorm"
-                    / "dataset.hdf5"
+                    / "dataset.txt"
                 )
             ],
             out_folder=existing_path(
@@ -303,8 +277,7 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "benchmark_franti"
-                    / "dataset.hdf5"
+                    / "dataset.txt"
                 ),
             ],
             out_folder=existing_path(
@@ -361,9 +334,7 @@ def get_maxsat_problem_visualization(
                     / "data"
                     / "algorithms_out"
                     / "maxsat"
-                    / "benchmark"
-                    / "new"
-                    / "dataset.hdf5"
+                    / "dataset.txt"
                 )
             ],
             mapping_inst=existing_path(
@@ -372,8 +343,7 @@ def get_maxsat_problem_visualization(
                 / "algorithms_in"
                 / "maxsat"
                 / "benchmark"
-                / "data"
-                / "mapping_benchmark_new.json"
+                / "stats.json"
             ),
             out_folder=existing_path(
                 path_create(
@@ -488,18 +458,37 @@ def get_maxsat_problem_visualization(
 
 
 if __name__ == "__main__":
+    
+    check_tsp(
+        existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
+    )
+    # check_clustering(
+        
+    #             existing_path(
+    #                 Path(".")
+    #                 / "data"
+    #                 / "algorithms_out"
+    #                 / "clustering"
+    #                 / "dataset.txt"
+    #             )
+    # )
+    # check_maxsat(
+    #     existing_path(
+    #                 Path(".")
+    #                 / "data"
+    #                 / "algorithms_out"
+    #                 / "clustering"
+    #                 / "dataset.txt"
+    #             )
+    # )
     print("TSP")
-    # print("tsplib")
-    # get_tsp("tsplib", False) # WIP
+    print("tsplib")
     print("quad")
     get_tsp("uniform_points", False)
-    # print("MAXSAT")
-    # print("benchmark2021")
-    # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
-    # print("randomly_generated")
-    # get_maxsat_problem_visualization("randomly_generated")
-    # print("randomly_generated3")
-    # get_maxsat_problem_visualization("randomly_generated3")
+    get_tsp("tsplib", False)
+    # # print("MAXSAT")
+    # # print("benchmark2021")
+    # # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
     # print("Clustering")
     # print("Aloise")
     # get_clustering("aloise_benchmark", profile=False)

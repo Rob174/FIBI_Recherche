@@ -7,13 +7,14 @@ double* blobs(Config* config) {
     const float dist_thresh = float(GRID_COORD_MAX - GRID_COORD_MIN) / 10.;
     std::mt19937 gen_points(config->SEED_POINTS);
     std::uniform_real_distribution<double> dis_std(std_min, std_max);
-    double centers[2][2];
-    double stds[2];
+    const int NUM_CENTERS = 2;
+    double centers[NUM_CENTERS][2];
+    double stds[NUM_CENTERS];
     std::uniform_real_distribution<double> dis_centers(GRID_COORD_MIN, GRID_COORD_MAX);
     for (int i_cent = 0; i_cent < config->NUM_DIM; i_cent++) {
         centers[0][i_cent] = dis_centers(gen_points);
     }
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < NUM_CENTERS; i++) {
         stds[i] = dis_std(gen_points) * scale_factor;
     }
     double distance = 0;
@@ -22,7 +23,7 @@ double* blobs(Config* config) {
         for (int i_cent = 0; i_cent < config->NUM_DIM; i_cent++) {
             centers[1][i_cent] = dis_centers(gen_points);
         }
-        distance = sqrt(dist(centers[0], centers[1], config)) - 2 * stds[0] - 2 * stds[1];
+        distance = sqrt(dist(centers[0], centers[1], config)) - 2 * (stds[0]+stds[1]);
         counter--;
     }
     double* points = new double[config->NUM_POINTS * config->NUM_DIM];

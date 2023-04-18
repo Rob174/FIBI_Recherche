@@ -17,6 +17,12 @@ void run_algorithm(Config* config) {
 	else if (config->POINTS_DISTR == 3) {
 		points = tsplib_sample_points(config);
 	}
+	else if (config->POINTS_DISTR == 4) {
+		points = open_points_1(config->SEED_POINTS,"benchmark.hdf5", config);
+	}
+	else if (config->POINTS_DISTR == 5) {
+		points = open_points_1(config->SEED_POINTS, "glass.hdf5", config,false);
+	}
 	else {
 		cout << "Wrong POINTS_DISTR " << config->POINTS_DISTR << endl;
 		exit(1);
@@ -36,7 +42,13 @@ void run_algorithm(Config* config) {
 	if (config->CLUST_IMPR == 1) {
 		improve_kmeans(clustering, config);
 	}
-	else if (config->CLUST_IMPR > 1) {
+	else if (config->CLUST_IMPR == 2) {
+		kmeansPlusPlus(clustering, config);
+	}
+	else if (config->CLUST_IMPR == 3) {
+		kmeansPlusPlusSuperGlutton(clustering, config);
+	}
+	else if (config->CLUST_IMPR > 3) {
 		cout << "Wrong CLUST_IMPR " << config->CLUST_IMPR << endl;
 		exit(1);
 	}
@@ -59,18 +71,7 @@ void run_algorithm(Config* config) {
 		run_FI(clustering, result, order, config);
 	}
 	result->set_time_end();
-	//Check no empty cluster
-	/*
-	bool* seen = new bool[config->NUM_CLUST];
-	for (int i = 0; i < config->NUM_POINTS; i++) {
-		seen[result->get_finalAssign()[i]] = true;
-	}
-	for (int i = 0; i < config->NUM_POINTS; i++) {
-		if (!seen[result->get_finalAssign()[i]]) {
-			std::cout << "GLOB_SEED:" << config->SEED_GLOB << ", empty cluster: " << i << std::endl;
-		}
-	}
-	delete[] seen;*/
+
 	create_dataset(result, clustering);
 	// Cleaning
 	delete result;

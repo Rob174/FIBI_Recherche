@@ -1,17 +1,19 @@
 from FIBI.analyse_results.factories.tsp.__init__ import *
+from FIBI.analyse_results.parser.parser import JSONParser
 from FIBI.analyse_results.visualization.global_analysis.components.averages import AverageFIBIDiffTgt, MinimizationTgtDiff
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import TestUsed
 from FIBI.analyse_results.visualization.global_analysis.pie_chart import PieChart
 from FIBI.analyse_results.visualization.global_analysis.pie_chart_distr import PieChartDistrib
 
 def get_tsp_uniform_visualizations(
-    path_mapping: Path, pathes_hdf5: List[Path], out_folder: Path
+    pathes_hdf5: List[Path], out_folder: Path
 ):
-    stats = MainParser(Parser(path_mapping))
+    stats = MainParser(JSONParser())
     # mapping names index in hdf5 to names of the attributes=
     query_to_path = DicoPathConverter(
         path_create(out_folder / "stats" / "dico_path_converter.json"), overwrite=True
     )
+    mapping_points = {0: "Uniformly distributed towns", 1: "TSPLIB"}
     mapping_impr = {
         0: "RAND",
         1: "GREEDY",
@@ -27,7 +29,7 @@ def get_tsp_uniform_visualizations(
                 name="IMPR",
                 mapping=mapping_impr,
             ),
-            ModifierOperation(dst_name="DATASET", operation=lambda x: "uniform_points"),
+            ModifierIntMapping(name="DATASET", mapping=mapping_points),
             ModifierOperation(dst_name="init_meth", operation=lambda x: 'random' if x['IMPR'] == "RAND" else 'greedy'),
             ModifierIntMapping(name="FI_BI", mapping={0: "BI", 1: "FI"}),
             ModifierOperation(
@@ -47,7 +49,8 @@ def get_tsp_uniform_visualizations(
             ),
         ],  # type: ignore
         filters=[
-            FilterAttrValueInt(attr="FI_BI", values_to_keep=[0, 1]),
+            FilterAttrValueInt(attr="DATASET", values_to_keep=[0]),
+            FilterDuplicatedKeys(False)
         ],
     )
     # legend for the table

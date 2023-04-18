@@ -8,9 +8,11 @@
 #include "moon.h"
 #include "uniform.h"
 #include "tsplib.h"
+#include "open_points_1.h"
 // clustering init
 #include "random_clust.h"
 #include "kmeans.h"
+#include "kmeansPlusPlus.h"
 // algorithms
 #include "iteration_order.h"
 #include "FI.h"

@@ -3,7 +3,7 @@ from FIBI.analyse_results.visualization.global_analysis.page_multiinstances impo
     Aggregator,
 )
 from FIBI.analyse_results.visualization.utils import default_fibi_order, dicos_fibi_diff
-from FIBI.analyse_results.visualization.statistical_tests import SignTest, ZTest
+from FIBI.analyse_results.visualization.statistical_tests import SignTest, ZTest, WilcoxonTest, TTest
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import (
     InitDistrShape)
 
@@ -18,9 +18,9 @@ class PValueEffectSize(Aggregator):
         init = InitDistrShape('ratio').aggregate(keys, dfs)[0]['data']
         diff = dicos_fibi_diff(dfs, self.metric, True)["-".join(default_fibi_order())]
         if init in ["ng"]:
-            test = SignTest()
+            test = WilcoxonTest()
         elif init in ["g", "gh"]:
-            test = ZTest()
+            test = TTest()
         else:
             raise ValueError("Unknown initialization: %s" % init)
         classes = [

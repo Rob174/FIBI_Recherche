@@ -7,7 +7,9 @@
 #include <map>
 #include <memory>
 
-#include "test.h"
+#include "test/tests.hpp"
+
+/*
 #include "MAXSATgenerator.h"
 #include "Algorithm.h"
 #include "AlgorithmObservable.h"
@@ -17,13 +19,14 @@
 #include "factories.h"
 #include "progress.h"
 #include "argParser.hpp"
+*/
 
 #ifdef _WIN32
 #include <windows.h>
 #elif __linux__
 #include <signal.h>
 #endif
-
+/*
 #define M_insert(key, value) (*args)[stringify(key)] = value
 
 int currBackup;
@@ -503,8 +506,10 @@ void consoleHandler(int signal)
 	}
 }
 #endif
+*/
 int main(int argc, char **argv)
 {
+	/*
 #ifdef _WIN32
 	if (!SetConsoleCtrlHandler(consoleHandler, TRUE))
 	{
@@ -636,5 +641,7 @@ int main(int argc, char **argv)
 			return 4;
 		}
 #endif
-	}
+	}*/
+	run_tests();
+	return 0;
 }

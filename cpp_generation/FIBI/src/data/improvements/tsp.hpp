@@ -50,7 +50,7 @@ vector<int>* improved_tour(const int num_towns, const int seed, const DistanceMa
 	for (int i = 0; i < num_towns - 1; i++)
 	{
 		// Find the argmin of distance
-		double min = std::numeric_limits<double>::max();
+		double min = 1e100;
 		int argmin = -1;
 		for (int j : available_points)
 		{
@@ -99,7 +99,7 @@ vector<int>* improved_rand_tour(const int num_towns, const int seed, const Dista
 			top_x_data.push_back(std::make_pair(d, j));
 		}
 		// Take top N
-		const int size_top = std::min(N, (int)(top_x_data.size()));
+		const int size_top = N < (int)(top_x_data.size()) ? N : (int)(top_x_data.size());
 		std::nth_element(top_x_data.begin(), top_x_data.begin() + size_top, top_x_data.end(),
 			[](auto& l, auto& r)
 			{ return l.first < r.first; });

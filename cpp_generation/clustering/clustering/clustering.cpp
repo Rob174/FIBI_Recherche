@@ -5,8 +5,8 @@ Clustering::Clustering(double* points, int* assignements, Config* config) : p_c(
     for (int i = 0; i < config->NUM_POINTS; i++) {
         this->n_p_p_c[i] = 0;
     }
-    this->c_c = new double[config->NUM_POINTS * config->NUM_DIM];
-    for (int i = 0; i < config->NUM_POINTS * config->NUM_DIM; i++) {
+    this->c_c = new double[config->NUM_CLUST * config->NUM_DIM];
+    for (int i = 0; i < config->NUM_CLUST * config->NUM_DIM; i++) {
         this->c_c[i] = 0.;
     }
 }

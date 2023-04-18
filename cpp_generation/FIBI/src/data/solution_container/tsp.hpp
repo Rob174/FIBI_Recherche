@@ -92,7 +92,7 @@ public:
 	}
 	// Getters
 	[[nodiscard]] const int* get_tour() { return tour.data(); }
-	const double* get_towns_pos() { return dist.get_town_pos(); }
+	const std::vector<double>& get_towns_pos() { return dist.get_town_pos(); }
 	// Utility
 	town_in_tour_id_t cycle_id(const town_in_tour_id_t i) const
 	{

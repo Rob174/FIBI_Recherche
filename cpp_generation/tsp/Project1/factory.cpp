@@ -13,15 +13,32 @@ void run_algorithm(Config* conf)
 		points = random_eucl_points_blobs(conf);
 	}
 	else if (conf->DATASET == 2) {
-		points = tsplib_sample_points(conf);
+		using namespace H5;
+		const H5std_string FILE_NAME("tsplib.hdf5");
+		points = tsplib_sample_points(FILE_NAME,conf);
 	}
-	else if(conf->DATASET > 3) {
+	else if (conf->DATASET == 3) {
+		using namespace H5;
+		const H5std_string FILE_NAME("tsplib_1000_stop.hdf5");
+		points = tsplib_sample_points(FILE_NAME,conf);
+	}
+	else if (conf->DATASET == 4) {
+		using namespace H5;
+		const H5std_string FILE_NAME("tsplib_extended.hdf5");
+		points = tsplib_sample_points(FILE_NAME, conf);
+	}
+	else if (conf->DATASET == 5) {
+		using namespace H5;
+		const H5std_string FILE_NAME("tsplib_paper_moreThan1000.hdf5");
+		points = tsplib_sample_points(FILE_NAME, conf);
+	}
+	else if(conf->DATASET > 6) {
 		std::cout << "Wrong dataset value " << conf->DATASET << std::endl;
 		exit(1);
 	}
 	//Preprocessing: distance matrix
 	DistanceMatrix* distances;
-	if (conf->DATASET == 3) {
+	if (conf->DATASET == 6) {
 		GeneratedDistanceMatrix* distancesGen = new GeneratedDistanceMatrix(conf);
 		distancesGen->compute();
 		distances = distancesGen;
@@ -42,10 +59,14 @@ void run_algorithm(Config* conf)
 	else if (conf->TOUR_ALGO == 1) {
 		tour_array = improved_tour(conf, distances);
 	}
+	else if (conf->TOUR_ALGO == 2) {
+		tour_array = improved_rand_tour(conf, distances);
+	}
 	else {
 		std::cout << "Wrong TOUR_ALGO value " << conf->TOUR_ALGO << std::endl;
 		exit(1);
 	}
+	//res->set_init_tour(points, tour_array);
 	//Create tour
 	Tour* tour = new Tour(tour_array, conf);
 	//Run algorithm
@@ -70,6 +91,7 @@ void run_algorithm(Config* conf)
 		exit(1);
 		break;
 	}
+	res->set_final_length(tour->get_length(distances));
 	res->set_time_end();
 	//Save results
 	save_to_hdf5(res, conf);

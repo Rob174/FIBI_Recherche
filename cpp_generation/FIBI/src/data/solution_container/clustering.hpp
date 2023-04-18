@@ -7,7 +7,7 @@
 
 using namespace std;
 
-template <bool debug = false, const double EPSILON = 1e-5>
+template <bool debug = false>
 class ClusteringSolutionContainer : public AbstractSolutionContainer<ClusteringSwap>
 {
 public:

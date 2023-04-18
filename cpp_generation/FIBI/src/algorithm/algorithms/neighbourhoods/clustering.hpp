@@ -4,8 +4,8 @@
 #include "abstract.hpp"
 #include "../../../data/solution_container/clustering.hpp"
 #include "../../../data/constants/clustering.hpp"
+#include "../../../utils.h"
 
-template <const double EPSILON = 1e-5>
 class ClusteringNeighbourhoodExplorer
 {
 private:

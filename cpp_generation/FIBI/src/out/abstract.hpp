@@ -5,6 +5,26 @@
 #include <exception>
 #include <cstdio>
 #include <fstream>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <cstdlib>
+#include <thread>
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <utility>
+#include <set>
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#endif
 
 
 using namespace std;
@@ -28,7 +48,7 @@ void clean_dataset(string filename = "dataset.hdf5") {
 * * @return void
 * */
 template <bool debug = false>
-void save_metadata(const unsigned long seed_glob, const vector < pair<string, double>>& values, string filename = "dataset.hdf5") {
+bool save_metadata(const unsigned long seed_glob, const vector < pair<string, double>>& values, string filename = "dataset.hdf5") {
 	// Save current absolute path
 	string current_path = filesystem::current_path().string();
 	if constexpr (debug) {
@@ -75,6 +95,7 @@ void save_metadata(const unsigned long seed_glob, const vector < pair<string, do
 			res[j] = values.at(j).second;
 		}
 		dataset.write(res, PredType::NATIVE_DOUBLE);
+		return true;
 	}
 	catch (FileIException error)
 	{
@@ -102,40 +123,70 @@ void save_metadata(const unsigned long seed_glob, const vector < pair<string, do
 * */
 void clean_dataset(string foldername = "dataset/") {
 	// Remove the folder and all its content
-	filesystem::remove_all(foldername);
+	try {
+		filesystem::remove_all(foldername);
+	}
+	catch (...) {
+		cout << "Current folder: " << filesystem::current_path().string() << endl;
+	}
 }
-/** @brief Save the metadata of the algorithm
-* * @param seed_glob The seed of the algorithm
-* * @param values The values to save
-* * @param filename The name of the file to save the data
-* * @tparam debug If true, print debug information (current folder)
-* * @return void
-* */
-template <bool debug = false>
-void save_metadata(const unsigned long seed_glob, const vector < pair<string, double>>& values, string foldername = "dataset/") {
-	// Save current absolute path
-	string current_path = filesystem::current_path().string();
-	if constexpr (debug) {
-		// print current folder
-		cout << "Current folder: " << current_path << endl;
+class MergeMetadata {
+	using json = nlohmann::json;
+private:
+	bool merged_exists_;
+	const int size_merge;
+	vector<vector<pair<string, double>>> metrics;
+	string filename;
+	// Private helper function to get the full path of the merged file
+	string merged_file_path() const {
+		return filename;
 	}
-	// filename is foldername + seed_glob converted to string
-	string filename = foldername + to_string(seed_glob) + ".json";
-	// Create the folder if it does not exist
-	if (!filesystem::exists(foldername)) {
-		filesystem::create_directory(foldername);
-	}
-	// Create the file and dump the values in the json format
-	ofstream file(filename);
-	file << "{";
-	for (size_t i = 0; i < values.size(); i++) {
-		file << "\"" << values.at(i).first << "\": " << values.at(i).second;
-		if (i != values.size() - 1) {
-			file << ", ";
+
+public:
+	MergeMetadata(const int size_merge = 1000, const string filename = "merged.txt") : filename(filename), size_merge(size_merge) {
+		// Check if the merged file already exists
+		merged_exists_ = false;
+		ifstream merged_file(merged_file_path());
+		if (merged_file.good()) {
+			merged_exists_ = true;
+			merged_file.close();
 		}
 	}
-	file << "}";
-	file.close();
-}
+	void add_metadata(vector<pair<string,double>> value) {
+		metrics.push_back(value);
+	}
+	bool ready_to_merge() const {
+		return metrics.size() > size_merge;
+	}
+	void merge() {
+		cout << "Merging..." << metrics.size() << " elements..." << endl;
+		// Open the merged file in append mode
+		ofstream merged_file(merged_file_path(), ios::app);
 
+		// Loop over the seeds to merge
+		int k = 0;
+		for (const vector<pair<string, double>> metadata : metrics) {
+			// Write the metadata as a JSON-like string
+			if (metadata.size() == 0) continue;
+			k++;
+			merged_file << "{";
+			int i = 0;
+			for (auto it = metadata.begin(); it != metadata.end(); ++it) {
+
+				merged_file << "\"" << (*it).first << "\"" << ":" << (*it).second;
+				if (std::next(it) != metadata.end()) {
+					merged_file << ", ";
+				}
+				i++;
+			}
+			merged_file << "},\n";
+		}
+		cout << "---> Merged " << k << " elements" << endl;
+		metrics.clear();
+
+		// Close the merged file
+		merged_file.close();
+	}
+
+};
 #endif // HDF5save

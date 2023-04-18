@@ -79,7 +79,9 @@ class JSONParser(AbstractBaseParser):
         return open(path, "r")
     def get_data(self, file: TextIOWrapper) -> Iterable:
         """Return the data to parse"""
-        return file
+        text = "[" + file.read()[:-2] + "]"
+        return json.loads(text)
+
 class MainParser:
     """Main parser entry point: parse a list of hdf5 files and return a list of dictionnaries.
     Concretely iterate over the files, iterate over the runs in the files, parse the runs and apply modifiers to obtain the final list of dictionnaries.
@@ -102,20 +104,23 @@ class MainParser:
         # Determine the total number of runs to parse in all the files
         total_size = 0
         for p in path_in:
-            with File(p, "r") as f:
+            with self.base_parser.open_file(p) as f:
                 total_size += len(self.base_parser.get_data(f)) # type: ignore
         # Parse the runs
         with DefaultProgressBar() as progress:
             progress.set_total_steps(total_size)
             for p in path_in:
-                with File(p, "r") as f:
+                with self.base_parser.open_file(p) as f:
                     for d in self.base_parser.get_data(f):# type: ignore
+                        if len(d) == 0:
+                            continue
                         dico = self.base_parser(p.stem, d)
                         keep = True
                         for filter_run in filters:
                             keep = keep and filter_run.filter_before_modifiers(dico)
                         if not keep:
                             continue
+                        b=0
                         for m in modifiers:
                             dico = m(dico)
                         keep = True

@@ -5,7 +5,8 @@
 #include "../../../data/solution_container/tsp.hpp"
 #include "../../../data/constants/tsp.hpp"
 
-template <const double EPSILON = 1e-5>
+#include "../../../utils.h"
+
 class TSPNeighbourhoodExplorer
 {
 private:

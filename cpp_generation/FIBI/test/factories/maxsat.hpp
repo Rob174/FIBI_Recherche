@@ -23,7 +23,7 @@ void test_MAXSATFactory() {
 					{"NUM_CLAUSES",50}
 				};
 				MAXSATConfig cf(args);
-				f.run(cf, root_data, out_data, i == 0);
+				f.run(cf, root_data);
 				cout << "\x1B[32m \tOK ";
 				cf.print();
 				cout << "\033[0m " << endl;

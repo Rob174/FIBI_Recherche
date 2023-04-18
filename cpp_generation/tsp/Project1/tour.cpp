@@ -11,7 +11,16 @@ Tour::~Tour() {
 double Tour::get_cost(DistanceMatrix *dist) {
     double tour_length = 0; 
     for (int i = 0; i < this->length;i++) {
-        tour_length += dist->get(this->tour[i], this->tour[(i+1) % this->length]);
+        double d = dist->get(this->tour[i], this->tour[(i + 1) % this->length]);
+        tour_length += d;
+    }
+    return tour_length;
+}
+double Tour::get_length(DistanceMatrix* dist) {
+    double tour_length = 0;
+    for (int i = 0; i < this->length; i++) {
+        double d = dist->get(this->tour[i], this->tour[(i + 1) % this->length]);
+        tour_length += d;
     }
     return tour_length;
 }

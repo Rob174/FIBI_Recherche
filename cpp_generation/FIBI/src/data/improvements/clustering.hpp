@@ -29,7 +29,7 @@ bool affectToNearestCluster(vector<double>& centroids, const vector<double>& poi
 	for (int i = 0; i < num_points; i++)
 	{
 		const double* c_points = &(points.data()[i * num_dims]);
-		double minDist = numeric_limits<double>::max();
+		double minDist = 1e100;
 		int chosenClust = -1;
 		for (int c = 0; c < num_clust; c++)
 		{
@@ -161,7 +161,7 @@ void kmeansPlusPlus(vector<double>& centroids, const vector<double>& points, vec
 	{
 		for (int j = 0; j < num_points; j++)
 		{
-			dist_matrix[i * num_points + j] = numeric_limits<double>::max();
+			dist_matrix[i * num_points + j] = 1e100;
 		}
 	}
 
@@ -175,7 +175,7 @@ void kmeansPlusPlus(vector<double>& centroids, const vector<double>& points, vec
 		for (int i = 0; i < num_points; i++)
 		{
 			// find closest centroid of point
-			double closest_dist = numeric_limits<double>::max();
+			double closest_dist = 1e100;
 			int closest_clust = -1;
 			for (int j = 0; j < num_clust; j++)
 			{
@@ -285,7 +285,7 @@ void kmeansPlusPlusSuperGlutton(vector<double>& centroids, const vector<double>&
 	{
 		for (int j = 0; j < num_points; j++)
 		{
-			dist_matrix[i * num_points + j] = numeric_limits<double>::max();
+			dist_matrix[i * num_points + j] = 1e100;
 		}
 	}
 
@@ -300,7 +300,7 @@ void kmeansPlusPlusSuperGlutton(vector<double>& centroids, const vector<double>&
 		for (int i = 0; i < num_points; i++)
 		{
 			// find closest centroid of point
-			double closest_dist = numeric_limits<double>::max();
+			double closest_dist = 1e100;
 			int closest_clust = -1;
 			for (int j = 0; j < num_clust; j++)
 			{

@@ -10,5 +10,7 @@
 #include "tsplib.h"
 #include "preprocessing.h"
 #include "save_to_hdf5.h"
+#include <H5Cpp.h>
+#include "improved_rand_tour.h"
 
 void run_algorithm(Config* conf);

@@ -14,6 +14,10 @@ void Result::set_final_cost(double final_cost)
 {
 	this->final_cost = final_cost;
 }
+void Result::set_final_length(double final_length)
+{
+	this->final_length = final_length;
+}
 void Result::set_init_cost(double init_cost)
 {
 	this->init_cost = init_cost;
@@ -24,6 +28,26 @@ double Result::get_time_elapsed() {
 void Result::set_time_end()
 {
 	this->duration = this->get_time_elapsed();
+}
+
+void Result::set_init_tour(double* points, int* tour)
+{
+	for (int i = 0; i < config->NUM_DIM * config->NUM_POINTS; i++) {
+		this->points[i] = points[i];
+	}
+	for (int i = 0; i < config->NUM_POINTS; i++) {
+		this->init_tour[i] = tour[i];
+	}
+}
+
+double* Result::get_points()
+{
+	return this->points;
+}
+
+int* Result::get_init_tour()
+{
+	return this->init_tour;
 }
 
 void Result::set_time_start()
@@ -59,5 +83,6 @@ std::vector<double>* Result::get_result() {
 	to_backup->push_back((double)this->num_iter);
 	to_backup->push_back((double)this->num_iter_glob);
 	to_backup->push_back((double)this->duration);
+	to_backup->push_back((double)this->final_length);
 	return to_backup;
 }

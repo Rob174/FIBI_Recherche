@@ -1,4 +1,5 @@
 from FIBI.analyse_results.factories.maxsat.__init__ import *
+from FIBI.analyse_results.parser.parser import JSONParser
 from FIBI.analyse_results.visualization.global_analysis.components.averages import AverageFIBIDiffTgt, MaximizationTgtDiff
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import TestUsed
 from FIBI.analyse_results.visualization.global_analysis.pie_chart import PieChart
@@ -9,7 +10,7 @@ def get_maxsat_instance_visualizations(
     mapping_inst: Path,
     out_folder: Path,
 ):
-    stats = MainParser(Parser(path_mapping))
+    stats = MainParser(JSONParser(path_mapping))
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
         mapping = json.load(f)
@@ -51,7 +52,11 @@ def get_maxsat_instance_visualizations(
                 operation=lambda d: d["final_cost"] / d["init_cost"],
             ),
         ],  # type: ignore
-        filters=[],
+        filters=[
+            FilterAttrValueInt(attr="DATASET", values_to_keep=[1]),
+            FilterDuplicatedKeys(False)
+            
+            ],
     )
     # legend for the table
     with open(

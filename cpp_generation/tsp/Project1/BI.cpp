@@ -24,7 +24,7 @@ void run_BI(Tour* tour, DistanceMatrix*dist, Result* res,Config* conf) {
 		delta = 0;
 		for (int i = 0; i <= conf->NUM_POINTS - 3; i++) {
 			int n_prime = i == 0 ? conf->NUM_POINTS - 2 : conf->NUM_POINTS-1;
-			for (int j = i + 1; j <= n_prime; j++) {
+			for (int j = i + 2; j <= n_prime; j++) {
 				double delta_ij =
 					dist->get(
 						tour->at(cyclic_id(i),conf),

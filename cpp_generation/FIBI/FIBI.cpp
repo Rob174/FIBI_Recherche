@@ -5,8 +5,8 @@
 
 using namespace std;
 
-int main()
+int main(const int argc, char** argv)
 {
-	run_tests();
+	run_tests(argc, argv);
 	return 0;
 }

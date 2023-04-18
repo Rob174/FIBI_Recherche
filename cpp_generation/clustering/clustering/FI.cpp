@@ -44,7 +44,7 @@ void run_FI(Clustering* clustering, Result* result, IterationOrder* order, Confi
         }
         if (abs(delta) < EPSILON) {
             result->set_final_cost(cost);
-            result->set_final_clust(clustering->p_c, clustering->c_a);
+            //result->set_final_clust(clustering->p_c, clustering->c_a);
             return;
         }
         outloop:

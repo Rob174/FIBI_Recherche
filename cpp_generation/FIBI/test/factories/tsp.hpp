@@ -23,7 +23,7 @@ void test_TSPFactory() {
 					{"NUM_DIM",2}
 				};
 				TSPConfig cf(args);
-				f.run(cf, root_data, out_data, i == 0);
+				f.run(cf, root_data);
 
 				cout << "\x1B[32m \tOK ";
 				cf.print();

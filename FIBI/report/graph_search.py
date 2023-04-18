@@ -191,8 +191,9 @@ def generator():
             for n in nodes:
                 n.make_links()
             g = Graph("G", format="png", strict=True)
-            g.attr("rankdir", "LR")
+            g.attr(rankdir= 'LR')
             g_dot = Graph("G", format="dot", strict=True)
+            g_dot.attr(rankdir='LR')
             Node.links = set()
             for n in nodes:
                 n.make_node(g)
@@ -201,10 +202,42 @@ def generator():
                 n.make_edges(g)
                 n.make_edges(g_dot)
             yield g, g_dot
+def selected_graph():
+    cost_vector = np.array([4,8,10,19])
+    size_costs = 4
+    print(f"Cost vector: {cost_vector}")
+    # make all posibilities of the encoding with constant hamming sum
+    Node.node_encoding_obj = {}
+    nodes = []
+    for i in range(2**size_costs):
+        i_bin = bin(i)[2:].zfill(size_costs)
+        i_bin = tuple([True if x == "1" else False for x in i_bin])
+        cost = sum([cost_vector[i] for i in range(len(i_bin)) if i_bin[i]])
+        nodes.append(Node(solution_encoding=i_bin, cost=cost, id=i))
+
+    for n in nodes:
+        n.make_links()
+    g = Graph("G", format="png", strict=True)
+    g.attr(rankdir= 'LR')
+    g_dot = Graph("G", format="dot", strict=True)
+    g_dot.attr(rankdir= 'LR')
+    Node.links = set()
+    for n in nodes:
+        n.make_node(g)
+        n.make_node(g_dot)
+    for n in nodes:
+        n.make_edges(g)
+        n.make_edges(g_dot)
+    g.view()
+    # copy to clipboard
+    src = g.source
+    pyperclip.copy(src)
 if __name__ == "__main__":
     for i,(g,g_dot) in enumerate(generator()):
         g.view()
         # copy to clipboard
         src = g.source
         pyperclip.copy(src)
-        b = 0
+        b=0
+    #selected_graph()
+    b = 0

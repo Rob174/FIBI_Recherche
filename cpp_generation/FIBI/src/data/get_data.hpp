@@ -56,19 +56,62 @@ const vector<double>* uniform_points(const unsigned long num_points, const unsig
 	uniform_real_distribution<> dis(minV, maxV);
 	return fill_vector_with<double>(dis, num_points * num_dims, seed);
 }
-/** @brief Generate a vector of random points
-* *
+/** @brief Generate a vector of random points. For the points are equally distributed into clusters. 
+* * For each cluster a normal distribution is used with a random center in the range [minV, maxV] and a random standard deviation in the range [(maxV - minV) / 10, (maxV - minV) / 2]
+* * Can be a different number of points per cluster of more than one because we need to assign the points to the clusters at the same time as we create them
 * * @param num_points Number of points
 * * @param num_dims Number of dimensions
+* * @param num_clust Number of clusters
 * * @param seed Seed for the random number generator
 * * @param minV Minimum value for the random number generator X coordinate
 * * @param maxV Maximum value for the random number generator Y coordinate
-* * @return const vector<double>& Vector of random points 1 dimensional
+* * @return const tuple<vector<double>*,vector<int>*,vector<double>*, vector<double>*> Vector of 
+* *		- random points, 
+* *     - cluster assignments 
+* *     - cluster centers (in the format num_dims * num_centers: flattened)
+* *     - standard deviations
 * */
-const vector<double>* normal_points(const unsigned long num_points, const unsigned long num_dims, const unsigned int seed, const double minV = DEFAULT_MIN_V, const double maxV = DEFAULT_MAX_V)
+const tuple<vector<double>*,vector<int>*, vector<double>*, vector<double>*> normal_points(const unsigned long num_points, const unsigned long num_dims, const unsigned int num_clust, const unsigned int seed, const double minV = DEFAULT_MIN_V, const double maxV = DEFAULT_MAX_V)
 {
-	normal_distribution<> dis(minV, maxV);
-	return fill_vector_with<double>(dis, num_points * num_dims, seed);
+	const int num_points_per_clust = num_points / num_clust;
+	const double clust_range = (maxV - minV) / num_clust;
+	const double clust_std = (maxV - minV) / 10;
+	const double clust_std_max = (maxV - minV) / 2;
+	vector<double>* points = new vector<double>(num_points * num_dims);
+	vector<int>* clust = new vector<int>(num_points); // Cluster assignment
+	vector<double>* clust_centers = new vector<double>(num_clust*num_dims);
+	vector<double>* clust_stds = new vector<double>(num_clust);
+	mt19937 gen(seed);
+	uniform_real_distribution<> dis(minV, maxV);
+	uniform_real_distribution<> dis_std(clust_std, clust_std_max);
+	int offset_pt = 0;
+	// Number of points per cluster is num_points / num_clust plus 1 
+	// if the number of points is not divisible by the number of clusters 
+	// and if the cluster index is less than the remainder
+	for (int i = 0; i < num_clust; i++)
+	{
+		// Generate a random standard deviation for the cluster
+		const double std = dis_std(gen);
+		(*clust_stds)[i] = (double)std;
+		// Generate a normal distribution for the cluster
+		normal_distribution<> dis_clust(0, std);
+		const int added = (i < (num_points % num_clust) ? 1 : 0);
+		const int number_of_pts = num_points_per_clust + added;
+		// Fill the points with the normal distribution
+		for (int k = 0; k < num_dims; k++) // dimensions first to sample the mean on the fly
+		{
+			const double mean = dis(gen);
+			(*clust_centers)[i * num_dims + k] = (double)mean;
+			// Move the decided mean
+			for (int j = offset_pt; j < offset_pt+ number_of_pts; j++)
+			{
+				(*points)[j * num_dims + k] = dis_clust(gen) + mean;
+				(*clust)[j] = i;
+			}
+		}
+		offset_pt += number_of_pts;
+	}
+	return make_tuple(points, clust, clust_centers, clust_stds);
 }
 /** @brief Generate a permutation of the numbers 0 to num_towns - 1
 * @param num_towns Number of towns

@@ -54,7 +54,7 @@ AFTER      ┌──────────────┐                  ┌
 											 └────────────┘
 */
 #define stringify(name) #name
-#define addCst(v) if(args.find(#v) != args.end())v = Uninitialized<int>(args.at(#v));else v = Uninitialized<int>();
+#define addCst(v) if(args.find(#v) != args.end() && args.at(#v) != -1){v = Uninitialized<int>(args.at(#v));}else {v = Uninitialized<int>();}
 
 #define jMk(v) {#v,(double)v.get()}
 class AbstractConfig

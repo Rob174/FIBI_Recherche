@@ -12,7 +12,7 @@ using namespace std;
 
 class TSPFactory : public AbstractFactory<TSPConfig> {
 public:
-	void run(TSPConfig& cf, string root_data = "./", string out_folder = "./", bool clean = false) override
+	vector<pair<string, double>> run(TSPConfig& cf, string root_data = "./") override
 	{
 		// setup
 		const vector<double>* towns_pos_ptr;
@@ -26,18 +26,12 @@ public:
 				cf.SEED_PROBLEM.get());
 			break;
 		case 1:
-
 #if HDF5save
 			dataset_name = "tsplib.hdf5";
 #else
 			dataset_name = "tsplib/";
 #endif
 			towns_pos_ptr = open_tsplib(cf.SEED_PROBLEM.get(), root_data + dataset_name, &cf);
-			break;
-		case 2:
-			towns_pos_ptr = normal_points(cf.NUM_TOWNS.get(),
-				cf.NUM_DIM.get(),
-				cf.SEED_PROBLEM.get());
 			break;
 		default:
 			throw invalid_argument("Invalid DATASET argument, Valid values are 0->2");
@@ -78,13 +72,10 @@ public:
 		// algorithms execution
 		vector<tsp_obs_t* > obs;
 		obs.push_back(&metrics);
-		unique_ptr<typename tsp_ls_t<>::ls_t> ls(getTSPLocalSearch<>(obs));
+		unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs,(bool)cf.FI_BI.get()));
 		ls->run(co, cf);
 		// writing the results
 		vector<pair<string, double>> res = get_results<TSPSwap, TSPSolutionContainer<>>(&metrics, &cf);
-		if (clean) {
-			clean_dataset(out_folder+"dataset_tsp/");
-		}
-		save_metadata<>(cf.SEED_GLOB.get(), res, out_folder+"dataset_tsp/");
+		return res;
 	}
 };

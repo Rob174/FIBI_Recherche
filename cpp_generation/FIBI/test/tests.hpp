@@ -23,6 +23,7 @@
 #include "./factories/clustering.hpp"
 #include "./factories/maxsat.hpp"
 #include "./launch/threadpool.hpp"
+#include "./launch/generators.hpp"
 
 using namespace std;
 #define TEST_MACRO(name) \
@@ -31,15 +32,17 @@ using namespace std;
 #define REGISTER(fn)                 \
     functions_to_run.push_back(&fn); \
     functions_names.push_back(#fn);
-void run_tests()
+void run_tests(const int argc, char** argv)
 {
-	vector<void (*)()> functions_to_run;
+	vector<void (*)(const int argc, char** argv)> functions_to_run;
 	vector<string> functions_names;
 	/*
 	REGISTER(test_uniform_points);
 	REGISTER(test_uniform_points_repetability);
-	REGISTER(test_normal_points);
-	REGISTER(test_normal_points_repetability);
+	*/
+	//REGISTER(test_normal_points);
+	//REGISTER(test_normal_points_repetability);
+	/*
 	REGISTER(test_random_clust);
 	REGISTER(test_random_clust_repeatability);
 	REGISTER(test_tsplib);
@@ -85,14 +88,15 @@ void run_tests()
 	REGISTER(test_thread_pool);
 	REGISTER(test_thread_pool_hdf5_read);
 	REGISTER(test_thread_pool_hdf5_write);
-	*/
 	REGISTER(test_thread_pool_TSPFactory);
+	*/
+	REGISTER(test_gather_metadata);
 #define DEBUG
 	for (int i = 0; i < functions_names.size(); i++)
 	{
 		try
 		{
-			functions_to_run.at(i)();
+			functions_to_run.at(i)(argc,argv);
 			cout << "\x1B[32m " << functions_names.at(i) << ":OK \033[0m " << endl;
 		}
 		// catch all runtime errors

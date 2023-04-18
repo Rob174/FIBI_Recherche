@@ -41,7 +41,7 @@ void run_BI(Clustering* clustering, Result* result, Config* config)
         }
         if (abs(delta) < EPSILON) {
             result->set_final_cost(cost);
-            result->set_final_clust(clustering->p_c, clustering->c_a);
+            //result->set_final_clust(clustering->p_c, clustering->c_a);
             return;
         }
 #if defined(DEBUG_LV2)

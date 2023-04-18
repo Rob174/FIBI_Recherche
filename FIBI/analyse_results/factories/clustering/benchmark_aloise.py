@@ -1,4 +1,5 @@
 from FIBI.analyse_results.factories.clustering.__init__ import *
+from FIBI.analyse_results.parser.parser import JSONParser
 from FIBI.analyse_results.visualization.global_analysis.components.averages import AverageFIBIDiffTgt, MinimizationTgtDiff
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import TestUsed
 from FIBI.analyse_results.visualization.global_analysis.pie_chart import PieChart
@@ -9,7 +10,7 @@ def get_clustering_benchmark_aloise_visualizations(
     mapping_inst: Path,
     out_folder: Path,
 ):
-    stats = MainParser(Parser(path_mapping))
+    stats = MainParser(JSONParser(path_mapping))
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
         mapping = json.load(f)
@@ -54,8 +55,8 @@ def get_clustering_benchmark_aloise_visualizations(
             ),
         ],  # type: ignore
         filters=[
-            FilterAttrValueInt(attr="IMPR", values_to_keep=[0, 1, 2]),
-            FilterAttrValueInt(attr="FI_BI", values_to_keep=[0, 1]),
+            FilterDuplicatedKeys(False),
+            FilterAttrValueInt(attr="DATASET", values_to_keep=[2]),
         ],
     )
     assert len(Ldata) > 0

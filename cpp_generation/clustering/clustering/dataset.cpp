@@ -1,4 +1,9 @@
 #include "dataset.h"
+#include <exception>
+#include <typeinfo>
+#include <stdexcept>
+
+//#define DUMP_CLUSTERS
 void create_dataset(Result*res, Clustering* final_clust) {
     const H5std_string FILE_NAME("dataset.hdf5");
     try {
@@ -39,11 +44,9 @@ void create_dataset(Result*res, Clustering* final_clust) {
             data[i] = (*results)[i];
         }
         dataset1.write(data, PredType::NATIVE_DOUBLE);
-        delete results;
-        delete []data;
 
+#ifdef DUMP_CLUSTERS
         // Save output points clustering of algorithm
-        /*
         Group group2(file.openGroup("points_coords"));
         hsize_t dims2[RANK1];
         dims2[0] = res->get_config()->NUM_POINTS * res->get_config()->NUM_DIM;
@@ -57,7 +60,10 @@ void create_dataset(Result*res, Clustering* final_clust) {
         DataSpace dataspace3(RANK1, dims3);
         DataSet dataset3 = group3.createDataSet(identifier, PredType::NATIVE_INT, dataspace3);
         dataset3.write(res->get_finalAssign(), PredType::NATIVE_INT);
-        */
+#endif
+        delete results;
+        delete[]data;
+        
     } 
     catch (FileIException error) {
         error.printErrorStack();
@@ -73,6 +79,12 @@ void create_dataset(Result*res, Clustering* final_clust) {
         error.printErrorStack();
         std::cout << "Error writing dataset: DataSpace operations" << std::endl;
         exit(-1);
+    }
+    catch (const std::exception& exc) {
+        std::cout << "Other exception" << std::endl;
+        std::cerr << exc.what();
+        exit(-1);
+
     }
 }
 

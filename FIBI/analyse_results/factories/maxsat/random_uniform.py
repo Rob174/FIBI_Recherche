@@ -1,4 +1,5 @@
 from FIBI.analyse_results.factories.maxsat.__init__ import *
+from FIBI.analyse_results.parser.parser import JSONParser
 from FIBI.analyse_results.visualization.global_analysis.components.averages import AverageFIBIDiffTgt, MaximizationTgtDiff
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import TestUsed
 from FIBI.analyse_results.visualization.global_analysis.pie_chart import PieChart
@@ -8,7 +9,7 @@ def get_maxsat_uniformly_generated_visualizations(
     pathes_hdf5: List[Path],
     out_folder: Path,
 ):
-    stats = MainParser(Parser(path_mapping))
+    stats = MainParser(JSONParser(path_mapping))
     query_to_path = DicoPathConverter(out_folder / "stats" / "dico_path_converter.json")
     Ldata = stats(
         pathes_hdf5,
