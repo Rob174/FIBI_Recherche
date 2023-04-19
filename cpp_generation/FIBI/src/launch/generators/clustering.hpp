@@ -54,7 +54,6 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 		int NUM_POINTS = values[4];
 		i++;
 	}
-	
 	// Dataset 1: Franti
 	ProductIterator it1({ l_seeds_assign, l_FI_BI, l_impr, seeds_problem_franti });
 	while ((values = it1.next()).size() > 0) {
@@ -161,5 +160,6 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 		int NUM_POINTS = values[4];
 		add_queue(seed_assign, seed_assign, FI_BI, impr, NUM_POINTS, 2, NUM_CLUST, 3);
 	}
+	
 	return {};
 }

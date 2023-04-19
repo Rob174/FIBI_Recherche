@@ -89,7 +89,10 @@ def get_clustering_franti_visualizations(
         InitCostVariation(
             path_create(out_folder / "initDistr"), fixed_attrs=[*fixed_attr, *cmp_attr]
         ),
-        PieChart(out_path=path_create(out_folder / "cases"),
+        PieChart(
+            dataset='Franti benchmark',
+            problem="Clustering",
+            out_path=path_create(out_folder / "cases"),
             fixed_attrs=fixed_attr,
             aggregators=aggregators,
             mappings_attr_names=mappings_attr_names,

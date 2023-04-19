@@ -92,7 +92,19 @@ public:
 			// Add seed done
 			{
 				std::unique_lock<std::mutex> lock(this->mutex_);
-				this->merger.add_metadata(res);
+				try {
+					this->merger.add_metadata(res);
+					if (args.at("SEED_GLOB") == 1000001) {
+						cout << "Result for 1000001: ";
+						for (auto p : res) {
+							cout << p.first << ": " << p.second << ",";
+						}
+						cout << endl;
+					}
+				}
+				catch (std::runtime_error& e) {
+					cout << "Problem for SEED_GLOB " << args.at("SEED_GLOB") << endl;
+				}
 			}
 			return res;
 		};

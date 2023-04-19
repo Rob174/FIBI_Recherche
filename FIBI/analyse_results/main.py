@@ -462,16 +462,12 @@ if __name__ == "__main__":
     check_tsp(
         existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
     )
-    # check_clustering(
-        
-    #             existing_path(
-    #                 Path(".")
-    #                 / "data"
-    #                 / "algorithms_out"
-    #                 / "clustering"
-    #                 / "dataset.txt"
-    #             )
-    # )
+    print("TSP")
+    print("quad")
+    get_tsp("uniform_points", False)
+    print("tsplib")
+    get_tsp("tsplib", False)
+    # # print("MAXSAT")
     # check_maxsat(
     #     existing_path(
     #                 Path(".")
@@ -481,20 +477,24 @@ if __name__ == "__main__":
     #                 / "dataset.txt"
     #             )
     # )
-    print("TSP")
-    print("tsplib")
-    print("quad")
-    get_tsp("uniform_points", False)
-    get_tsp("tsplib", False)
-    # # print("MAXSAT")
     # # print("benchmark2021")
     # # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
-    # print("Clustering")
-    # print("Aloise")
-    # get_clustering("aloise_benchmark", profile=False)
-    # print("Quad")
-    # get_clustering("uniform_points", profile=False)
-    # print("QuadNorm")
-    # get_clustering("uniform_points_norm", profile=False)
-    # print("Franti")
-    # get_clustering("franti_benchmark", profile=False)
+    print("Clustering")
+    check_clustering(
+        
+                existing_path(
+                    Path(".")
+                    / "data"
+                    / "algorithms_out"
+                    / "clustering"
+                    / "dataset.txt"
+                )
+    )
+    print("Aloise")
+    get_clustering("aloise_benchmark", profile=False)
+    print("Quad")
+    get_clustering("uniform_points", profile=False)
+    print("QuadNorm")
+    get_clustering("uniform_points_norm", profile=False)
+    print("Franti")
+    get_clustering("franti_benchmark", profile=False)

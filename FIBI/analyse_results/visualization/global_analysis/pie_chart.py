@@ -12,6 +12,7 @@ import pandas as pd
 import textwrap
 import FIBI.analyse_results.visualization.global_analysis.test as t
 from importlib import reload
+from string import Template
 
 def make_cases(buffer):
     # create a dict counting the number of occurences of the following cases
@@ -81,7 +82,7 @@ def make_cases(buffer):
                 if f['query']['IMPR'] not in Ldico:
                     Ldico[f['query']['IMPR']] = []
         main_case,case_chosen,color,case_letter = get_case(case_dict)
-        Ldico[f['query']['IMPR']].append({'case':case_chosen,'main_case':main_case,'color':color,'letter':case_letter})
+        Ldico[f['query']['IMPR']].append({'case':case_chosen,'main_case':main_case,'color':color,'letter':case_letter, 'query': f['query']})
     return Ldico
 
 def make_plotly_piechart(Ldico, out_path):
@@ -113,8 +114,10 @@ def make_plotly_piechart(Ldico, out_path):
             t.append(p)
             s.append(t)
         soup_to_file(s,out_path / f'cases_legend_{k}.html')
+
 class PieChart(MultiInstanceVisualization):
-    def __init__(self, out_path: Path, fixed_attrs: List[str], rows: List[str], cols: List[str], aggregators: List[Aggregator], 
+    """A class to create the pie chart of the cases of """
+    def __init__(self, dataset: str, problem: str, out_path: Path, fixed_attrs: List[str], rows: List[str], cols: List[str], aggregators: List[Aggregator], 
                  query_to_path: DicoPathConverter,
                  mappings_attr_names: Dict[str,str], legend: Optional[Legend] = None):
         self.buffer: List[BufferDataAggr] = []
@@ -126,6 +129,8 @@ class PieChart(MultiInstanceVisualization):
         self.query_to_path = query_to_path
         self.rows = rows
         self.cols = cols
+        self.dataset = dataset
+        self.problem = problem
     def on_new_data(
         self, keys: dict, dfs: List[DfExtract]
     ): 
@@ -135,13 +140,114 @@ class PieChart(MultiInstanceVisualization):
         self.buffer.append(BufferDataAggr(query=keys,fields=elems))
     def on_end(self):
         Ldico = make_cases(self.buffer)
-        make_latex_piechart(Ldico,self.out_path)
+        make_latex_piechart(Ldico,self.out_path,self.dataset, self.problem)
         make_plotly_piechart(Ldico, self.out_path)
 
-def make_latex_piechart(Ldico, out_path):
+def format_identifier(s: str) -> str:
+    s = s.replace(' ','')
+    s = s.replace('.','')
+    return s
+def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, template_path: Path, size_inner:int = 2, size_out:int = 4):
+    """Make a latex sunburst pie chart from the values provided:
+    # In
+        init: str, the initialization used for the data
+        values: dict[str,int] the number of times each case as specified in the get_case function has been seen
+        template_path: Path, path to the template to create the latex figure
+        size_inner: int, the size of the inner pie chart (main categories: A, B, C)
+        size_outer: int, the size of the outer pie chart (main categories: A1, A2, B1, B2, B3, C1)
+    # Out
+        the latex code to show the sunburst pie chart
+    """
+    a = values['a']
+    a1 = values['a1']
+    a2 = values['a2']
+    b = values['b']
+    b1 = values['b1']
+    b2 = values['b2']
+    b3 = values['b3']
+    c = values['c']
+    c1 = values['c1']
+    tot = a+b+c
+    # inner group
+    data: Dict[str,Tuple[float,Dict[str,float]]] = {"a":(a,{"a1":a1,"a2":a2}),"b":(b,{"b1":b1,"b2":b2,"b3":b3}),"c":(c,{"c1":c1})}
+    lines = []
+    colors = ["red","green","blue"]
+    for i,(innerCat,(nbVals,dico_inner)) in enumerate(data.items()):
+        lines.append(f"\\def\\cat{innerCat.upper()}Color{{my{colors[i]}}}")
+        lines.append(f"\\def\\catOuter{innerCat.upper()}Color{{mylight{colors[i]}}}")
+    def generator_inner(data):
+        angle = 0
+        for innerCat,(nbVals,dico_inner) in data.items():
+            frac = nbVals/tot
+            perc = frac*100
+            start_angle = angle
+            end_angle = start_angle + frac*360
+            middle = (start_angle+end_angle)/2
+            angle = end_angle
+            yield innerCat, nbVals, frac,perc, start_angle, end_angle, middle,dico_inner
+    
+    def generator_outer(data):
+        angle = 0
+        for innerCat, nbVals, frac,perc, start_angle, end_angle, middle,dico_inner in generator_inner(data):
+            for subcat, nbValsSubCat in dico_inner.items():
+                frac = nbValsSubCat/tot
+                perc = frac*100
+                start_angle = angle
+                end_angle = start_angle + frac*360
+                middle = (start_angle+end_angle)/2
+                angle = end_angle
+                yield innerCat,subcat, nbValsSubCat, frac,perc, start_angle, end_angle, middle
+    lines.append(f"\\def\\shiftOuter{{1.2}}")
+    lines.append(f"\\def\\shiftInner{{0.7}}")
+    lines.append(f"\\pgfmathsetmacro{{\\posRadLabInner}}{{\sizeInnerPie+\\shiftInner}}")
+    lines.append(f"\\pgfmathsetmacro{{\\posRadLabOuter}}{{\sizeOuterPie+\\shiftOuter}}")
+    
+    lines.append(f"% outer pie: subcategories")
+    for innerCat, outerCat, nbVals, frac,perc, start_angle, end_angle, middle in generator_outer(data):
+        lines.append(f"\\filledarc{{{start_angle}}}{{{end_angle}}}{{\\sizeOuterPie}}{{\\catOuter{innerCat.upper()}Color}}")
+    
+        
+    lines.append(f"% inner pie: categories")
+    for innerCat, nbVals, frac,perc, start_angle, end_angle, middle,dico_inner in generator_inner(data):
+        lines.append(f"\\filledarc{{{start_angle}}}{{{end_angle}}}{{\\sizeInnerPie}}{{\\cat{innerCat.upper()}Color}}")
+    
+    lines.append(f"% Outer pie labels")
+    for outerCat, innerCat, nbVals, frac,perc, start_angle, end_angle, middle in generator_outer(data):
+        lines.append(f"\\node at ({middle}:\\posRadLabOuter) {{{innerCat.upper()}}};")
+        lines.append(f"\\node [below] at ({middle}:\\posRadLabOuter) {{{perc:.2f}\\%}};")
+        
+    lines.append(f"% inner pie labels")
+    for innerCat, nbVals, frac,perc, start_angle, end_angle, middle, dico in generator_inner(data):
+        lines.append(f"\\node at ({middle}:\\posRadLabInner) {{{innerCat.upper()}}};")
+        lines.append(f"\\node [below] at ({middle}:\\posRadLabInner) {{{perc:.2f}\\%}};")
+    
+        
+    with open(template_path) as f:
+        template = f.read()
+    template = Template(template)
+    result = template.substitute(
+        diagram="\n    ".join(lines),
+        sizeOuter=size_out,
+        sizeInner=size_inner,
+        sizeFig="\\sizeFig",
+        title=f"{dataset}, {init}",
+        reference=f"res{format_identifier(problem).capitalize()}{format_identifier(dataset).capitalize()}{format_identifier(init)}"
+    )
+    return result
+def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Optional[Path] = None, template_fig: Optional[Path] = None):
+    if template_sunburst is None:
+        template_sunburst = Path(".") / "data" / "analysis_results" / "styles" / "sunburst.txt"
+    if template_fig is None:
+        template_fig = Path(".") / "data" / "analysis_results" / "styles" / "templateFigSunburst.txt"
+        
+    with open(template_fig) as f:
+        template = f.read()
+    template = Template(template)
+    diagrams = {}
     for k in Ldico:
         df = pd.DataFrame(Ldico[k])[['main_case','case','letter','color']].groupby(['main_case','case','letter','color']).size().reset_index(name='number')            
         L = df.to_dict(orient='records')
+        
         a = sum(e['number'] for e in L if e['letter'] in ['A','B'])
         a1 = sum(e['number'] for e in L if e['letter'] in ['A'])
         a2 = sum(e['number'] for e in L if e['letter'] in ['B'])
@@ -151,17 +257,36 @@ def make_latex_piechart(Ldico, out_path):
         b3 = sum(e['number'] for e in L if e['letter'] in ['E'])
         c = sum(e['number'] for e in L if e['letter'] in ['F'])
         c1 = sum(e['number'] for e in L if e['letter'] in ['F'])
-        tot = a+b+c
-        a /= tot
-        a1 /= tot
-        a2 /= tot
-        b /= tot
-        b1 /= tot
-        b2 /= tot
-        b3 /= tot
-        c /= tot
-        c1 /= tot
-        string = f"\\sunburstCases{{{a}}}{{{a1}}}{{{a2}}}{{{b}}}{{{b1}}}{{{b2}}}{{{b3}}}{{{c}}}{{{c1}}}"
-        out_path.mkdir(parents=True, exist_ok=True)
-        with open(out_path / f'piechart_{k}.tex', 'w') as f:
-            f.write(string)
+        res = make_one_latex_piechart(
+            dataset=dataset,
+            problem=problem,
+            init=k,
+            values={
+                "a":a,
+                "a1":a1,
+                "a2": a2,
+                "b":b,
+                "b1":b1,
+                "b2":b2,
+                "b3":b3,
+                "c":c,
+                "c1": c1
+            },
+            template_path=template_sunburst
+        )
+        diagrams[k] = res
+    def sort_fn(s: str) -> Tuple:
+        pos = 0,0,0
+        if 'RAND' in s:
+            return pos
+        return 1, -len(s), s
+    diagrams = [diagrams[k] for k in sorted(diagrams,key=sort_fn)]
+    result = template.substitute(
+        sunbursts="\n    ".join(diagrams),
+        title=f"{problem}, {dataset}",
+        reference=f"res{format_identifier(problem).capitalize()}{format_identifier(dataset).capitalize()}"
+    )
+    out_path.mkdir(parents=True, exist_ok=True)
+    with open(out_path / f'piechart_{dataset}.tex', 'w') as f:
+        f.write(result)
+    

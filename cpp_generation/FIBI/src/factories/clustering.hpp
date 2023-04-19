@@ -55,7 +55,11 @@ public:
 		}
 		if (cf.NUM_POINTS.get() <= cf.NUM_CLUST.get())
 		{
-			return {};
+			vector<pair<string, double>>res{};
+			for (pair<string, double> p : cf.get_json()) {
+				res.push_back(p);
+			}
+			return res;
 		}
 		unique_ptr<const vector<double>> points_pos(points_pos_ptr);
 		vector<int>* assignements_ptr = random_clust(cf.NUM_CLUST.get(), cf.NUM_POINTS.get(), cf.SEED_ASSIGN.get());

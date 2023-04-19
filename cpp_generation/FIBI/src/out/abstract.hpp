@@ -153,6 +153,9 @@ public:
 		}
 	}
 	void add_metadata(vector<pair<string,double>> value) {
+		if (value.size() == 0) {
+			throw runtime_error("Expected non empty metadata");
+		}
 		metrics.push_back(value);
 	}
 	bool ready_to_merge() const {
@@ -167,7 +170,7 @@ public:
 		int k = 0;
 		for (const vector<pair<string, double>> metadata : metrics) {
 			// Write the metadata as a JSON-like string
-			if (metadata.size() == 0) continue;
+			if (metadata.size() == 0) throw runtime_error("Expected non empty metadata");
 			k++;
 			merged_file << "{";
 			int i = 0;

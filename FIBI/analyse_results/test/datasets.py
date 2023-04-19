@@ -6,7 +6,17 @@ import pandas as pd
 class CheckNumSeedGlob:
     """Check if there are the expected number of elements per hyperparameter combination"""
     def __init__(self, data: List[Dict]) -> None:
-        self.df = pd.DataFrame(data).drop_duplicates(subset=['SEED_GLOB'], keep=False)
+        L = []
+        seeds_glob = set({})
+        for d in data:
+            if d['SEED_GLOB'] in seeds_glob:
+                continue
+            seeds_glob.add(d['SEED_GLOB'])
+            if "duration" not in d:
+                continue
+            L.append(d)
+        self.seeds_glob = seeds_glob
+        self.df = pd.DataFrame(L)
     def check(self, dataset: int, columns_agg: List, exp_num: int = 1000) -> bool:
         check_ok = True
         result = self.df.query("DATASET == "+str(dataset)).groupby(columns_agg).agg({'SEED_GLOB': ['count', lambda x: ','.join(map(lambda a:str(int(a)), x))]})
@@ -17,7 +27,7 @@ class CheckNumSeedGlob:
             if e['SEED_GLOB_count_agg'] != exp_num:
                 check_ok = False
                 print({k:v for k,v in e.items() if k != "SEED_GLOB_agg"})
-                print(e['SEED_GLOB_count_agg'])
+                # print(e['SEED_GLOB_count_agg'])
         return check_ok
     def get_contiguous_intervals(self,lst):
         intervals = []
@@ -33,10 +43,10 @@ class CheckNumSeedGlob:
         intervals.append([start, end])
         return intervals
     def get_missing_seeds(self):
-        max_seed = max(self.df["SEED_GLOB"])
+        max_seed = max(self.seeds_glob)
         missing = []
         for i in range(int(max_seed)):
-            if i not in self.df["SEED_GLOB"]:
+            if i not in self.seeds_glob:
                 missing.append(i)
         cont_int = self.get_contiguous_intervals(missing)
         # print("missing: ",cont_int)

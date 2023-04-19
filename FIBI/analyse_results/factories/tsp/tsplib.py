@@ -107,6 +107,8 @@ def get_tsplib_visualizations(
             path_create(out_folder / "initDistr"), fixed_attrs=[*fixed_attr, *cmp_attr]
         ),
         PieChart(
+            dataset='TSPLIB',
+            problem="TSP",
             out_path=path_create(out_folder / "cases"),
             fixed_attrs=fixed_attr,
             aggregators=aggregators,
