@@ -28,7 +28,7 @@ void test_random_tour() {
 	}
 }	
 /**
-* @brief Test the improved_tour function:
+* @brief Test the init_tsp_greedy function:
 * - Check that the number of towns is correct
 * - Check that the tour is valid
 */
@@ -42,7 +42,7 @@ void test_improved_tour_1() {
 	const int seed = dis_ints(gen)-1;
 	unique_ptr<const vector<double>> towns(uniform_points(num_towns, num_dims, seed));
 	DistanceMatrix m(num_towns, num_dims, *towns);
-	unique_ptr < vector<int>> tour(improved_tour(num_towns, seed, m));
+	unique_ptr < vector<int>> tour(init_tsp_greedy(num_towns, seed, m));
 	// Check that the number of towns is correct
 	if (tour->size() != num_towns) {
 		throw runtime_error("The number of towns is not correct: expected " + to_string(num_towns) + " but got " + to_string(tour->size()));
@@ -56,7 +56,7 @@ void test_improved_tour_1() {
 	}
 }
 /**
-* @brief Test the improved_tour function:
+* @brief Test the init_tsp_greedy function:
 * - Check on a particular example that the result is valid
 */
 void test_improved_tour_2() {
@@ -82,7 +82,7 @@ void test_improved_tour_2() {
 	*/
 	DistanceMatrix m(num_towns, num_dims, *towns);
 	const int start_town = 5; // Determined with the debugger for rthe current code
-	vector<int> *tour = improved_tour(num_towns, seed, m);
+	vector<int> *tour = init_tsp_greedy(num_towns, seed, m);
 	vector<int> expected_tour = { 5, 2, 4, 7, 6, 8, 9, 0, 1, 3 };
 	// Check that the final tour is correct
 	cout << "Checking... ";
@@ -100,7 +100,7 @@ void test_improved_tour_2() {
 	cout << endl;
 }
 /**
-* @brief Test the improved_rand_tour function:
+* @brief Test the init_tsp_greedy_topk function:
 * - Check that the number of towns is correct
 * - Check that the tour is valid
 */
@@ -114,7 +114,7 @@ void test_improved_rand_tour_1() {
 	const int seed = dis_ints(gen) - 1;
 	unique_ptr<const vector<double>> towns(uniform_points(num_towns, num_dims, seed));
 	DistanceMatrix m(num_towns, num_dims, *towns);
-	unique_ptr < vector<int>> tour(improved_tour(num_towns, seed, m));
+	unique_ptr < vector<int>> tour(init_tsp_greedy(num_towns, seed, m));
 	// Check that the number of towns is correct
 	if (tour->size() != num_towns) {
 		throw runtime_error("The number of towns is not correct: expected " + to_string(num_towns) + " but got " + to_string(tour->size()));
@@ -129,7 +129,7 @@ void test_improved_rand_tour_1() {
 }
 
 /**
-* @brief Test the improved_rand_tour function:
+* @brief Test the init_tsp_greedy_topk function:
 * - Check that with a top 1 we have the same result as for test_improved_2
 */
 void test_improved_rand_tour_2() {
@@ -155,7 +155,7 @@ void test_improved_rand_tour_2() {
 	*/
 	DistanceMatrix m(num_towns, num_dims, *towns);
 	const int start_town = 5; // Determined with the debugger for rthe current code
-	vector<int>* tour = improved_rand_tour(num_towns, seed, m, 1);
+	vector<int>* tour = init_tsp_greedy_topk(num_towns, seed, m, 1);
 	vector<int> expected_tour = { 5, 2, 4, 7, 6, 8, 9, 0, 1, 3 };
 	// Check that the final tour is correct
 	cout << "Checking... ";

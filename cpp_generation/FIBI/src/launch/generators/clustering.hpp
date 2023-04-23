@@ -12,17 +12,18 @@
 
 using namespace std;
 
-vector<pair<string, double>> clusteringfactory_run(const map<string, int>& args, string root_data, int thread_id) {
+vector<pair<string, double>>* clusteringfactory_run(map<string,long>* args, string root_data, int thread_id) {
 	
 	ClusteringFactory f;
 	ClusteringConfig cf(args);
 
-	vector<pair<string, double>> success = f.run(cf, root_data);
-	if (args.at("SEED_GLOB") % 100 == 0) {
+	vector<pair<string, double>>* success = f.run(cf, root_data);
+	if (args->at("SEED_GLOB") % 100 == 0) {
 		cout << "\x1B[32m \tOK ";
 		cf.print();
 		cout << "\033[0m " << endl;
 	}
+	delete args;
 	return success;
 }
 template <int seed_stop = -1>
@@ -43,7 +44,7 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 	iota(l_seeds_assign.begin(), l_seeds_assign.end(), 0);
 
 	vector<int> values;
-	int i = 0;
+	long i = 0;
 	// Dataset 0: Uniform
 	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
 		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
@@ -93,18 +94,24 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 		}
 	}
 	const int num_poss = i;
-	i = 0;
 	Progress progress(num_poss, "\033[31m", "Queued");
 
-	auto add_queue = [&pool, &progress, &i, &missing, &arguments](
+	auto add_queue = [&pool, &progress, &missing, &arguments](
+		long i,
 		int seed_problem, int seed_assign, int FI_BI, int impr, int num_clust, int num_dim, int num_point, int dataset) {
 			bool stop;
 			stop = i > arguments.end_seed && arguments.end_seed != -1;
+			stop = i > seed_stop && seed_stop != -1;
 			stop = stop || (i < arguments.start_seed);
 			stop = stop && missing->find(i) == missing->end();
-		map<string, int> args{
+			if (stop) {
+				progress.skip();
+				return;
+			}
+			long seed_glob = i;
+		map<string,long>* args = new map<string,long>{
 			{"DATASET",dataset},
-			{"SEED_GLOB",i},
+			{"SEED_GLOB",seed_glob},
 			{"SEED_PROBLEM",seed_problem},
 			{"SEED_ASSIGN",seed_assign},
 			{"FI_BI",FI_BI},
@@ -113,19 +120,11 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 			{"NUM_DIM",num_dim},
 			{"NUM_CLUST",num_clust}
 		};
-		if (i > arguments.end_seed && arguments.end_seed != -1) { 
-			return;
-		}
-		if (i >= arguments.start_seed || (missing->find(i) != missing->end())) {
-			pool.submit(clusteringfactory_run, args, arguments.root_data);
-		}
-		if (i < arguments.start_seed) progress.skip();
-		if constexpr (seed_stop != -1 && seed_stop == i) {
-			return;
-		}
+		pool.submit(clusteringfactory_run, args, arguments.root_data);
 		progress.print(i);
 		return;
 	};
+	i = 0;
 	// Dataset 0: Uniform
 	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
 		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
@@ -134,7 +133,7 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 					const int NUM_CLUST = num_clusters[NUM_CLUST_i];
 					for (int NUM_POINTS_i = 0; NUM_POINTS_i < num_points.size(); NUM_POINTS_i++) {
 						const int NUM_POINTS = num_points[NUM_POINTS_i];
-						add_queue(seed_assign, seed_assign, FI_BI, impr, NUM_CLUST, 2, NUM_POINTS, 0);
+						add_queue(i,seed_assign, seed_assign, FI_BI, impr, NUM_CLUST, 2, NUM_POINTS, 0);
 						i++;
 					}
 				}
@@ -147,7 +146,7 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
 			for (int impr = 0; impr < 3; impr++) {
 				for (int seed_problem = 0; seed_problem < seeds_problem_franti.size(); seed_problem++) {
-					add_queue(seed_problem, seed_assign, FI_BI, impr, -1, -1, -1, 1);
+					add_queue(i,seed_problem, seed_assign, FI_BI, impr, -1, -1, -1, 1);
 					i++;
 				}
 			}
@@ -161,7 +160,7 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 				for (int seed_problem = 0; seed_problem < seeds_problem_aloise.size(); seed_problem++) {
 					for (int NUM_CLUST_i = 0; NUM_CLUST_i < num_clusters.size(); NUM_CLUST_i++) {
 						const int NUM_CLUST = num_clusters[NUM_CLUST_i];
-						add_queue(seed_problem, seed_assign, FI_BI, impr, NUM_CLUST, -1, -1, 2);
+						add_queue(i,seed_problem, seed_assign, FI_BI, impr, NUM_CLUST, -1, -1, 2);
 						i++;
 					}
 				}
@@ -177,7 +176,7 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 					const int NUM_CLUST = num_clusters[NUM_CLUST_i];
 					for (int NUM_POINTS_i = 0; NUM_POINTS_i < num_points.size(); NUM_POINTS_i++) {
 						const int NUM_POINTS = num_points[NUM_POINTS_i];
-						add_queue(seed_assign, seed_assign, FI_BI, impr, NUM_POINTS, 2, NUM_CLUST, 3);
+						add_queue(i,seed_assign, seed_assign, FI_BI, impr, NUM_POINTS, 2, NUM_CLUST, 3);
 						i++;
 					}
 				}

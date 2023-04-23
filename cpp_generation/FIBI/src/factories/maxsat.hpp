@@ -12,7 +12,7 @@ using namespace std;
 
 class MAXSATFactory : public AbstractFactory<MAXSATConfig> {
 public:
-	vector<pair<string, double>> run(MAXSATConfig& cf, string root_data = "./") override
+	vector<pair<string, double>>* run(MAXSATConfig& cf, string root_data = "./") override
 	{
 		// setup
 		vector<clause_t>* clauses_ptr = nullptr;
@@ -65,7 +65,7 @@ public:
 		obs.push_back(&metrics);
 		unique_ptr<typename maxsat_ls_t::ls_t> ls(getMAXSATLocalSearch(obs, (bool)cf.FI_BI.get()));
 		ls->run(co, cf);
-		vector<pair<string, double>> res = get_results<MAXSATSwap, MAXSATSolutionContainer>(&metrics, &cf);
+		vector<pair<string, double>>* res = get_results<MAXSATSwap, MAXSATSolutionContainer>(&metrics, &cf);
 		return res;
 	}
 };

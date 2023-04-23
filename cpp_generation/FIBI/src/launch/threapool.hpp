@@ -19,14 +19,14 @@ using namespace std;
 class ThreadPool {
 private:
 	vector<thread> threads_;
-	queue<function<vector<pair<string, double>>(int)>> tasks_; // modified to take tasks returning bool
+	queue<function<vector<pair<string, double>>*(int)>> tasks_; // modified to take tasks returning bool
 	mutex mutex_;
 	condition_variable condition_;
 	bool stop_ = false;
 	int thread_count_ = 0;
 	MergeMetadata& merger;
 public:
-	void add_metadata(vector<pair<string, double>> metadata) {
+	void add_metadata(vector<pair<string, double>>* metadata) {
 		unique_lock<mutex> lock(mutex_);
 		this->merger.add_metadata(metadata);
 	}
@@ -41,7 +41,7 @@ public:
 			threads_.emplace_back([this, i] {
 				int thread_id = i;
 				while (true) {
-					function<vector<pair<string, double>>(int)> task; // modified to take tasks returning bool
+					function<vector<pair<string, double>>*(int)> task; // modified to take tasks returning bool
 					{
 						unique_lock<mutex> lock(mutex_);
 						condition_.wait(lock, [this] { return stop_ || !tasks_.empty(); });
@@ -51,7 +51,7 @@ public:
 						task = move(tasks_.front());
 						tasks_.pop();
 					}
-					vector<pair<string, double>> result = task(thread_id); // modified to store the result of the task
+					vector<pair<string, double>>* result = task(thread_id); // modified to store the result of the task
 					{
 						unique_lock<mutex> lock(mutex_);
 						// Check if merging is possible
@@ -84,26 +84,19 @@ public:
 		this->merger.merge();
 	}
 
-	// Can submit functions taking two arguments: map<string,int> and int (thread_id) and returning a bool
-	bool submit(std::function<vector<pair<string, double>>(std::map<std::string, int>, std::string, int)> task, std::map<std::string, int> args, std::string root_data) {
+	// Can submit functions taking two arguments: map<string,long> and int (thread_id) and returning a bool
+	bool submit(std::function<vector<pair<string, double>>*(std::map<std::string, long>*, std::string, int)> task, std::map<std::string, long>* args, std::string root_data) {
 		auto bound_task = [this,task, args, root_data](int thread_id) {
-			vector<pair<string, double>> res = task(args, root_data, thread_id); // modified to return the result of the task
+			vector<pair<string, double>>* res = task(args, root_data, thread_id); // modified to return the result of the task
 
 			// Add seed done
 			{
 				std::unique_lock<std::mutex> lock(this->mutex_);
 				try {
 					this->merger.add_metadata(res);
-					if (args.at("SEED_GLOB") == 1000001) {
-						cout << "Result for 1000001: ";
-						for (auto p : res) {
-							cout << p.first << ": " << p.second << ",";
-						}
-						cout << endl;
-					}
 				}
 				catch (std::runtime_error& e) {
-					cout << "Problem for SEED_GLOB " << args.at("SEED_GLOB") << endl;
+					cout << "Problem for SEED_GLOB " << args->at("SEED_GLOB") << endl;
 				}
 			}
 			return res;

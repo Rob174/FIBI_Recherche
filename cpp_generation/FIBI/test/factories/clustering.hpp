@@ -12,7 +12,7 @@ void test_ClusteringFactory() {
 	for (int dataset = 0; dataset < 4; dataset++) {
 		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
 			for (int impr = 0; impr < 2; impr++) {
-				map<string, int> args{
+				map<string,long>* args = new map<string,long>{
 					{"DATASET",dataset},
 					{"SEED_GLOB",i},
 					{"SEED_PROBLEM",0},
@@ -27,6 +27,7 @@ void test_ClusteringFactory() {
 				f.run(cf, root_data);
 				cout << "\x1B[32m \tOK ";
 				cf.print();
+				delete args;
 				cout << "\033[0m " << endl;
 				i++;
 			}

@@ -113,14 +113,13 @@ using json = nlohmann::json;
 
 
 template <typename T_Swap, typename T_Container>
-vector<pair<string, double>> get_results(const Metrics < T_Swap, T_Container>* m, const AbstractConfig* c) {
-	int i = 0;
-	vector<pair<string, double>>res{};
+vector<pair<string, double>>* get_results(const Metrics < T_Swap, T_Container>* m, const AbstractConfig* c) {
+	vector<pair<string, double>>* res = new vector<pair<string, double>>{};
 	for (pair<string, double> p : m->get_data()) {
-		res.push_back(p);
+		res->push_back(p);
 	}
 	for (pair<string, double> p : c->get_json()) {
-		res.push_back(p);
+		res->push_back(p);
 	}
 	return res;
 }

@@ -12,12 +12,12 @@
 
 using namespace std;
 
-vector<pair<string, double>> MAXSATfactory_run(const map<string, int>& args, string root_data, int thread_id) {
+vector<pair<string, double>>* MAXSATfactory_run(map<string,long>* args, string root_data, int thread_id) {
 	MAXSATFactory f;
 	MAXSATConfig cf(args);
 
-	vector<pair<string, double>> success = f.run(cf, root_data);
-	if (args.at("SEED_GLOB") % 100 == 0) {
+	vector<pair<string, double>>* success = f.run(cf, root_data);
+	if (args->at("SEED_GLOB") % 100 == 0) {
 		cout << "\x1B[32m \tOK ";
 		cf.print();
 		cout << "\033[0m " << endl;
@@ -51,11 +51,10 @@ vector<pair<string, double>> run_maxsat(Args arguments, const unique_ptr < set<i
 		i++;
 	}
 	const int num_poss = i;
-	i = 0;
 	Progress progress(num_poss, "\033[31m", "Queued");
 
-	auto add_queue = [&pool, &progress, &i, &missing, &arguments](int seed_problem, int seed_assign, int FI_BI, int impr, int num_variables, int num_clauses, int dataset) {
-		map<string, int> args{
+	auto add_queue = [&pool, &progress, &missing, &arguments](int i, int seed_problem, int seed_assign, int FI_BI, int impr, int num_variables, int num_clauses, int dataset) {
+		map<string,long>* args=new map<string,long>{
 			{"DATASET",dataset},
 			{"SEED_GLOB",i},
 			{"SEED_PROBLEM",seed_problem},
@@ -77,17 +76,18 @@ vector<pair<string, double>> run_maxsat(Args arguments, const unique_ptr < set<i
 			if (seed_stop == i) return vector<pair<string, double>>{};
 		}
 		progress.print(i);
-		i++;
 		return vector<pair<string, double>>{};
 	};
 	// Dataset 0: Uniform
+	i = 0;
 	it0.restart();
 	while ((values = it0.next()).size() > 0) {
 		int seed_assign = values[0];
 		int FI_BI = values[1];
 		int impr = values[2];
 		int seed_problem = values[3];
-		add_queue(seed_problem, seed_assign, FI_BI, impr, -1, -1, 1);
+		add_queue(i,seed_problem, seed_assign, FI_BI, impr, -1, -1, 1);
+		i++;
 	}
 	return {};
 }

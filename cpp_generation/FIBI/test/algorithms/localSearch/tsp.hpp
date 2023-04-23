@@ -73,7 +73,8 @@ void test_LocalSearch_TSP_flips_explored() {
 	unique_ptr<TSP1NeighbourhoodExplorLogger> logger(new TSP1NeighbourhoodExplorLogger());
 	vector<tsp_obs_t*> obs{ logger.get() };
 	unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs));
-	TSPConfig conf(map<string, int>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims }});
+	map<string,long> *args = new map<string,long>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims } };
+	TSPConfig conf(args);
 	// Compute 2 in n-1
 	const int n = num_towns;
 	const unsigned int expected_num_swaps = (unsigned int)((n - 3) * (1 + (double)(n - 2) / 2));
@@ -99,6 +100,7 @@ void test_LocalSearch_TSP_flips_explored() {
 			);
 		}
 	}
+	delete args;
 }
 
 /** @brief Test that the correct moves are explored with BI for the following instance}
@@ -169,7 +171,8 @@ void test_LocalSearch_TSP_flips_explored_detail_BI() {
 	unique_ptr<TSP1NeighbourhoodExplorLogger> logger(new TSP1NeighbourhoodExplorLogger());
 	vector<tsp_obs_t*> obs{ logger.get() };
 	unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs));
-	TSPConfig conf(map<string, int>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims }});
+	map<string,long>* args = new map<string,long>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims } };
+	TSPConfig conf(args);
 	try {
 		ls->run(c, conf);
 	}
@@ -195,6 +198,7 @@ void test_LocalSearch_TSP_flips_explored_detail_BI() {
 			throw runtime_error("For final choice expecting " + exp_final_choice.str() + " but got " + final_choice.str());
 		}
 	}
+	delete args;
 }
 
 /** @brief Test that the correct moves are explored with FI for the following instance}
@@ -264,7 +268,8 @@ void test_LocalSearch_TSP_flips_explored_detail_FI() {
 	unique_ptr<TSP1NeighbourhoodExplorLogger> logger(new TSP1NeighbourhoodExplorLogger());
 	vector<tsp_obs_t*> obs{ logger.get() };
 	unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs, true));
-	TSPConfig conf(map<string, int>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims }});
+	map<string,long>* args = new map<string,long>{ {"NUM_TOWNS", num_towns}, { "NUM_DIM", num_dims } };
+	TSPConfig conf(args);
 	try {
 		ls->run(c, conf);
 	}
@@ -286,4 +291,5 @@ void test_LocalSearch_TSP_flips_explored_detail_FI() {
 			throw runtime_error("For final choice expecting " + exp_final_choice.str() + " but got " + final_choice.str());
 		}
 	}
+	delete args;
 }

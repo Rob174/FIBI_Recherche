@@ -13,7 +13,7 @@ using namespace std;
 
 class ClusteringFactory : public AbstractFactory<ClusteringConfig> {
 public:
-	vector<pair<string, double>> run(ClusteringConfig& cf, string root_data = "./") override
+	vector<pair<string, double>>* run(ClusteringConfig& cf, string root_data = "./") override
 	{
 		// setup
 		const vector<double>* points_pos_ptr;
@@ -55,9 +55,9 @@ public:
 		}
 		if (cf.NUM_POINTS.get() <= cf.NUM_CLUST.get())
 		{
-			vector<pair<string, double>>res{};
+			vector<pair<string, double>>*res = new vector<pair<string, double>>;
 			for (pair<string, double> p : cf.get_json()) {
-				res.push_back(p);
+				res->push_back(p);
 			}
 			return res;
 		}
@@ -71,11 +71,23 @@ public:
 			break;
 		case 1:
 			/* Kmeans++ */
-			kmeansPlusPlus(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get());
+			init_clustering_greedy_randomized(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get());
 			break;
 		case 2:
 			/* KMeans++ super glutton */
-			kmeansPlusPlusSuperGlutton(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get());
+			init_clustering_greedy(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get());
+			break;
+		case 3:
+			/* KMeans++ super glutton */
+			init_clustering_greedy_topk(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get(),3);
+			break;
+		case 4:
+			/* KMeans++ super glutton */
+			init_clustering_greedy_topk(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get(), 4);
+			break;
+		case 5:
+			/* KMeans++ super glutton */
+			init_clustering_greedy_topk(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get(), 5);
 			break;
 		default:
 			throw invalid_argument("Invalid IMPR argument, Valid values are 0->2");
@@ -92,7 +104,7 @@ public:
 		obs.push_back(&metrics);
 		unique_ptr<typename clust_ls_t::ls_t> ls(getClusteringLocalSearch(obs, (bool)cf.FI_BI.get()));
 		ls->run(co, cf);
-		vector<pair<string, double>> res = get_results<ClusteringSwap, ClusteringSolutionContainer<>>(&metrics, &cf);
+		vector<pair<string, double>>* res = get_results<ClusteringSwap, ClusteringSolutionContainer<>>(&metrics, &cf);
 		return res;
 	}
 };

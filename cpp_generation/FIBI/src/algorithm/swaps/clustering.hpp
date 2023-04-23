@@ -11,9 +11,9 @@ public:
 	point_id_t point_id;
 	cluster_id_t cluster_src;
 	cluster_id_t cluster_dst;
-	map<string, int> get_dict()
+	map<string,long> get_dict()
 	{
-		map<string, int> dict;
+		map<string,long> dict;
 		dict["point_id"] = point_id;
 		dict["cluster_src"] = cluster_src;
 		dict["cluster_dst"] = cluster_dst;

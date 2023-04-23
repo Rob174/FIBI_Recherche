@@ -6,7 +6,7 @@
 
 using namespace std;
 
-/** @brief Test the general coherence of the result of the kmeansPlusPlus function}
+/** @brief Test the general coherence of the result of the init_clustering_greedy_randomized function}
 * - n_pts_per_clust <-> checked with cluster_assign
 * - centroids <-> checked with cluster_assign + points
 */
@@ -24,7 +24,7 @@ void test_kmeansPlusPlus() {
 	vector<double> centroids(num_clusters * num_dims, -1);// -1 to detect errors
 	vector<int> clusters_assign(num_points, -1);// -1 to detect errors
 	vector<int> num_pts_per_clust(num_clusters, -1);// -1 to detect errors
-	kmeansPlusPlus(centroids, *points, clusters_assign, num_pts_per_clust, num_dims, seed);
+	init_clustering_greedy_randomized(centroids, *points, clusters_assign, num_pts_per_clust, num_dims, seed);
 	// Check1: centroid[i] must be equal to the sum of points assigned to cluster i (points)
 	// Check2: n_pts_per_clust[i] = how many points are assigned to cluster i (clusters_assign)
 
@@ -70,7 +70,7 @@ void test_kmeansPlusPlus() {
 	}
 }
 
-/** @brief Test the general coherence of the result of the kmeansPlusPlusSuperGlutton function}
+/** @brief Test the general coherence of the result of the init_clustering_greedy function}
 * - n_pts_per_clust <-> checked with cluster_assign
 * - centroids <-> checked with cluster_assign + points
 */
@@ -88,7 +88,7 @@ void test_kmeansPlusPlusSuperGlutton() {
 	vector<double> centroids(num_clusters * num_dims, -1);// -1 to detect errors
 	vector<int> clusters_assign(num_points, -1);// -1 to detect errors
 	vector<int> num_pts_per_clust(num_clusters, -1);// -1 to detect errors
-	kmeansPlusPlusSuperGlutton(centroids, *points, clusters_assign, num_pts_per_clust, num_dims, seed);
+	init_clustering_greedy(centroids, *points, clusters_assign, num_pts_per_clust, num_dims, seed);
 	// Check1: centroid[i] must be equal to the sum of points assigned to cluster i (points)
 	// Check2: n_pts_per_clust[i] = how many points are assigned to cluster i (clusters_assign)
 

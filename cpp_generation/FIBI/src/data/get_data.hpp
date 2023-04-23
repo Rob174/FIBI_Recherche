@@ -117,7 +117,7 @@ const tuple<vector<double>*,vector<int>*, vector<double>*, vector<double>*> norm
 * @param num_towns Number of towns
 * @seed Seed for the random number generator
 */
-vector<int>* random_tour(const unsigned long num_towns, const unsigned int seed)
+vector<int>* random_tour(const long num_towns, const long seed)
 {
 	// Make a vector of all towns and shuffle it
 	vector<int>* tour = new vector<int>(num_towns);

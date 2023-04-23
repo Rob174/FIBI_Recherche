@@ -17,6 +17,7 @@
 #include <vector>
 #include <utility>
 #include <set>
+#include <iomanip>
 #ifdef _WIN32
 #include <Windows.h>
 #else
@@ -135,7 +136,7 @@ class MergeMetadata {
 private:
 	bool merged_exists_;
 	const int size_merge;
-	vector<vector<pair<string, double>>> metrics;
+	vector<vector<pair<string, double>>*> metrics;
 	string filename;
 	// Private helper function to get the full path of the merged file
 	string merged_file_path() const {
@@ -152,8 +153,8 @@ public:
 			merged_file.close();
 		}
 	}
-	void add_metadata(vector<pair<string,double>> value) {
-		if (value.size() == 0) {
+	void add_metadata(vector<pair<string,double>>* value) {
+		if (value->size() == 0) {
 			throw runtime_error("Expected non empty metadata");
 		}
 		metrics.push_back(value);
@@ -168,16 +169,16 @@ public:
 
 		// Loop over the seeds to merge
 		int k = 0;
-		for (const vector<pair<string, double>> metadata : metrics) {
+		for (const vector<pair<string, double>>* metadata : metrics) {
 			// Write the metadata as a JSON-like string
-			if (metadata.size() == 0) throw runtime_error("Expected non empty metadata");
+			if (metadata->size() == 0) throw runtime_error("Expected non empty metadata");
 			k++;
 			merged_file << "{";
 			int i = 0;
-			for (auto it = metadata.begin(); it != metadata.end(); ++it) {
+			for (auto it = metadata->begin(); it != metadata->end(); ++it) {
 
-				merged_file << "\"" << (*it).first << "\"" << ":" << (*it).second;
-				if (std::next(it) != metadata.end()) {
+				merged_file << "\"" << (*it).first << "\"" << ":" << std::scientific << std::setprecision(25) << (*it).second;
+				if (std::next(it) != metadata->end()) {
 					merged_file << ", ";
 				}
 				i++;
@@ -185,6 +186,9 @@ public:
 			merged_file << "},\n";
 		}
 		cout << "---> Merged " << k << " elements" << endl;
+		for (vector<pair<string, double>>* metadata : metrics) {
+			delete metadata;
+		}
 		metrics.clear();
 
 		// Close the merged file

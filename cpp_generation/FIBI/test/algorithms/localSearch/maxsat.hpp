@@ -66,7 +66,8 @@ void test_LocalSearch_MAXSAT_flips_explored() {
 	unique_ptr<const vector<clause_t>> clause(random_clauses(num_variables, num_clauses, seed));
 	unique_ptr<vector<bool>> assignements(random_assignements(num_variables, seed));
 	vector<double> weights(num_clauses, 1.0);
-	MAXSATConfig conf(map<string, int>{ {"NUM_VARIABLES", num_variables}, { "NUM_CLAUSES", num_clauses }});
+	map<string,long>* args = new map<string,long>{ {"NUM_VARIABLES", num_variables}, { "NUM_CLAUSES", num_clauses } };
+	MAXSATConfig conf(args);
 	MAXSATSolutionContainer c(weights, *assignements, *clause);
 	unique_ptr<MAXSAT1NeighbourhoodExplorLogger> logger(new MAXSAT1NeighbourhoodExplorLogger());
 	vector<maxsat_obs_t*> obs{ logger.get() };
@@ -90,6 +91,7 @@ void test_LocalSearch_MAXSAT_flips_explored() {
 			);
 		}
 	}
+	delete args;
 }
 /**
 * Maximize: (v0 V NOT v1 V v2) AND (v1 V NOT v3 V v4) AND (NOT v0 V v3) AND (NOT v2 V NOT v3) AND (v0 V NOT v4)
@@ -119,7 +121,8 @@ void test_LocalSearch_MAXSAT_flips_explored_detail_BI() {
 	};
 	vector<bool> assignements{ true, false, true, true, false };
 	vector<double> weights(num_clauses, 1.0);
-	MAXSATConfig conf(map<string, int>{ {"NUM_VARIABLES", num_variables}, { "NUM_CLAUSES", num_clauses }});
+	map<string,long>* args = new map<string,long>{ {"NUM_VARIABLES", num_variables}, { "NUM_CLAUSES", num_clauses } };
+	MAXSATConfig conf(args);
 	MAXSATSolutionContainer c(weights, assignements, clauses);
 	unique_ptr<MAXSAT1NeighbourhoodExplorLogger> logger(new MAXSAT1NeighbourhoodExplorLogger());
 	vector<maxsat_obs_t*> obs{ logger.get() };
@@ -149,6 +152,7 @@ void test_LocalSearch_MAXSAT_flips_explored_detail_BI() {
 			throw runtime_error("For final choice expecting " + exp_final_choice.str() + " but got " + final_choice.str());
 		}
 	}
+	delete args;
 }
 
 /**
@@ -179,7 +183,8 @@ void test_LocalSearch_MAXSAT_flips_explored_detail_FI() {
 	};
 	vector<bool> assignements{ true, false, true, true, false };
 	vector<double> weights(num_clauses, 1.0);
-	MAXSATConfig conf(map<string, int>{ {"NUM_VARIABLES", num_variables}, { "NUM_CLAUSES", num_clauses }});
+	map<string,long>* args = new map<string,long>{ {"NUM_VARIABLES", num_variables}, { "NUM_CLAUSES", num_clauses } };
+	MAXSATConfig conf(args);
 	MAXSATSolutionContainer c(weights, assignements, clauses);
 	unique_ptr<MAXSAT1NeighbourhoodExplorLogger> logger(new MAXSAT1NeighbourhoodExplorLogger());
 	vector<maxsat_obs_t*> obs{ logger.get() };
@@ -209,4 +214,5 @@ void test_LocalSearch_MAXSAT_flips_explored_detail_FI() {
 			throw runtime_error("For final choice expecting " + exp_final_choice.str() + " but got " + final_choice.str());
 		}
 	}
+	delete args;
 }

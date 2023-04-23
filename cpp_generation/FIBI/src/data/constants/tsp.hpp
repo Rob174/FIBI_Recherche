@@ -5,7 +5,7 @@ using namespace std;
 class TSPConfig : public AbstractConfig
 {
 public:
-	Uninitialized<int> SEED_GLOB,
+	Uninitialized<long> SEED_GLOB,
 		SEED_PROBLEM,
 		SEED_ASSIGN,
 		DATASET,
@@ -15,7 +15,7 @@ public:
 		NUM_DIM;
 
 public:
-	TSPConfig(map<string, int> args)
+	TSPConfig(map<string,long>* args)
 	{
 		addCst(SEED_GLOB);
 		addCst(SEED_PROBLEM);

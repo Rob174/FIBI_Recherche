@@ -38,7 +38,7 @@ void test_improve_maxsat() {
 		const int num_clauses = it.value()["num_clauses"];
 		const int num_vars = it.value()["num_variables"];
 		const int num_weights = it.value()["num_clauses"];
-		map<string, int> m = { {"SEED_ASSIGN", 0} };
+		map<string,long> *m = new map<string,long>{ {"SEED_ASSIGN", 0} };
 		MAXSATConfig c(m);
 
 		// Get the data
@@ -60,5 +60,6 @@ void test_improve_maxsat() {
 		if (assignment->size() != num_vars) {
 			throw runtime_error("The number of variables in the assignment is not the expected one. Expected " + to_string(num_vars) + " but got " + to_string(assignment->size()));
 		}
+		delete m;
 	}
 }

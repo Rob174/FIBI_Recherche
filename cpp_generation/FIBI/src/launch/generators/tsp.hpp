@@ -11,13 +11,13 @@
 
 using namespace std;
 
-vector<pair<string, double>> tspfactory_run(const map<string, int>& args, string root_data, int thread_id) {
+vector<pair<string, double>>* tspfactory_run(map<string,long>* args, string root_data, int thread_id) {
 
 	TSPFactory f;
 	TSPConfig cf(args);
 
-	vector<pair<string, double>> success = f.run(cf, root_data);
-	if (args.at("SEED_GLOB") % 100 == 0) {
+	vector<pair<string, double>>* success = f.run(cf, root_data);
+	if (args->at("SEED_GLOB") % 100 == 0) {
 		cout << "\x1B[32m \tOK ";
 		cf.print();
 		cout << "\033[0m " << endl;
@@ -75,7 +75,7 @@ bool run_tsp(Args arguments, const unique_ptr <set<int>>& missing) {
 		int seed_assign = values[3];
 		for (int seed_problem : seeds_problem.at(dataset)) {
 			if (dataset == 1 && impr == 1) continue; //tsplib with improvement will give always the same result
-			map<string, int> args{
+			map<string,long> *args = new map<string,long>{
 				{"DATASET",dataset},
 				{"SEED_GLOB",i},
 				{"FI_BI",FI_BI},
@@ -84,11 +84,11 @@ bool run_tsp(Args arguments, const unique_ptr <set<int>>& missing) {
 				{"NUM_DIM",2}
 			};
 			if (dataset == 1) {// TSPLIB has different 
-				args["SEED_PROBLEM"] = seed_problem;
-				args["SEED_ASSIGN"] = seed_assign;
+				(*args)["SEED_PROBLEM"] = seed_problem;
+				(*args)["SEED_ASSIGN"] = seed_assign;
 			} else {
-				args["SEED_PROBLEM"] = seed_assign;
-				args["SEED_ASSIGN"] = seed_assign;
+				(*args)["SEED_PROBLEM"] = seed_assign;
+				(*args)["SEED_ASSIGN"] = seed_assign;
 			}
 			if (i > arguments.end_seed && arguments.end_seed != -1) return false;
 			if (i >= arguments.start_seed || (missing->find(i) != missing->end())) {

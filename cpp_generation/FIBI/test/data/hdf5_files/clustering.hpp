@@ -29,12 +29,12 @@ void test_clustering_aloise() {
 		const int instance = it.value()["ID"];
 		const int num_dims = it.value()["NUM_DIM"];
 		const int num_points = it.value()["NUM_POINTS"];
-		map<string, int> m = { };
+		map<string,long> *m = new map<string,long>{ };
 		ClusteringConfig c(m);
 
 		// Get the data
 		unique_ptr<const vector<double>> data(open_clustering(instance, path_hdf5, &c, false));
-
+		delete m;
 		// Check that the number of dimensions is correct
 		if (c.NUM_DIM.get() != num_dims) {
 			throw runtime_error("The number of dimensions is not correct: expected " + to_string(num_dims) + " but got " + to_string(c.NUM_DIM.get()));
@@ -78,7 +78,7 @@ void test_clustering_franti() {
 		const int num_dims = it.value()["NUM_DIM"];
 		const int num_points = it.value()["NUM_POINTS"];
 		const int num_clust = it.value()["NUM_CLUST"];
-		map<string, int> m = { };
+		map<string,long> *m = new map<string,long>{ };
 		ClusteringConfig c(m);
 
 		// Get the data
@@ -105,5 +105,8 @@ void test_clustering_franti() {
 		if (data->size() != num_points * num_dims) {
 			throw runtime_error("The number of data is not correct: expected " + to_string(num_points * num_dims) + " elements but got " + to_string(data->size()) + " for instance " + to_string(instance));
 		}
+		delete m;
 	}
+
+
 }

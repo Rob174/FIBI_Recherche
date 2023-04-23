@@ -12,7 +12,7 @@ using namespace std;
 
 class TSPFactory : public AbstractFactory<TSPConfig> {
 public:
-	vector<pair<string, double>> run(TSPConfig& cf, string root_data = "./") override
+	vector<pair<string, double>>* run(TSPConfig& cf, string root_data = "./") override
 	{
 		// setup
 		const vector<double>* towns_pos_ptr;
@@ -34,7 +34,7 @@ public:
 			towns_pos_ptr = open_tsplib(cf.SEED_PROBLEM.get(), root_data + dataset_name, &cf);
 			break;
 		default:
-			throw invalid_argument("Invalid DATASET argument, Valid values are 0->2");
+			throw invalid_argument("Invalid DATASET argument, Valid values are 0->1");
 			break;
 		}
 		unique_ptr<const vector<double>> towns_pos(towns_pos_ptr);
@@ -48,22 +48,26 @@ public:
 			break;
 		case 1:
 			/* Improved tour */
-			tour_ptr = improved_tour(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m);
+			tour_ptr = init_tsp_greedy(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m);
 			break;
 		case 2:
 			/* Improved random tour TOP 3*/
-			tour_ptr = improved_rand_tour(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 3);
+			tour_ptr = init_tsp_greedy_topk(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 3);
 			break;
 		case 3:
 			/* Improved random tour TOP 4*/
-			tour_ptr = improved_rand_tour(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 4);
+			tour_ptr = init_tsp_greedy_topk(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 4);
 			break;
 		case 4:
 			/* Improved random tour TOP 5*/
-			tour_ptr = improved_rand_tour(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 5);
+			tour_ptr = init_tsp_greedy_topk(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 5);
+			break;
+		case 5:
+			/* Improved random tour TOP 6*/
+			tour_ptr = init_tsp_greedy_randomized(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m);
 			break;
 		default:
-			throw invalid_argument("Invalid IMPR argument, Valid values are 0->4");
+			throw invalid_argument("Invalid IMPR argument, Valid values are 0->5");
 			break;
 		}
 		unique_ptr<vector<int>> tour(tour_ptr);
@@ -75,7 +79,7 @@ public:
 		unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs,(bool)cf.FI_BI.get()));
 		ls->run(co, cf);
 		// writing the results
-		vector<pair<string, double>> res = get_results<TSPSwap, TSPSolutionContainer<>>(&metrics, &cf);
+		vector<pair<string, double>>* res = get_results<TSPSwap, TSPSolutionContainer<>>(&metrics, &cf);
 		return res;
 	}
 };

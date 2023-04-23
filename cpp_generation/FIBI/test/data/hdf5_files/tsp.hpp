@@ -29,11 +29,12 @@ void test_tsplib() {
 		// Cast key into int
 		const int instance = stoi(key);
 		const unsigned int exp_n_points = it.value()["n_pts"];
-		map<string, int> m = { {"NUM_DIM",2} };
+		map<string,long> *m = new map<string,long>{ {"NUM_DIM",2} };
 		TSPConfig c(m);
 
 		// Get the data
 		unique_ptr<const vector<double>> data(open_tsplib(instance, path_hdf5, &c));
+		delete m;
 
 		// Check that the number of points is correct
 		if (data->size() != exp_n_points * 2) {

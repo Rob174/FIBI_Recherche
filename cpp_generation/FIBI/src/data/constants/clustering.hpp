@@ -5,7 +5,7 @@ using namespace std;
 class ClusteringConfig : public AbstractConfig
 {
 public:
-	Uninitialized<int> SEED_GLOB,
+	Uninitialized<long> SEED_GLOB,
 		SEED_PROBLEM,
 		SEED_ASSIGN,
 		DATASET,
@@ -16,7 +16,7 @@ public:
 		NUM_CLUST;
 
 public:
-	ClusteringConfig(map<string, int> args)
+	ClusteringConfig(map<string,long>* args)
 	{
 		addCst(SEED_GLOB);
 		addCst(SEED_PROBLEM);

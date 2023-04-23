@@ -5,15 +5,34 @@ using data_t = long long int;
 using json = nlohmann::json;
 class StatsRegisterer {
 private:
-    json j;
+	json j;
 public:
-    StatsRegisterer(const int id, std::string orig_name);
-    void set_num_clauses(data_t n);
-    void set_num_variables(data_t n);
-	const data_t num_clauses() const;
-	const data_t num_variables() const;
-	const bool stats_ready() const;
-	json get_json();
+	StatsRegisterer(const int id, std::string orig_name) {
+		this->j["id"] = id;
+		this->j["name"] = orig_name;
+	};
+	void set_num_clauses(data_t n) {
+		this->j["num_clauses"] = n;
+	};
+	void set_num_variables(data_t n) {
+		this->j["num_variables"] = n;
+	};
+	const data_t num_clauses() const {
+		return this->j["num_clauses"];
+	};
+	const data_t num_variables() const {
+		return this->j["num_variables"];
+	};
+	const bool stats_ready() const {
+		// Check that we have id, num_clauses and num_variables
+		if (this->j.find("num_clauses") == this->j.end()) return false;
+		if (this->j.find("num_variables") == this->j.end()) return false;
+		if (this->j.find("id") == this->j.end()) return false;
+		return true;
+	};
+	json get_json() {
+		return this->j;
+	};
 };
 
 class JSONStorage

@@ -42,12 +42,14 @@ void test_ClusteringSolutionContainer_compute_quality_metric_1() {
 	vector<int> cluster_ids = {
 		0, 0, 0, 0, 1, 1, 1, 1
 	};
-	ClusteringConfig conf({ {"NUM_CLUST", num_clusters}, {"NUM_DIM", num_dims}, {"NUM_POINTS",num_points} });
+	map<string,long>* args = new map<string,long>{ {"NUM_CLUST", num_clusters}, {"NUM_DIM", num_dims}, {"NUM_POINTS",num_points} };
+	ClusteringConfig conf(args);
 	ClusteringSolutionContainer c(points, cluster_ids, conf);
 	const double quality = c.compute_quality_metric();
 	if (abs(quality - 120) >= EPSILON) {
 		throw runtime_error("The quality metric is not correct: expected 120 but got " + to_string(quality));
 	}
+	delete args;
 }
 
 /**
@@ -83,7 +85,8 @@ void test_ClusteringSolutionContainer_test_flip() {
 	vector<int> cluster_ids = {
 		0, 0, 0, 0, 0, 1, 1, 1
 	};
-	ClusteringConfig conf({ {"NUM_CLUST", num_clusters}, {"NUM_DIM", num_dims}, {"NUM_POINTS",num_points} });
+	map<string,long>* args = new map<string,long>{ {"NUM_CLUST", num_clusters}, {"NUM_DIM", num_dims}, {"NUM_POINTS",num_points} };
+	ClusteringConfig conf(args);
 	ClusteringSolutionContainer c(points, cluster_ids, conf);
 	const double quality = c.compute_quality_metric();
 	ClusteringSwap s(4, 0, 1); // 0: B ; 1: A
@@ -94,6 +97,7 @@ void test_ClusteringSolutionContainer_test_flip() {
 	if (abs(new_quality - 120) >= EPSILON) {
 		throw runtime_error("The quality metric is not correct: expected 120 but got " + to_string(new_quality) + " with computed new quality " + to_string(cmpt_quality));
 	}
+	delete args;
 
 }
 
@@ -112,7 +116,8 @@ void test_ClusteringSolutionContainer_compute_quality_metric_2() {
 	const int seed = dis_ints(gen) - 1;
 	unique_ptr<const vector<double>> points(uniform_points(num_points, num_dims, seed));
 	unique_ptr<vector<int>> cluster_ids(random_clust(num_clust, num_points, seed));
-	ClusteringConfig conf({ {"NUM_CLUST", num_clust}, {"NUM_DIM", num_dims}, {"NUM_POINTS",num_points} });
+	map<string,long>* args = new map<string,long>{ {"NUM_CLUST", num_clust}, {"NUM_DIM", num_dims}, {"NUM_POINTS",num_points} };
+	ClusteringConfig conf(args);
 	ClusteringSolutionContainer<false> c(*points, *cluster_ids, conf);
 	const double quality = c.compute_quality_metric();
 	for (int i = 0; i < 100; i++) {
@@ -129,4 +134,5 @@ void test_ClusteringSolutionContainer_compute_quality_metric_2() {
 			throw runtime_error("The quality metric is not correct: expected " + to_string(quality) + " but got " + to_string(c.compute_quality_metric()));
 		}
 	}
+	delete args;
 }

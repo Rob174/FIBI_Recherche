@@ -29,7 +29,7 @@ void test_maxsat_benchmark() {
 		const int num_clauses = it.value()["num_clauses"];
 		const int num_vars = it.value()["num_variables"];
 		const int num_weights = it.value()["num_clauses"];
-		map<string, int> m = { };
+		map<string,long> *m = new map<string,long>{ };
 		MAXSATConfig c(m);
 
 		// Get the data
@@ -37,6 +37,7 @@ void test_maxsat_benchmark() {
 		auto [clauses_ptr, weights_ptr, n_vars] = parse_maxsat(*data);
 		unique_ptr<vector<clause_t>> clauses(clauses_ptr);
 		unique_ptr<vector<double>> weights(weights_ptr);
+		delete m;
 		// Check number of clauses
 		if (num_clauses != clauses->size()) {
 			throw runtime_error("Number of clauses does not match for instance " + to_string(instance) + " with expected " + to_string(num_clauses) + " but seen " + to_string(clauses->size()));

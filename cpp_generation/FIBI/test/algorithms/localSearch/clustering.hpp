@@ -64,7 +64,8 @@ void test_LocalSearch_Clust_flips_explored() {
 	const int seed = dis_ints(gen) - 1;
 	unique_ptr<const vector<double>> points(uniform_points(num_points, num_dims, seed));
 	unique_ptr<vector<int>> assignements(random_clust(num_clust, num_points, seed));
-	ClusteringConfig conf(map<string, int>{ {"NUM_POINTS", num_points}, { "NUM_DIM", num_dims }, { "NUM_CLUST",num_clust }});
+	map<string,long>* args = new map<string,long>{ {"NUM_POINTS", num_points}, { "NUM_DIM", num_dims }, { "NUM_CLUST",num_clust } };
+	ClusteringConfig conf(args);
 	ClusteringSolutionContainer<> c(*points, *assignements, conf);
 	unique_ptr<Clust1NeighbourhoodExplorLogger> logger(new Clust1NeighbourhoodExplorLogger());
 	vector<clustering_obs_t*> obs{ logger.get() };
@@ -95,6 +96,7 @@ void test_LocalSearch_Clust_flips_explored() {
 			);
 		}
 	}
+	delete args;
 }
 
 /** @brief Test that the correct moves are explored with BI for the following instance}
@@ -161,7 +163,8 @@ void test_LocalSearch_Clust_flips_explored_detail_BI() {
 		-5,3	// [4]
 	};
 	vector<int> assignements{ 0,1,1,1,0 };
-	ClusteringConfig conf(map<string, int>{ {"NUM_POINTS", num_points}, { "NUM_DIM", num_dims }, { "NUM_CLUST",num_clust }});
+	map<string,long>* args = new map<string,long>{ {"NUM_POINTS", num_points}, { "NUM_DIM", num_dims }, { "NUM_CLUST",num_clust } };
+	ClusteringConfig conf(args);
 	ClusteringSolutionContainer<> c(points, assignements, conf);
 	unique_ptr<Clust1NeighbourhoodExplorLogger> logger(new Clust1NeighbourhoodExplorLogger());
 	vector<clustering_obs_t*> obs{ logger.get() };
@@ -191,6 +194,7 @@ void test_LocalSearch_Clust_flips_explored_detail_BI() {
 			throw runtime_error("For final choice expecting " + exp_final_choice.str() + " but got " + final_choice.str());
 		}
 	}
+	delete args;
 }
 
 /** @brief Test that the correct moves are explored with FI for the following instance}
@@ -257,7 +261,8 @@ void test_LocalSearch_Clust_flips_explored_detail_FI() {
 		-5,3	// [4]
 	};
 	vector<int> assignements{ 0,1,1,1,0 };
-	ClusteringConfig conf(map<string, int>{ {"NUM_POINTS", num_points}, { "NUM_DIM", num_dims }, { "NUM_CLUST",num_clust }});
+	map<string,long>* args = new map<string,long>{ {"NUM_POINTS", num_points}, { "NUM_DIM", num_dims }, { "NUM_CLUST",num_clust } };
+	ClusteringConfig conf(args);
 	ClusteringSolutionContainer<> c(points, assignements, conf);
 	unique_ptr<Clust1NeighbourhoodExplorLogger> logger(new Clust1NeighbourhoodExplorLogger());
 	vector<clustering_obs_t*> obs{ logger.get() };
@@ -283,4 +288,5 @@ void test_LocalSearch_Clust_flips_explored_detail_FI() {
 			throw runtime_error("For final choice expecting " + exp_final_choice.str() + " but got " + final_choice.str());
 		}
 	}
+	delete args;
 }
