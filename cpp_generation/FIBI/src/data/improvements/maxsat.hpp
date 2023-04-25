@@ -66,7 +66,7 @@ vector<bool>* improve_maxsat(const map<const var_id_t, vector<clause_id_t>>& var
 	{
 		// ti: if we set xi to true, all clauses with only one variable left
 		stats currStatsTrue = { .SAT = formerStats.SAT, .UNSAT = formerStats.UNSAT, .B = formerStats.B };
-		// and without a negation will be set to true
+		// and without a negation will be set to true: because **at least** one true required
 		for (int clause_id : undecided_clauses_per_var.at(var_id).at(1))
 		{
 			currStatsTrue.SAT += weights[clause_id];

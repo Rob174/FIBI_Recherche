@@ -27,15 +27,20 @@
 
 
 void test_gather_metadata(const int argc, char** argv) {
-	const Args arguments = parseArguments(argc, argv);
+	Args arguments = parseArguments(argc, argv);
 	unique_ptr<set<int>> missing(read_missing());
 	if (arguments.problem == "tsp") {
 		cout << "TSP" << endl;
 		run_tsp<-1>(arguments, missing);
 	}
 	else if (arguments.problem == "clustering") {
-		cout << "clustering" << endl;
-		run_clustering<-1>(arguments, missing);
+		cout << "clustering " << arguments.all << endl;
+		if (arguments.all == "true") {
+			run_clustering_full(arguments, missing);
+		}
+		else {
+			run_clustering<-1>(arguments, missing);
+		}
 	}
 	else if (arguments.problem == "maxsat") {
 		cout << "maxsat" << endl;

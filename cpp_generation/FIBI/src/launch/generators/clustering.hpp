@@ -27,7 +27,7 @@ vector<pair<string, double>>* clusteringfactory_run(map<string,long>* args, stri
 	return success;
 }
 template <int seed_stop = -1>
-vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < set<int>>& missing) {
+void run_clustering(Args arguments, const unique_ptr < set<int>>& missing) {
 	MergeMetadata merger(arguments.merge_size, arguments.fileout);
 	ThreadPool pool(merger, arguments.num_threads);
 	// Define possibilities
@@ -39,54 +39,58 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 	}
 	vector<int> seeds_problem_franti{ 0,1,2,8,9,10,11,12,13,124,125,126,127,128 };
 	vector<int>l_FI_BI{ 0, 1 };
-	vector<int>l_impr{ 0, 1, 2 };
 	vector<int> l_seeds_assign(arguments.num_rep, 0);
 	iota(l_seeds_assign.begin(), l_seeds_assign.end(), 0);
 
 	vector<int> values;
 	long i = 0;
-	// Dataset 0: Uniform
-	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
-		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 3; impr++) {
+	if (arguments.dataset == 0) {
+		// Dataset 0: Uniform
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
 				for (int NUM_CLUST_i = 0; NUM_CLUST_i < num_clusters.size(); NUM_CLUST_i++) {
+					const int NUM_CLUST = num_clusters.at(NUM_CLUST_i);
 					for (int NUM_POINTS_i = 0; NUM_POINTS_i < num_points.size(); NUM_POINTS_i++) {
+						const int NUM_POINTS = num_points.at(NUM_POINTS_i);
 						i++;
 					}
 				}
 			}
 		}
 	}
-	// Dataset 1: Franti
-	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
-		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 3; impr++) {
-				for (int seed_problem = 0; seed_problem < seeds_problem_franti.size(); seed_problem++) {
+	else if (arguments.dataset == 1) {
+		// Dataset 1: Franti
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
+				for (int seed_problem_i = 0; seed_problem_i < seeds_problem_franti.size(); seed_problem_i++) {
+					const int seed_problem = seeds_problem_franti.at(seed_problem_i);
 					i++;
 				}
 			}
 		}
 	}
-
-	// Dataset 2: Aloise
-	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
-		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 3; impr++) {
-				for (int seed_problem = 0; seed_problem < seeds_problem_aloise.size(); seed_problem++) {
+	else if (arguments.dataset == 2) {
+		// Dataset 2: Aloise
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
+				for (int seed_problem_i = 0; seed_problem_i < seeds_problem_aloise.size(); seed_problem_i++) {
+					const int seed_problem = seeds_problem_aloise.at(seed_problem_i);
 					for (int NUM_CLUST_i = 0; NUM_CLUST_i < num_clusters.size(); NUM_CLUST_i++) {
+						const int NUM_CLUST = num_clusters.at(NUM_CLUST_i);
 						i++;
 					}
 				}
 			}
 		}
 	}
-
-	// Dataset 3: Normal dataset
-	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
-		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 3; impr++) {
+	else if (arguments.dataset == 3) {
+		// Dataset 3: Normal dataset
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
 				for (int NUM_CLUST_i = 0; NUM_CLUST_i < num_clusters.size(); NUM_CLUST_i++) {
+					const int NUM_CLUST = num_clusters.at(NUM_CLUST_i);
 					for (int NUM_POINTS_i = 0; NUM_POINTS_i < num_points.size(); NUM_POINTS_i++) {
+						const int NUM_POINTS = num_points.at(NUM_POINTS_i);
 						i++;
 					}
 				}
@@ -94,6 +98,7 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 		}
 	}
 	const int num_poss = i;
+	cout << num_poss << " TODO" << endl;
 	Progress progress(num_poss, "\033[31m", "Queued");
 
 	auto add_queue = [&pool, &progress, &missing, &arguments](
@@ -125,64 +130,90 @@ vector<pair<string, double>> run_clustering(Args arguments, const unique_ptr < s
 		return;
 	};
 	i = 0;
-	// Dataset 0: Uniform
-	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
-		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 3; impr++) {
+	if (arguments.start_seed == -1)
+	{
+		cout << "Out because start seed" << endl;
+		return;
+	}
+	if (arguments.dataset == 0) {
+		// Dataset 0: Uniform
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
 				for (int NUM_CLUST_i = 0; NUM_CLUST_i < num_clusters.size(); NUM_CLUST_i++) {
-					const int NUM_CLUST = num_clusters[NUM_CLUST_i];
+					const int NUM_CLUST = num_clusters.at(NUM_CLUST_i);
 					for (int NUM_POINTS_i = 0; NUM_POINTS_i < num_points.size(); NUM_POINTS_i++) {
-						const int NUM_POINTS = num_points[NUM_POINTS_i];
-						add_queue(i,seed_assign, seed_assign, FI_BI, impr, NUM_CLUST, 2, NUM_POINTS, 0);
+						const int NUM_POINTS = num_points.at(NUM_POINTS_i);
+						add_queue(i, seed_assign, seed_assign, FI_BI, arguments.impr, NUM_CLUST, 2, NUM_POINTS, arguments.dataset);
 						i++;
 					}
 				}
 			}
 		}
 	}
-	
-	// Dataset 1: Franti
-	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
-		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 3; impr++) {
-				for (int seed_problem = 0; seed_problem < seeds_problem_franti.size(); seed_problem++) {
-					add_queue(i,seed_problem, seed_assign, FI_BI, impr, -1, -1, -1, 1);
+	else if (arguments.dataset == 1) {
+		// Dataset 1: Franti
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
+				for (int seed_problem_i = 0; seed_problem_i < seeds_problem_franti.size(); seed_problem_i++) {
+					const int seed_problem = seeds_problem_franti.at(seed_problem_i);
+					add_queue(i, seed_problem, seed_assign, FI_BI, arguments.impr, -1, -1, -1, arguments.dataset);
 					i++;
 				}
 			}
 		}
 	}
-
-	// Dataset 2: Aloise
-	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
-		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 3; impr++) {
-				for (int seed_problem = 0; seed_problem < seeds_problem_aloise.size(); seed_problem++) {
+	else if (arguments.dataset == 2) {
+		// Dataset 2: Aloise
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
+				for (int seed_problem_i = 0; seed_problem_i < seeds_problem_aloise.size(); seed_problem_i++) {
+					const int seed_problem = seeds_problem_aloise.at(seed_problem_i);
 					for (int NUM_CLUST_i = 0; NUM_CLUST_i < num_clusters.size(); NUM_CLUST_i++) {
-						const int NUM_CLUST = num_clusters[NUM_CLUST_i];
-						add_queue(i,seed_problem, seed_assign, FI_BI, impr, NUM_CLUST, -1, -1, 2);
+						const int NUM_CLUST = num_clusters.at(NUM_CLUST_i);
+						add_queue(i, seed_problem, seed_assign, FI_BI, arguments.impr, NUM_CLUST, -1, -1, arguments.dataset);
 						i++;
 					}
 				}
 			}
 		}
 	}
-
-	// Dataset 3: Normal
-	for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
-		for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
-			for (int impr = 0; impr < 3; impr++) {
+	else if (arguments.dataset == 3) {
+		// Dataset 3: Normal dataset
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
 				for (int NUM_CLUST_i = 0; NUM_CLUST_i < num_clusters.size(); NUM_CLUST_i++) {
-					const int NUM_CLUST = num_clusters[NUM_CLUST_i];
+					const int NUM_CLUST = num_clusters.at(NUM_CLUST_i);
 					for (int NUM_POINTS_i = 0; NUM_POINTS_i < num_points.size(); NUM_POINTS_i++) {
-						const int NUM_POINTS = num_points[NUM_POINTS_i];
-						add_queue(i,seed_assign, seed_assign, FI_BI, impr, NUM_POINTS, 2, NUM_CLUST, 3);
+						const int NUM_POINTS = num_points.at(NUM_POINTS_i);
+						add_queue(i, seed_assign, seed_assign, FI_BI, arguments.impr, NUM_POINTS, 2, NUM_CLUST, arguments.dataset);
 						i++;
 					}
 				}
 			}
 		}
 	}
-	
-	return {};
+	else {
+		cout << "Unknow dataset" << endl;
+	}
+	return;
+}
+
+void run_clustering_full(Args arguments, const unique_ptr < set<int>>& missing) {
+	if (arguments.dataset != -1 && arguments.impr == -1) {
+		cout << "DATASET per DATASET" << endl;
+		for (int impr = 0; impr < 6; impr++) {
+			arguments.set_impr(impr);
+			run_clustering<-1>(arguments, missing);
+		}
+	}
+	else {
+		cout << "Full possibility" << endl;
+		for (int dataset = 0; dataset < 4; dataset++) {
+			for (int impr = 0; impr < 6; impr++) {
+				arguments.set_dataset(dataset);
+				arguments.set_impr(impr);
+				run_clustering<-1>(arguments, missing);
+			}
+		}
+	}
 }

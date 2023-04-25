@@ -50,7 +50,9 @@ public:
 			);
 			break;
 		default:
-			throw invalid_argument("Invalid DATASET argument, Valid values are 0->2");
+			string error = "Invalid DATASET argument, Valid values are 0->3";
+			cout << error << endl;
+			throw invalid_argument(error);
 			break;
 		}
 		if (cf.NUM_POINTS.get() <= cf.NUM_CLUST.get())
@@ -90,7 +92,9 @@ public:
 			init_clustering_greedy_topk(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get(), 5);
 			break;
 		default:
-			throw invalid_argument("Invalid IMPR argument, Valid values are 0->2");
+			string error = "Invalid IMPR argument, Valid values are 0->5";
+			cout << error << endl;
+			throw invalid_argument(error);
 			break;
 		}
 		unique_ptr<vector<int>> assignements(assignements_ptr);
