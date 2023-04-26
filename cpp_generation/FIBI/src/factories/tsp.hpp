@@ -47,24 +47,24 @@ public:
 			tour_ptr = random_tour(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get());
 			break;
 		case 1:
+			/* Improved random tour GREEDY RANDOMIZED*/
+			tour_ptr = init_tsp_greedy_randomized(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m);
+			break;
+		case 2:
 			/* Improved tour */
 			tour_ptr = init_tsp_greedy(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m);
 			break;
-		case 2:
+		case 3:
 			/* Improved random tour TOP 3*/
 			tour_ptr = init_tsp_greedy_topk(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 3);
 			break;
-		case 3:
+		case 4:
 			/* Improved random tour TOP 4*/
 			tour_ptr = init_tsp_greedy_topk(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 4);
 			break;
-		case 4:
+		case 5:
 			/* Improved random tour TOP 5*/
 			tour_ptr = init_tsp_greedy_topk(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 5);
-			break;
-		case 5:
-			/* Improved random tour TOP 6*/
-			tour_ptr = init_tsp_greedy_randomized(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m);
 			break;
 		default:
 			throw invalid_argument("Invalid IMPR argument, Valid values are 0->5");

@@ -30,6 +30,13 @@ void test_gather_metadata(const int argc, char** argv) {
 	Args arguments = parseArguments(argc, argv);
 	unique_ptr<set<int>> missing(read_missing());
 	if (arguments.problem == "tsp") {
+		cout << "tsp " << arguments.all << endl;
+		if (arguments.all == "true") {
+			run_tsp_full(arguments, missing);
+		}
+		else {
+			run_tsp<-1>(arguments, missing);
+		}
 		cout << "TSP" << endl;
 		run_tsp<-1>(arguments, missing);
 	}
