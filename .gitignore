@@ -2706,3 +2706,10 @@ cpp_generation/Max_SAT/Max_SAT/Max_SAT.vcxproj.filters
 cpp_generation/tsp/Project1/Project1.vcxproj
 cpp_generation/tsp/Project1/Project1.vcxproj.filters
 .VSCodeCounter/*
+cpp_generation/clustering/clustering/clustering.vcxproj
+cpp_generation/clustering/clustering/clustering.vcxproj.filters
+cpp_generation/clustering/Test/Test.vcxproj
+cpp_generation/clustering/Test/Test.vcxproj.filters
+cpp_generation/clustering/clustering.sln
+cpp_generation/FIBI/CMakeFiles/FIBI.dir/*
+cpp_generation/FIBI/FIBI
