@@ -130,14 +130,6 @@ def get_clustering(
         profiler.enable()
     if subproblem == "aloise_benchmark":
         get_clustering_benchmark_aloise_visualizations(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "clustering"
-                / "benchmark_aloise"
-                / "mapping.json"
-            ),
             pathes_hdf5=[
                 existing_path(
                     Path(".")
@@ -178,17 +170,8 @@ def get_clustering(
                     / "profile.prof"
                 )
             )
-    elif subproblem == "uniform_points": # TODO
+    elif subproblem == "uniform_points":
         get_clustering_uniform_visualizations(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "clustering"
-                / "quad"
-                / "new"
-                / "mapping.json"
-            ),
             pathes_hdf5=[
                 existing_path(
                     Path(".")
@@ -216,16 +199,8 @@ def get_clustering(
                     / "profile.prof"
                 )
             )
-    elif subproblem == "uniform_points_norm": # TODO
+    elif subproblem == "uniform_points_norm":
         get_clustering_uniform_norm_visualizations(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "clustering"
-                / "quadNorm"
-                / "mapping.json"
-            ),
             pathes_hdf5=[
                 existing_path(
                     Path(".")
@@ -255,14 +230,6 @@ def get_clustering(
             )
     elif subproblem == "franti_benchmark":
         get_clustering_franti_visualizations(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "clustering"
-                / "benchmark_franti"
-                / "mapping.json"
-            ),
             mapping_inst=existing_path(
                 Path(".")
                 / "data"
@@ -458,15 +425,30 @@ def get_maxsat_problem_visualization(
 
 
 if __name__ == "__main__":
-    
-    check_tsp(
-        existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
-    )
+    folder_missing = path_create(Path(".")
+            / "data"
+            / "algorithms_out"
+            / "missing"
+            )
+    num_files = 2
+    server = "rmoine@132.207.72.24:/home/rmoine/"
+    # check_tsp(
+    #     existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
+    # )
     print("TSP")
     print("quad")
     get_tsp("uniform_points", False)
     print("tsplib")
-    get_tsp("tsplib", False)
+    # get_tsp("tsplib", False)
+    print("Clustering")
+    print("Aloise")
+    # get_clustering("aloise_benchmark", profile=False)
+    print("Quad")
+    # get_clustering("uniform_points", profile=False)
+    print("QuadNorm")
+    # get_clustering("uniform_points_norm", profile=False)
+    print("Franti")
+    # get_clustering("franti_benchmark", profile=False)
     # # print("MAXSAT")
     # check_maxsat(
     #     existing_path(
@@ -479,22 +461,16 @@ if __name__ == "__main__":
     # )
     # # print("benchmark2021")
     # # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
-    print("Clustering")
-    check_clustering(
-        
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "clustering"
-                    / "dataset.txt"
-                )
-    )
-    print("Aloise")
-    get_clustering("aloise_benchmark", profile=False)
-    print("Quad")
-    get_clustering("uniform_points", profile=False)
-    print("QuadNorm")
-    get_clustering("uniform_points_norm", profile=False)
-    print("Franti")
-    get_clustering("franti_benchmark", profile=False)
+    
+    # check_clustering(
+    #     existing_path(
+    #         Path(".")
+    #         / "data"
+    #         / "algorithms_out"
+    #         / "clustering"
+    #         / "dataset.txt"
+    #     ),
+    #     folder_missing,
+    #     num_files,
+    #     server
+    # )

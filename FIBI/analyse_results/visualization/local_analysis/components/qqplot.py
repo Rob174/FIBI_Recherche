@@ -57,10 +57,10 @@ class QQPlot:
         html = bs4.BeautifulSoup(
             fig.to_html(full_html=False, include_plotlyjs="cdn"), features="html.parser"
         )
-        s.div.append(html) # type: ignore
+        s.div.append(html)  # type: ignore
         p = s.new_tag("p")
         p.string = "Initialisation: " + initialization
-        s.div.append(p) # type: ignore
+        s.div.append(p)  # type: ignore
         return HTMLDataOut(
             query=keys,
             data=s,

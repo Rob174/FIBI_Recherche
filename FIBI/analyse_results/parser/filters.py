@@ -40,3 +40,27 @@ class FilterDuplicatedKeys(FilterParsedRun):
         accept = key not in self.keys
         self.keys.add(key)
         return accept
+class FilterDuplicatedKeysPerGroup(FilterParsedRun):
+    """Remove the runs with duplicated keys per grouped elements. Filters after the modifiers."""
+    def __init__(self, group_attrs: List[str]) -> None:
+        super().__init__()
+        self.keys = {}
+        self.group_attrs = group_attrs
+    def filter_before_modifiers(self, dico: dict) -> bool:
+        group = ",".join([str(dico[k]) for k in self.group_attrs])
+        if group not in self.keys:
+            self.keys[group] = set({})
+        key = dico["KEY"]
+        accept = key not in self.keys[group]
+        self.keys[group].add(key)
+        return accept
+class FilterMetricsObserved(FilterParsedRun):
+    """Remove the runs that do not have metrics.
+    # args
+        attr_metric: str, the attribute to check the presence of to determine if there are the metrics"""
+    def __init__(self, attr_metric: str = "init_cost") -> None:
+        super().__init__()
+        self.attr_metric = attr_metric
+    def filter_before_modifiers(self, dico: dict) -> bool:
+        accept = self.attr_metric in dico
+        return accept

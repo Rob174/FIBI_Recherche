@@ -7,6 +7,7 @@ from FIBI.analyse_results.visualization.local_analysis.components.qqplot import 
 from FIBI.analyse_results.visualization.local_analysis.components.register_seeds import RegisterSeeds
 from FIBI.analyse_results.visualization.local_analysis.components.tables import TableAttrFIBI
 from FIBI.analyse_results.visualization.local_analysis.components.test_viewer import TestViewer
+from FIBI.analyse_results.visualization.statistical_tests import AbstractStatisticMaker
 
 
 def analyse_attr(attr: str, folder_out: Path) -> List:
@@ -20,7 +21,7 @@ def analyse_attr(attr: str, folder_out: Path) -> List:
 
 class PageInstance(SingleInstanceVisualization):
     def __init__(self, folder_out: Path, fixed_attrs: List[str], 
-                 query_to_path: DicoPathConverter):
+                 query_to_path: DicoPathConverter, tests_used: Dict[str,AbstractStatisticMaker]):
         self.components = [
             RegisterSeeds(),
             *analyse_attr('num_iter',folder_out=folder_out),
@@ -30,7 +31,7 @@ class PageInstance(SingleInstanceVisualization):
             *analyse_attr('final_cost',folder_out=folder_out),
             *analyse_attr('ratio',folder_out=folder_out),
             QQPlot('ratio'),
-            TestViewer('ratio')
+            TestViewer('ratio',**tests_used)
         ]
         self.order = [c.type for c in (self.components)]
         super(PageInstance, self).__init__(fixed_attrs,['FI_BI'])

@@ -2,6 +2,7 @@ import pandas as pd
 from typing import *
 from pathlib import Path
 from FIBI.analyse_results.parser.parser import JSONParser
+from math import ceil
 import pandas as pd
 class CheckNumSeedGlob:
     """Check if there are the expected number of elements per hyperparameter combination"""
@@ -48,27 +49,37 @@ class CheckNumSeedGlob:
         for i in range(int(max_seed)):
             if i not in self.seeds_glob:
                 missing.append(i)
-        cont_int = self.get_contiguous_intervals(missing)
-        # print("missing: ",cont_int)
         return missing
+    def save_missing_seeds(self, missing: List[int], folder: Path, num_files: int = 2, server: str = ""):
+        # split missing into num_files lists
+        step = ceil(len(missing) / num_files)
+        lists = [[missing[i] for i in range(k*step,(k+1)*step) if i < len(missing)] for k in range(num_files)]
+        for i in range(num_files):
+            with open(folder / f"missing{i+1}.txt",'w') as f:
+                f.write(",".join(map(str,lists[i])))
+        if server != "":
+            with open(folder / f"upload.sh",'w') as f:
+                f.write("#!/bin/bash/\n"+"\n".join([f"mv missing{i+1}.txt missing.txt&&scp missing.txt {server}{i+1}/" for i in range(num_files)]))
         
-def check_tsp(path: Path):
+        
+        
+def check_tsp(path: Path, folder_missing: Path, num_files: int = 2, server: str = ""):
     p = JSONParser()
     with p.open_file(path) as f:
         data = list(p.get_data(f))
     c = CheckNumSeedGlob(data)
+    # c.save_missing_seeds(c.get_missing_seeds(),folder_missing,num_files,server)
     if not c.check(0,["NUM_TOWNS","IMPR","FI_BI"]):
         raise Exception("Not ok for TSP uniform points")
     if not c.check(1,["SEED_PROBLEM","IMPR","FI_BI"]):
         raise Exception("Not ok for TSP uniform points")
     
-def check_clustering(path: Path):
+def check_clustering(path: Path, folder_missing: Path, num_files: int = 2, server: str = ""):
     p = JSONParser()
     with p.open_file(path) as f:
         data = list(p.get_data(f))
     c = CheckNumSeedGlob(data)
-    with open("missing.txt","w") as f:
-        f.write(",".join(str(e) for e in c.get_missing_seeds()))
+    # c.save_missing_seeds(c.get_missing_seeds(),folder_missing,num_files,server)
     if not c.check(0,["NUM_POINTS","NUM_CLUST","IMPR","FI_BI"]):
         raise Exception("Not ok for Clustering uniform points")
     if not c.check(1,["SEED_PROBLEM","NUM_CLUST","IMPR","FI_BI"]):
@@ -78,11 +89,12 @@ def check_clustering(path: Path):
     if not c.check(3,["NUM_POINTS","NUM_CLUST","IMPR","FI_BI"]):
         raise Exception("Not ok for Clustering blobs")
     
-def check_maxsat(path: Path):
+def check_maxsat(path: Path, folder_missing: Path, num_files: int = 2, server: str = ""):
     p = JSONParser()
     with p.open_file(path) as f:
         data = list(p.get_data(f))
     c = CheckNumSeedGlob(data)
+    # c.save_missing_seeds(c.get_missing_seeds(),folder_missing,num_files,server)
     if not c.check(0,["SEED_PROBLEM","NUM_VARIABLES","NUM_CLAUSES","IMPR","FI_BI"]):
         raise Exception("Not ok for MAXSAT benchmark")
     

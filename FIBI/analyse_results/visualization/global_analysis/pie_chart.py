@@ -171,10 +171,6 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
     # inner group
     data: Dict[str,Tuple[float,Dict[str,float]]] = {"a":(a,{"a1":a1,"a2":a2}),"b":(b,{"b1":b1,"b2":b2,"b3":b3}),"c":(c,{"c1":c1})}
     lines = []
-    colors = ["red","green","blue"]
-    for i,(innerCat,(nbVals,dico_inner)) in enumerate(data.items()):
-        lines.append(f"\\def\\cat{innerCat.upper()}Color{{my{colors[i]}}}")
-        lines.append(f"\\def\\catOuter{innerCat.upper()}Color{{mylight{colors[i]}}}")
     def generator_inner(data):
         angle = 0
         for innerCat,(nbVals,dico_inner) in data.items():
@@ -197,10 +193,6 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
                 middle = (start_angle+end_angle)/2
                 angle = end_angle
                 yield innerCat,subcat, nbValsSubCat, frac,perc, start_angle, end_angle, middle
-    lines.append(f"\\def\\shiftOuter{{1.2}}")
-    lines.append(f"\\def\\shiftInner{{0.7}}")
-    lines.append(f"\\pgfmathsetmacro{{\\posRadLabInner}}{{\sizeInnerPie+\\shiftInner}}")
-    lines.append(f"\\pgfmathsetmacro{{\\posRadLabOuter}}{{\sizeOuterPie+\\shiftOuter}}")
     
     lines.append(f"% outer pie: subcategories")
     for innerCat, outerCat, nbVals, frac,perc, start_angle, end_angle, middle in generator_outer(data):
@@ -215,11 +207,17 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
     for outerCat, innerCat, nbVals, frac,perc, start_angle, end_angle, middle in generator_outer(data):
         lines.append(f"\\node at ({middle}:\\posRadLabOuter) {{{innerCat.upper()}}};")
         lines.append(f"\\node [below] at ({middle}:\\posRadLabOuter) {{{perc:.2f}\\%}};")
+        if perc < 0.01:
+            lines[-1] = "% "+lines[-1]
+            lines[-2] = "% "+lines[-2]
         
     lines.append(f"% inner pie labels")
     for innerCat, nbVals, frac,perc, start_angle, end_angle, middle, dico in generator_inner(data):
         lines.append(f"\\node at ({middle}:\\posRadLabInner) {{{innerCat.upper()}}};")
         lines.append(f"\\node [below] at ({middle}:\\posRadLabInner) {{{perc:.2f}\\%}};")
+        if perc < 0.01:
+            lines[-1] = "% "+lines[-1]
+            lines[-2] = "% "+lines[-2]
     
         
     with open(template_path) as f:
@@ -230,6 +228,7 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
         sizeOuter=size_out,
         sizeInner=size_inner,
         sizeFig="\\sizeFig",
+        sizeFigCaption="\\sizeFigCaption",
         title=f"{dataset}, {init}",
         reference=f"res{format_identifier(problem).capitalize()}{format_identifier(dataset).capitalize()}{format_identifier(init)}"
     )
@@ -279,12 +278,12 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
         pos = 0,0,0
         if 'RAND' in s:
             return pos
-        return 1, -len(s), s
+        return 1, len(s), s
     diagrams = [diagrams[k] for k in sorted(diagrams,key=sort_fn)]
     result = template.substitute(
-        sunbursts="\n    ".join(diagrams),
+        sunbursts="\n    ".join([d.replace("\n","\n    ") for d in diagrams]),
         title=f"{problem}, {dataset}",
-        reference=f"res{format_identifier(problem).capitalize()}{format_identifier(dataset).capitalize()}"
+        reference=f"res{format_identifier(problem).capitalize()}{format_identifier(dataset).capitalize()}",
     )
     out_path.mkdir(parents=True, exist_ok=True)
     with open(out_path / f'piechart_{dataset}.tex', 'w') as f:

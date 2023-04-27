@@ -168,59 +168,6 @@ def maxsat_familles():
         progress.set_total_steps(n)
         parse_folder(root, progress, root, first_only=True)
 
-
-# def filter_maxsat_instances(
-#     min_clauses: Optional[int] = 0,
-#     max_clauses: Optional[int] = None,
-#     min_var: Optional[int] = 0,
-#     max_var: Optional[int] = None,
-# ):
-#     root = Path("data/src_datasets/maxsat/maxsat_benchmark/")
-#     stats_fold = Path("data/out_analysis/maxsat_benchmark/instance_stats/")
-
-#     path_mapping = root / "mapping_benchmark.json"
-#     path_stats = stats_fold / "stats_num_vars_clauses.csv"
-#     path_stats_xls = stats_fold / "stats_num_vars_clauses.xls"
-#     path_hdf5 = root / "maxsat_benchmark.hdf5"
-
-#     make_path_new = lambda path: path.parent / (path.stem + "_new" + path.suffix)
-
-#     with open(path_mapping) as f:
-#         mapping_glob = json.load(f)
-#     df = pd.read_csv(path_stats)
-#     l_query = [
-#         txt + "<" + str(e)
-#         for e, txt in [[max_clauses, "num_vars"], [max_var, "clauses_tot"]]
-#         if e is not None
-#     ]
-#     l_query.extend(
-#         [
-#             txt + ">" + str(e)
-#             for e, txt in [[min_clauses, "num_vars"], [min_var, "clauses_tot"]]
-#             if e is not None
-#         ]
-#     )
-#     query = "&".join(l_query)
-#     df_filtered = df.query(query)
-#     print(f"{len(df_filtered)} elements")
-#     new_mapping = []
-#     with File(path_hdf5, "r") as f_in:
-#         with File(make_path_new(path_hdf5), "w") as f_out:
-#             for new_id, name in enumerate(df_filtered["name"]):
-#                 id = next(e["id"] for e in mapping_glob if e["name"] == name)
-#                 new_mapping.append(
-#                     {"name": name, "id": str(new_id), "previous_id": str(id)}
-#                 )
-#                 f_out.create_dataset(
-#                     name=str(new_id), data=np.copy(f_in[str(id)]), dtype=int
-#                 )
-#     # Update stats
-#     df_filtered.to_csv(make_path_new(path_stats))
-#     df_filtered.to_excel(make_path_new(path_stats_xls))
-#     with open(make_path_new(path_mapping), "w") as f:
-#         json.dump(new_mapping, f)
-
-
 def main():
     
     print("maxsat_benchmark()")

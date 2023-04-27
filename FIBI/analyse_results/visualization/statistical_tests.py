@@ -31,23 +31,19 @@ class AbstractClassMapping(abc.ABC):
 class SignTest(AbstractStatisticMaker):
     name = "Sign Test"
 
-    def __init__(self) -> None:
-        self.name = SignTest.name
-        super().__init__()
-
     def __call__(self, diff: np.ndarray):
         assert len(diff) >= 10, f"Warning: sample size too small {len(diff)}"
         # Source: https://openpress.usask.ca/introtoappliedstatsforpsych/chapter/16-2-median-sign-test/
         n = np.count_nonzero(diff)
         if n == 0:
             return dict(
-                X='x',
-                statistic='x',
-                pvalue='x',
-                r_plus='x',
-                r_minus='x',
+                X="x",
+                statistic="x",
+                pvalue="x",
+                r_plus="x",
+                r_minus="x",
                 n=0,
-                effect_size='x',
+                effect_size="x",
                 name=self.name,
                 pvalue_classes=[PValueMapping()(np.nan, test="SignTest")],
                 es_classes=[EffectSizeMapping()(np.nan, test="SignTest")],
@@ -77,11 +73,19 @@ class SignTest(AbstractStatisticMaker):
 
     def explain_to_text(self, diff: np.ndarray) -> List[bs4.BeautifulSoup]:
         dico_res = self(diff)
-        n = dico_res["n"]
-        r_plus = dico_res["r_plus"] if not isinstance(dico_res["r_plus"], str) else np.nan
-        r_minus = dico_res["r_minus"] if not isinstance(dico_res["r_minus"], str) else np.nan
-        X = dico_res["X"] if not isinstance(dico_res["X"], str) else np.nan
-        Z = dico_res["statistic"] if not isinstance(dico_res["statistic"], str) else np.nan
+        n: int = dico_res["n"]
+        r_plus = (
+            dico_res["r_plus"] if not isinstance(dico_res["r_plus"], str) else np.nan
+        )
+        r_minus = (
+            dico_res["r_minus"] if not isinstance(dico_res["r_minus"], str) else np.nan
+        )
+        X: float = dico_res["X"] if not isinstance(dico_res["X"], str) else np.nan
+        Z = (
+            dico_res["statistic"]
+            if not isinstance(dico_res["statistic"], str)
+            else np.nan
+        )
         to_bf = lambda x: bs4.BeautifulSoup(x, "html.parser")
         txt = []
         txt.append(
@@ -156,14 +160,31 @@ class SignTest(AbstractStatisticMaker):
             )
         )
         return txt
-    
+
+
 from numpy import compress
 from scipy.stats._stats_py import rankdata, find_repeats
 from scipy.stats._hypotests import _get_wilcoxon_distr
 
+
 class WilcoxonTest(AbstractStatisticMaker):
     name = "Wilcoxon"
-    def make_dico_result(self, es, count, n_zero, r_plus, r_minus, T, mode, prob, mn=None, se = None, rep = None, z=None):
+
+    def make_dico_result(
+        self,
+        es,
+        count,
+        n_zero,
+        r_plus,
+        r_minus,
+        T,
+        mode,
+        prob,
+        mn=None,
+        se=None,
+        rep=None,
+        z=None,
+    ):
         return dict(
             count=count,
             n_zero=n_zero,
@@ -175,22 +196,22 @@ class WilcoxonTest(AbstractStatisticMaker):
             mn=mn,
             se=se,
             z=z,
-            rep = rep,
+            rep=rep,
             prob=prob,
             effect_size=f"{es:{'.2f' if es != np.nan else 'x'}}",
             name=self.name,
             pvalue_classes=[PValueMapping()(prob, test=self.name)],
             es_classes=[EffectSizeMapping()(es, test=self.name)],
+            es=es,
         )
+
     def __call__(self, diff: np.ndarray):
         d = diff.astype(np.float64)  # type: ignore
         assert len(diff) >= 10, f"Warning: sample size too small {len(diff)}"
         n = diff.shape[0]
 
+        mode = "approx"
 
-        mode = 'approx'
-        
-            
         count = len(d)
         n_zero = np.sum(d == 0)
         if n_zero == len(d):
@@ -202,13 +223,12 @@ class WilcoxonTest(AbstractStatisticMaker):
                 r_plus=0,
                 r_minus=0,
                 T=0,
-                mode=mode, 
-                prob=np.nan, 
-                mn=None, 
-                se=None, 
-                z=None
+                mode=mode,
+                prob=np.nan,
+                mn=None,
+                se=None,
+                z=None,
             )
-
 
         r = rankdata(abs(d))
         r_plus = np.sum((d > 0) * r)
@@ -221,14 +241,14 @@ class WilcoxonTest(AbstractStatisticMaker):
         # (If alternative='pratt', r_plus + r_minus = count*(count+1)/2 - r_zero.)
         # [3] uses the r_plus for the one-sided test, keep min for two-sided test
         # to keep backwards compatibility
-        
+
         T = min(r_plus, r_minus)
         mn = None
         se = None
         z = None
         rep = None
-        mn = count * (count + 1.) * 0.25
-        se = count * (count + 1.) * (2. * count + 1.)
+        mn = count * (count + 1.0) * 0.25
+        se = count * (count + 1.0) * (2.0 * count + 1.0)
 
         replist, repnum = find_repeats(r)
         if repnum.size != 0:
@@ -243,24 +263,26 @@ class WilcoxonTest(AbstractStatisticMaker):
 
         # compute statistic and p-value using normal approximation
         z = (T - mn - d) / se
-        prob = 2. * distributions.norm.sf(abs(z))
-        es = 4*abs(T-(r_plus-r_minus)/2)/(count*(count+1))
-        return self.make_dico_result(es, count, n_zero, r_plus, r_minus, T, mode, prob, mn, se, rep, z)
+        prob = 2.0 * distributions.norm.sf(abs(z))
+        es = 4 * abs(T - (r_plus - r_minus) / 2) / (count * (count + 1))
+        return self.make_dico_result(
+            es, count, n_zero, r_plus, r_minus, T, mode, prob, mn, se, rep, z
+        )
 
     def explain_to_text(self, diff: np.ndarray) -> List[bs4.BeautifulSoup]:
         dico_res = self(diff)
-        count=dico_res["count"]
-        n_zero=dico_res["n_zero"]
-        r_plus=dico_res["r_plus"]
-        r_minus=dico_res["r_minus"]
-        statistic=dico_res["statistic"]
-        mode=dico_res["mode"]
-        mn=dico_res["mn"]
-        se=dico_res["se"]
-        z=dico_res["z"]
-        rep=dico_res["rep"]
-        rep=dico_res["prob"]
-        es=dico_res["es"]
+        count = dico_res["count"]
+        n_zero = dico_res["n_zero"]
+        r_plus = dico_res["r_plus"]
+        r_minus = dico_res["r_minus"]
+        statistic = dico_res["statistic"]
+        mode = dico_res["mode"]
+        mn = dico_res["mn"]
+        se = dico_res["se"]
+        z = dico_res["z"]
+        rep = dico_res["rep"]
+        prob = dico_res["prob"]
+        es = dico_res["es"]
         txt = []
         to_bf = lambda x: bs4.BeautifulSoup(x, "html.parser")
         txt.append(
@@ -269,11 +291,15 @@ class WilcoxonTest(AbstractStatisticMaker):
             )
         )
         txt.append(
-            to_bf(f"Mode 'approx' with n_zero={n_zero}. This mode by default as for 1000 samples the Wilcoxon exact distribution is not implemente in scipy")
+            to_bf(
+                f"Mode 'approx' with n_zero={n_zero}. This mode by default as for 1000 samples the Wilcoxon exact distribution is not implemente in scipy"
+            )
         )
-        if count-n_zero < 10:
+        if count - n_zero < 10:
             txt.append(
-                to_bf(f"Not enough non nul values remaining, pvalue and effect size cannot be computed")
+                to_bf(
+                    f"Not enough non nul values remaining, pvalue and effect size cannot be computed"
+                )
             )
         txt.append(
             to_bf(
@@ -284,7 +310,7 @@ class WilcoxonTest(AbstractStatisticMaker):
             txt.append(
                 to_bf(f"Only null values, cannot compute pvalue and effect size")
             )
-        elif count-n_zero < 10:
+        elif count - n_zero < 10:
             # message already added
             pass
         else:
@@ -295,22 +321,50 @@ class WilcoxonTest(AbstractStatisticMaker):
             )
             txt.append(
                 to_bf(
-                    r"<p>$$\mu = \frac{count \times (count+1)}{4} = "+"\frac{"+f"{count}"+r" \times ("+f"{count}+1)"+r"}{4}$$</p>"
+                    r"<p>$$\mu = \frac{count \times (count+1)}{4} = "
+                    + "\frac{"
+                    + f"{count}"
+                    + r" \times ("
+                    + f"{count}+1)"
+                    + r"}{4}$$</p>"
                 )
             )
             eq = r"<p>$$\sigma = \sqrt{\frac{count \times (count+1) \times (2\times count+1)"
-            eq_txt = r"<p>$$\sigma = \sqrt{\frac{"+str(count)+r" \times ("+str(count)+r"+1) \times (2\times "+str(count)+r"+1)"
+            eq_txt = (
+                r"<p>$$\sigma = \sqrt{\frac{"
+                + str(count)
+                + r" \times ("
+                + str(count)
+                + r"+1) \times (2\times "
+                + str(count)
+                + r"+1)"
+            )
             if rep is not None:
                 eq += r" - \frac{\sum t \times (t^2-t)}{2}"
-                eq_txt = r" - \frac{" + str((rep * (rep * rep - 1)).sum())+r"}{2}"
+                eq_txt = r" - \frac{" + str((rep * (rep * rep - 1)).sum()) + r"}{2}"
             eq += r"}{24}}$$</p>"
             eq_txt += r"}{24}}$$</p>"
             txt.append(to_bf(eq))
             txt.append(to_bf(eq_txt))
-            eq = r"<p>$$z=\frac{T-\mu}{\sigma}=\frac{"+str(statistic)+"-"+str(mn)+r"}{"+str(se)+"}$$</p>"
+            eq = (
+                r"<p>$$z=\frac{T-\mu}{\sigma}=\frac{"
+                + str(statistic)
+                + "-"
+                + str(mn)
+                + r"}{"
+                + str(se)
+                + "}$$</p>"
+            )
             txt.append(to_bf(eq))
-            txt.append(to_bf(r"pvalue=2 \times Pr(x>|z|)= 2 \times Pr(x>"+str(z)+r")="+str(prob)))
-            
+            txt.append(
+                to_bf(
+                    r"<p>$$pvalue=2 \times Pr(x>|z|)= 2 \times Pr(x>"
+                    + str(z)
+                    + r")="
+                    + str(prob)+"$$</p>"
+                )
+            )
+
             # plot a normal distribution with plotly and add the t value as a vertical line with a text
             fig = go.Figure()
             lim = abs(z) * 2
@@ -327,14 +381,17 @@ class WilcoxonTest(AbstractStatisticMaker):
             txt.append(to_bf(fig))
         return txt
 
+
 import scipy.special as special
+
 
 class TTest(AbstractStatisticMaker):
     name = "TTest"
+
     def __call__(self, diff: np.ndarray):
         diff = diff.astype(np.float64)  # type: ignore
         n = diff.shape[0]
-        df = n-1
+        df = n - 1
         v = np.var(diff, 0, ddof=1)
         dm = np.mean(diff, 0)
         denom = np.sqrt(v / n)
@@ -347,8 +404,9 @@ class TTest(AbstractStatisticMaker):
                 print(traceback.format_exc())
                 raise Exception
         prob = float(
-            special.stdtr(df, -np.abs(t))*2# stdtr Student t distribution cumulative distribution function
-        ) 
+            special.stdtr(df, -np.abs(t))
+            * 2  # stdtr Student t distribution cumulative distribution function
+        )
         if v == 0:
             cohens = np.nan
         else:
@@ -418,6 +476,8 @@ class TTest(AbstractStatisticMaker):
             )
         )
         return txt
+
+
 class ZTest(AbstractStatisticMaker):
     name = "ZTest"
 
@@ -513,6 +573,11 @@ class ZTest(AbstractStatisticMaker):
         )
         return txt
 
+def tests_wilcoxon_ttest() -> Dict[str,AbstractStatisticMaker]:
+    return {"test_gauss":TTest(),"test_nongauss":WilcoxonTest()}
+
+def tests_signtest_ztest() -> Dict[str,AbstractStatisticMaker]:
+    return {"test_gauss":ZTest(),"test_nongauss":SignTest()}
 
 class PValueMapping(AbstractClassMapping):
     def __call__(self, value: float, test: str) -> str:
@@ -555,7 +620,7 @@ class EffectSizeMapping(AbstractClassMapping):
                 return "es-medium"
             else:
                 return "es-big"
-            
+
         else:
             if value < 0.15:
                 return "es-small"

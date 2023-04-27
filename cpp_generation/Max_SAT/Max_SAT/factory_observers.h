@@ -1,4 +1,0 @@
-#ifndef FACTORY_OBSERVERS_H
-#define FACTORY_OBSERVERS_H
-
-#endif

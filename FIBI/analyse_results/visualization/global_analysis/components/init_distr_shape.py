@@ -1,6 +1,7 @@
 import FIBI.analyse_results.utils.__init__
 from FIBI.analyse_results.visualization.global_analysis.components.__init__ import *
 from FIBI.analyse_results.visualization.global_analysis.page_multiinstances import AggregatedData, Aggregator
+from FIBI.analyse_results.visualization.statistical_tests import AbstractStatisticMaker
 from FIBI.analyse_results.visualization.utils import default_fibi_order, dicos_fibi_diff
 from FIBI.analyse_results.utils.stats import check_in_inter, qqplot
 
@@ -24,14 +25,18 @@ class InitDistrShape(Aggregator):
         )]
 
 class TestUsed(InitDistrShape):
+    def __init__(self, metric: str, test_gauss: AbstractStatisticMaker, test_nongauss: AbstractStatisticMaker):
+        self.test_gauss = test_gauss
+        self.test_nongauss = test_nongauss
+        self.metric = metric
     def aggregate(self, keys: dict, dfs: List[DfExtract]) -> List[AggregatedData]:
         [init_distr] =  super().aggregate(keys, dfs)
         if init_distr['data'] == 'ng':
-            test_used = "signTest"
-            classes = ['signtest', init_distr['data']]
+            test_used = self.test_nongauss.name
+            classes = [self.test_nongauss.name, init_distr['data']]
         else:
-            test_used = "ztest"
-            classes = ['ztest', init_distr['data']]
+            test_used = self.test_gauss.name
+            classes = [self.test_gauss.name, init_distr['data']]
         return [AggregatedData(
             type= "test_used",
             data= test_used,
