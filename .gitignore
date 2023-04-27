@@ -2713,3 +2713,4 @@ cpp_generation/clustering/Test/Test.vcxproj.filters
 cpp_generation/clustering/clustering.sln
 cpp_generation/FIBI/CMakeFiles/FIBI.dir/*
 cpp_generation/FIBI/FIBI
+cpp_generation/FIBI/CMakeFiles/*
