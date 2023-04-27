@@ -52,7 +52,7 @@ public:
 				TSPSwap tmp_swap(co.cycle_id(i), co.cycle_id(j));
 				double delta_ij = co.test_flip(tmp_swap);
 				o->on_test_end(co, delta_ij, tmp_swap);
-				if (delta_ij < delta)
+				if (delta_ij < -EPSILON && delta_ij < delta)
 				{
 					delta = delta_ij;
 					chosen_swap = tmp_swap;

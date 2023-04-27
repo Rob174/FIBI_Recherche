@@ -120,24 +120,9 @@ const tuple<vector<double>*,vector<int>*, vector<double>*, vector<double>*> norm
 vector<int>* random_tour(const long num_towns, const long seed)
 {
 	// Make a vector of all towns and shuffle it
-#ifdef P_COMPACT
 	vector<int>* tour = new vector<int>(num_towns);
 	iota(tour->begin(), tour->end(), 0);
 	shuffle(tour->begin(), tour->end(), mt19937(seed));
-#else
-	std::mt19937 gen_dist(seed);
-	vector<int>* tour = new vector<int>(num_towns);
-	for (int i = 0; i < num_towns; i++)
-		(*tour)[i] = i;
-	for (int i = 0; i < num_towns - 2; i++)
-	{
-		std::uniform_int_distribution<> dis_choice(i, num_towns - 1);
-		int r = dis_choice(gen_dist);
-		int tmp = (*tour)[i];
-		(*tour)[i] = (*tour)[r];
-		(*tour)[r] = tmp;
-	}
-#endif
 	return tour;
 }
 /** @brief Generate a vector of random clusters
