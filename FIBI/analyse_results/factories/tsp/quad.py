@@ -11,7 +11,7 @@ def get_tsp_uniform_visualizations(
     pathes_hdf5: List[Path], out_folder: Path
 ):
     mapping_datasets = mapping_tsp_datasets()
-    dataset = 1
+    dataset = 0
     fixed_attr = ["IMPR", "NUM_TOWNS"]
     additionnal_modifiers: List[AbstractModifier] = [
         ConvertToInteger(fields=["NUM_TOWNS"]),
