@@ -2714,3 +2714,13 @@ cpp_generation/clustering/clustering.sln
 cpp_generation/FIBI/CMakeFiles/FIBI.dir/*
 cpp_generation/FIBI/FIBI
 cpp_generation/FIBI/CMakeFiles/*
+cpp_generation/parse_benchmark_maxsat/parse_benchmark_maxsat.sln
+cpp_generation/parse_benchmark_maxsat/parse_benchmark_maxsat.vcxproj.filters
+cpp_generation/parse_benchmark_maxsat/parse_benchmark_maxsat.vcxproj
+data/analysis_results/*
+cpp_generation/tsp/Rapport20220316-1709.diagsession
+cpp_generation/tsp/tsp.sln
+cpp_generation/tsp/Project1/packages.config
+desktop.ini
+illustrations.ai
+vandelay-py.js
