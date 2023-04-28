@@ -84,7 +84,8 @@ void run_tsp(Args arguments, const unique_ptr <set<int>>& missing) {
 				{"SEED_ASSIGN", seed_assign},
 				{"SEED_PROBLEM", seed_problem}
 			};
-			pool.submit(tspfactory_run, args, arguments.root_data);
+			tspfactory_run(args, arguments.root_data, 0);
+			//pool.submit(tspfactory_run, args, arguments.root_data);
 			progress.print(i);
 	};
 	if (arguments.dataset == 0) {
