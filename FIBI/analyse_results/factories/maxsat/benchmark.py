@@ -9,6 +9,7 @@ def get_maxsat_instance_visualizations(
     pathes_hdf5: List[Path],
     mapping_inst: Path,
     out_folder: Path,
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
     stats = MainParser(JSONParser(path_mapping))
     # mapping names index in hdf5 to names of the attributes

@@ -54,7 +54,8 @@ from FIBI.analyse_results.test.datasets import check_clustering, check_maxsat, c
 
 
 def get_tsp(
-    subproblem: Literal["uniform_points", "tsplib"], profile: Optional[bool] = False
+    subproblem: Literal["uniform_points", "tsplib"], profile: Optional[bool] = False,
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
     if profile:
         profiler = cProfile.Profile()
@@ -69,6 +70,7 @@ def get_tsp(
             out_folder=existing_path(
                 path_create(Path(".") / "data" / "analysis_results" / "tsp" / "quad")
             ),
+            test_group=test_group
         )
         folder_profiler = "quad"
         if profile:
@@ -99,6 +101,7 @@ def get_tsp(
             out_folder=existing_path(
                 path_create(Path(".") / "data" / "analysis_results" / "tsp" / "tsplib")
             ),
+            test_group=test_group
         )
         folder_profiler = "tsplib"
     else:
@@ -124,6 +127,7 @@ def get_tsp(
 def get_clustering(
     subproblem: Literal["aloise_benchmark", "franti_benchmark", "uniform_points", "uniform_points_norm"],
     profile: Optional[bool] = False,
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
     if profile:
         profiler = cProfile.Profile()
@@ -156,6 +160,7 @@ def get_clustering(
                     / "benchmark_aloise"
                 )
             ),
+            test_group=test_group
         )
 
         if profile:
@@ -186,6 +191,7 @@ def get_clustering(
                     Path(".") / "data" / "analysis_results" / "clustering" / "quad"
                 )
             ),
+            test_group=test_group
         )
         if profile:
             profiler.disable()
@@ -215,6 +221,7 @@ def get_clustering(
                     Path(".") / "data" / "analysis_results" / "clustering" / "quadNorm"
                 )
             ),
+            test_group=test_group
         )
         if profile:
             profiler.disable()
@@ -256,6 +263,7 @@ def get_clustering(
                     / "benchmark_franti"
                 )
             ),
+            test_group=test_group
         )
         if profile:
             profiler.disable()
@@ -283,7 +291,8 @@ def existing_path(path: Path) -> Path:
 
 
 def get_maxsat_problem_visualization(
-    subproblem: Literal["maxsat_evaluation_benchmark2021", "randomly_generated", "randomly_generated2", "randomly_generated3"]
+    subproblem: Literal["maxsat_evaluation_benchmark2021", "randomly_generated", "randomly_generated2", "randomly_generated3"],
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
     if subproblem == "maxsat_evaluation_benchmark2021":
         get_maxsat_instance_visualizations(
@@ -321,6 +330,7 @@ def get_maxsat_problem_visualization(
                     / "maxsat_evaluation_benchmark2021"
                 )
             ),
+            test_group=test_group
         )
     elif subproblem == "randomly_generated":
         get_maxsat_uniformly_generated_visualizations(
@@ -351,6 +361,7 @@ def get_maxsat_problem_visualization(
                     / "randomly_generated"
                 )
             ),
+            test_group=test_group
         )
     elif subproblem == "randomly_generated2":
         get_maxsat_uniformly_generated_visualizations2(
@@ -389,6 +400,7 @@ def get_maxsat_problem_visualization(
                     / "randomly_generated2"
                 )
             ),
+            test_group=test_group
         )
     elif subproblem == "randomly_generated3":
         get_maxsat_uniformly_generated_visualizations3(
@@ -419,6 +431,7 @@ def get_maxsat_problem_visualization(
                     / "randomly_generated3"
                 )
             ),
+            test_group=test_group
         )
     else:
         raise ValueError(f"Unknown subproblem {subproblem}")
@@ -435,20 +448,21 @@ if __name__ == "__main__":
     # check_tsp(
     #     existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
     # )
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest"
     print("TSP")
     print("quad")
-    # get_tsp("uniform_points", False)
+    get_tsp("uniform_points", False, test_group=test_group)
     print("tsplib")
-    # get_tsp("tsplib", False)
+    get_tsp("tsplib", False, test_group=test_group)
     print("Clustering")
     print("Aloise")
-    get_clustering("aloise_benchmark", profile=False)
+    get_clustering("aloise_benchmark", profile=False, test_group=test_group)
     print("Quad")
-    get_clustering("uniform_points", profile=False)
+    get_clustering("uniform_points", profile=False, test_group=test_group)
     print("QuadNorm")
-    get_clustering("uniform_points_norm", profile=False)
+    get_clustering("uniform_points_norm", profile=False, test_group=test_group)
     print("Franti")
-    get_clustering("franti_benchmark", profile=False)
+    get_clustering("franti_benchmark", profile=False, test_group=test_group)
     # # print("MAXSAT")
     # check_maxsat(
     #     existing_path(

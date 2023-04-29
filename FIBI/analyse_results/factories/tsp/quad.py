@@ -8,7 +8,8 @@ from FIBI.analyse_results.visualization.global_analysis.pie_chart_distr import P
 from FIBI.analyse_results.visualization.statistical_tests import SignTest, ZTest
 
 def get_tsp_uniform_visualizations(
-    pathes_hdf5: List[Path], out_folder: Path
+    pathes_hdf5: List[Path], out_folder: Path,
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
     mapping_datasets = mapping_tsp_datasets()
     dataset = 0
@@ -27,5 +28,6 @@ def get_tsp_uniform_visualizations(
         problem="TSP",
         out_folder=out_folder,
         fixed_attr=fixed_attr,
-        Ldata=Ldata
+        Ldata=Ldata,
+        test_group=test_group
     )

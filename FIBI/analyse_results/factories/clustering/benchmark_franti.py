@@ -5,6 +5,7 @@ def get_clustering_franti_visualizations(
     pathes_hdf5: List[Path],
     out_folder: Path,
     mapping_inst: Path,
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
     problem = "Clustering"
     dataset = 1
@@ -30,5 +31,6 @@ def get_clustering_franti_visualizations(
         problem=problem,
         out_folder=out_folder,
         fixed_attr=fixed_attr,
-        Ldata=Ldata
+        Ldata=Ldata,
+        test_group=test_group
     )

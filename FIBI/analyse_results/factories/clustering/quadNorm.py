@@ -4,6 +4,7 @@ from FIBI.analyse_results.factories.common import *
 def get_clustering_uniform_norm_visualizations(
     pathes_hdf5: List[Path],
     out_folder: Path,
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
     problem = "Clustering"
     dataset = 3
@@ -23,5 +24,6 @@ def get_clustering_uniform_norm_visualizations(
         problem=problem,
         out_folder=out_folder,
         fixed_attr=fixed_attr,
-        Ldata=Ldata
+        Ldata=Ldata,
+        test_group=test_group
     )
