@@ -448,17 +448,17 @@ if __name__ == "__main__":
     # check_tsp(
     #     existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
     # )
-    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest"
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest"   
     print("TSP")
     print("quad")
     get_tsp("uniform_points", False, test_group=test_group)
     print("tsplib")
     get_tsp("tsplib", False, test_group=test_group)
     print("Clustering")
-    print("Aloise")
+    print("Aloise") 
     get_clustering("aloise_benchmark", profile=False, test_group=test_group)
     print("Quad")
-    get_clustering("uniform_points", profile=False, test_group=test_group)
+    get_clustering("uniform_points", profile=False, test_group=test_group)  
     print("QuadNorm")
     get_clustering("uniform_points_norm", profile=False, test_group=test_group)
     print("Franti")
