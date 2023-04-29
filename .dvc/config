@@ -1,4 +1,6 @@
 [core]
     remote = remote_hdd
+[cache]
+    type = "hardlink,symlink"
 ['remote "remote_hdd"']
     url = D:/version_control/FIBI_Recherche
