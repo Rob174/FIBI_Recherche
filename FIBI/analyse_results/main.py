@@ -45,7 +45,6 @@ from FIBI.analyse_results.factories.clustering.benchmark_franti import get_clust
 from FIBI.analyse_results.factories.clustering.quad import get_clustering_uniform_visualizations
 from FIBI.analyse_results.factories.clustering.quadNorm import get_clustering_uniform_norm_visualizations
 from FIBI.analyse_results.factories.maxsat.benchmark import get_maxsat_instance_visualizations
-from FIBI.analyse_results.factories.maxsat.random_uniform import get_maxsat_uniformly_generated_visualizations, get_maxsat_uniformly_generated_visualizations2, get_maxsat_uniformly_generated_visualizations3
 from FIBI.analyse_results.factories.tsp.quad import get_tsp_uniform_visualizations
 from FIBI.analyse_results.factories.tsp.tsplib import get_tsplib_visualizations
 from FIBI.analyse_results.test.datasets import check_clustering, check_maxsat, check_tsp
@@ -328,107 +327,6 @@ def get_maxsat_problem_visualization(
                     / "analysis_results"
                     / "maxsat"
                     / "maxsat_evaluation_benchmark2021"
-                )
-            ),
-            test_group=test_group
-        )
-    elif subproblem == "randomly_generated":
-        get_maxsat_uniformly_generated_visualizations(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "maxsat"
-                / "randomly_generated"
-                / "mapping.json"
-            ),
-            pathes_hdf5=[
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "maxsat"
-                    / "randomly_generated"
-                    / "dataset.hdf5"
-                )
-            ],
-            out_folder=existing_path(
-                path_create(
-                    Path(".")
-                    / "data"
-                    / "analysis_results"
-                    / "maxsat"
-                    / "randomly_generated"
-                )
-            ),
-            test_group=test_group
-        )
-    elif subproblem == "randomly_generated2":
-        get_maxsat_uniformly_generated_visualizations2(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "maxsat"
-                / "randomly_generated2"
-                / "mapping.json"
-            ),
-            path_metadata=(
-                Path(".")
-                / "data"
-                / "src_datasets"
-                / "maxsat"
-                / "kcnf_formula"
-                / "metadata.json"
-            ),
-            pathes_hdf5=[
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "maxsat"
-                    / "randomly_generated2"
-                    / "dataset.hdf5"
-                )
-            ],
-            out_folder=existing_path(
-                path_create(
-                    Path(".")
-                    / "data"
-                    / "analysis_results"
-                    / "maxsat"
-                    / "randomly_generated2"
-                )
-            ),
-            test_group=test_group
-        )
-    elif subproblem == "randomly_generated3":
-        get_maxsat_uniformly_generated_visualizations3(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "maxsat"
-                / "randomly_generated3"
-                / "mapping.json"
-            ),
-            pathes_hdf5=[
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "maxsat"
-                    / "randomly_generated3"
-                    / "dataset.hdf5"
-                )
-            ],
-            out_folder=existing_path(
-                path_create(
-                    Path(".")
-                    / "data"
-                    / "analysis_results"
-                    / "maxsat"
-                    / "randomly_generated3"
                 )
             ),
             test_group=test_group
