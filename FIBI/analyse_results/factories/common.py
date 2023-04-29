@@ -27,7 +27,6 @@ def get_common_modifiers(mapping_dataset: Dict[int, str]):
         5: "GREEDY TOP5",
     }
     return [
-        ConvertToInteger(fields=["NUM_TOWNS"]),
         ModifierIntMapping(
             name="IMPR",
             mapping=mapping_impr,
@@ -159,8 +158,8 @@ def run_data_extractor(
             mappings_attr_names=mappings_attr_names,
             legend=Legend(legend),
             query_to_path=query_to_path,
-            rows=fixed_attr[:2],
-            cols=[],
+            rows=[a for a in fixed_attr if a != "NUM_CLUST"],
+            cols=["NUM_CLUST"] if "NUM_CLUST" in fixed_attr else [],
         ),
         PageInstance(
             path_create(out_folder / "stats"),
