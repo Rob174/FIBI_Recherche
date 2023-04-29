@@ -1,0 +1,4 @@
+[core]
+    remote = remote_hdd
+['remote "remote_hdd"']
+    url = D:/version_control/FIBI_Recherche
