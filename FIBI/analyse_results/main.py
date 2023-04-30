@@ -265,7 +265,7 @@ def get_clustering(
             test_group=test_group
         )
         if profile:
-            profiler.disable()
+            profiler.disable() #type: ignore
             profiler.dump_stats(
                 path_create(
                     Path(".")
