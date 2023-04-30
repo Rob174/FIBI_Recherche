@@ -1,5 +1,6 @@
 from FIBI.analyse_results.utils.__init__ import *
 from colorsys import hls_to_rgb
+import os
 
 def default_html(stylesheet: str, script_id: int=1) -> bs4.BeautifulSoup:
     """stylesheet: str name of the stylesheet without css extension"""
@@ -65,5 +66,6 @@ def color_palet(n_colors: int, sat: float, lum: float = 0.8) -> List[str]:
 
 def soup_to_file(s: bs4.BeautifulSoup,p: Path):
     p.parent.mkdir(exist_ok=True,parents=True)
+    # Remove the file
     with open(p,'w') as f:
         f.write(str(s.prettify()))
