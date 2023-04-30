@@ -28,4 +28,4 @@ def dvc_manager(add_rmv: Optional[Literal['add','rmv']] = None, folder_path: Opt
                 print(f'Removing file: {file_path}')
 
 if __name__ == "__main__":
-    
+    dvc_manager("add","data/")
