@@ -1,0 +1,4 @@
+outs:
+- md5: 17d1cbf320a338465b34a82fe6dc9869
+  size: 998
+  path: mapping_tsplib_less_than_1000.json

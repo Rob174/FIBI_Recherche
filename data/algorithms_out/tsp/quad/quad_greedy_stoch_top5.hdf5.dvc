@@ -1,0 +1,4 @@
+outs:
+- md5: f9867f9d1a712f13295c99c9f5d2e145
+  size: 52125280
+  path: quad_greedy_stoch_top5.hdf5

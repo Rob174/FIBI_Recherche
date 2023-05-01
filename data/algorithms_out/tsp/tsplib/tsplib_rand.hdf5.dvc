@@ -1,0 +1,4 @@
+outs:
+- md5: c855aa50621d5d17e82cda4cd7bb9f3d
+  size: 49344320
+  path: tsplib_rand.hdf5

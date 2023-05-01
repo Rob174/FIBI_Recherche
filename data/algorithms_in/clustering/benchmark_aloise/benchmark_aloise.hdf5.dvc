@@ -1,0 +1,4 @@
+outs:
+- md5: ec785457feb6e9b31d37fa2a3b14b2e2
+  size: 660260
+  path: benchmark_aloise.hdf5

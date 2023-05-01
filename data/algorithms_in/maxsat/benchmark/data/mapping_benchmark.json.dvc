@@ -1,0 +1,4 @@
+outs:
+- md5: e788ec9db67b7d54662731662ddd83b9
+  size: 84701
+  path: mapping_benchmark.json
