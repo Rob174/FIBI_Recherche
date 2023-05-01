@@ -33,7 +33,14 @@ class InitCostVariation(MultiInstanceVisualization):
         fig.update_layout(yaxis_title=r"σ normalized")
         folder = self.out_folder
         (folder).mkdir(parents=True, exist_ok=True)
-        fig.write_html(folder / "initDistribution.html")
-        fig.write_image(folder / "initDistribution.png")
+        
+        path_img = folder / "initDistribution.png"
+        path_html = folder / "initDistribution.html"
+        os.system("dvc remove "+path_html.resolve().as_posix()+".dvc")
+        os.system("dvc remove "+path_img.resolve().as_posix()+".dvc")
+        fig.write_html(path_html)
+        fig.write_image(path_img)
+        os.system("dvc add "+path_html.resolve().as_posix()+".dvc")
+        os.system("dvc add "+path_img.resolve().as_posix()+".dvc")
         
         
