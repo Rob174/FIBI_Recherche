@@ -40,7 +40,7 @@ class InitCostVariation(MultiInstanceVisualization):
         os.system("dvc remove "+path_img.resolve().as_posix()+".dvc")
         fig.write_html(path_html)
         fig.write_image(path_img)
-        os.system("dvc add "+path_html.resolve().as_posix()+".dvc")
-        os.system("dvc add "+path_img.resolve().as_posix()+".dvc")
+        os.system("dvc add "+path_html.resolve().as_posix())
+        os.system("dvc add "+path_img.resolve().as_posix())
         
         

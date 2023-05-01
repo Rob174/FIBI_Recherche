@@ -70,4 +70,4 @@ def soup_to_file(s: bs4.BeautifulSoup,p: Path):
     # Remove the file
     with open(p,'w') as f:
         f.write(str(s.prettify()))
-    os.system("dvc add "+p.resolve().as_posix()+".dvc")
+    os.system("dvc add "+p.resolve().as_posix())

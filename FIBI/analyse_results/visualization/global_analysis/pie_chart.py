@@ -10,7 +10,6 @@ import re
 import plotly.express as px
 import pandas as pd
 import textwrap
-import FIBI.analyse_results.visualization.global_analysis.test as t
 from importlib import reload
 from string import Template
 
@@ -290,5 +289,5 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
     os.system("dvc remove "+path_out.resolve().as_posix()+".dvc")
     with open(path_out, 'w') as f:
         f.write(result)
-    os.system("dvc add "+path_out.resolve().as_posix()+".dvc")
+    os.system("dvc add "+path_out.resolve().as_posix())
     
