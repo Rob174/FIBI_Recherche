@@ -1,0 +1,5 @@
+outs:
+- md5: 5ffcbcba12ec49669a898723debf0e7c.dir
+  size: 268159455
+  nfiles: 14
+  path: algorithms_in
