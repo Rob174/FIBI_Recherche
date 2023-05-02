@@ -436,7 +436,7 @@ void init_clustering_greedy_topk(vector<double>& centroids, const vector<double>
 				}
 			}
 			cluster_assign[i] = closest_clust;
-			top_x_data.push_back({ closest_dist , i });
+			top_x_data.push_back({ -closest_dist , i });
 		}
 		// Take top N
 		const int size_top = N < (int)(top_x_data.size()) ? N : (int)(top_x_data.size());
