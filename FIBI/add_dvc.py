@@ -14,7 +14,7 @@ def process_file(file_path, add, remove,i,tot):
         elif remove:
             # Remove the file from the directory
             os.system("dvc remove "+file_path.resolve().as_posix())
-
+#
 def dvc_manager(add_rmv: Optional[Literal['add','rmv']] = None, folder_path: Optional[pathlib.Path] = None):
     parser = argparse.ArgumentParser(description='Add or remove files in a directory.')
     if folder_path is None:
@@ -39,8 +39,8 @@ def dvc_manager(add_rmv: Optional[Literal['add','rmv']] = None, folder_path: Opt
         remove = add_rmv == "rmv"
     files = list(folder_path.rglob('*'))
     tot = len(files)
-    with Pool() as pool:
+    with Pool(processes=16) as pool:
         pool.starmap(process_file, [(file_path, add, remove, i,tot) for i,file_path in enumerate(files)])
 
 if __name__ == "__main__":
-    dvc_manager("add",pathlib.Path("data/"))
+    dvc_manager("rmv",pathlib.Path("data/"))

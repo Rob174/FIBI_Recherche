@@ -86,12 +86,13 @@ void compKmeansCentroids(vector<double>& centroids, const vector<double>& points
 		changed = affectToNearestCluster(centroids, points, cluster_assign, n_pts_per_clust, num_dims);
 	}
 }
-/** @brief  Compute the distance between the centroids (up to num_centroids) and the points (up to num_points) and store it in the distance matrix }
+/** @brief  Compute the distance between the centroids (up to num_centroids) and the points (up to num_points) and store it in the distance matrix
 * * @param[out] dist_matrix, the distance matrix to update
 * * @param[in] centroids, the centroids of the clusters
 * * @param[in] points, the points to be assigned to a cluster
 * */
 void update_dist_matrix(vector<double>& dist_matrix, const vector<double>& centroids, const vector<double>& points, const int num_centroids, const int num_dims, const int num_points) {
+	// As the previous centroids are fixed, we only need to compute the distance with the new centroid
 	for (int i = num_centroids - 1; i < num_centroids; i++)
 	{
 		for (int j = 0; j < num_points; j++)
@@ -133,6 +134,7 @@ pair < vector<double>*, vector<int>*> cmpt_centroids_and_npts_per_clust(const ve
 }
 /** @brief *  This function implements the kmeans++ algorithm to find an initial solution for kmeans.
  *  The algorithm is described in the paper:
+ * https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf
  *  Arthur, D., & Vassilvitskii, S. (2007). k-means++: The advantages of careful seeding. Proceedings of the eighteenth annual ACM-SIAM symposium on Discrete algorithms, 1027-1035.
  * }
  * @param centroids[out], the centroids found by the algorithm
