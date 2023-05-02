@@ -1,0 +1,5 @@
+outs:
+- md5: dafa792246fbf4485617e293bb9cda09.dir
+  size: 2190871639
+  nfiles: 3793
+  path: analysis_results
