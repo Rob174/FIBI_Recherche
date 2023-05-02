@@ -317,7 +317,7 @@ void init_clustering_greedy(vector<double>& centroids, const vector<double>& poi
 			weights.push_back(closest_dist);
 		}
 		// Find new centroid
-		// 2. Find new centroid using random discrete distribution
+		// 2. New centroid is the farthest point from fixed clusters
 		const int chosen_point = distance(weights.begin(), max_element(weights.begin(), weights.end()));
 		const double* point = &(points.data()[chosen_point * num_dims]);
 		const int start = num_centroids * num_dims;
