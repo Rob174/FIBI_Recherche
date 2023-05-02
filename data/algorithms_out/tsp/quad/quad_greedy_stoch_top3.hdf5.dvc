@@ -1,4 +1,0 @@
-outs:
-- md5: cc07b822dc54de779aba89b14df32ed2
-  size: 25968728
-  path: quad_greedy_stoch_top3.hdf5

@@ -1,4 +1,0 @@
-outs:
-- md5: fca61174312aedeae1acef71feb0f9f4
-  size: 49282856
-  path: tsplib_greedy_stoch_top5.hdf5

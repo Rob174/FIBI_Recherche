@@ -1,4 +1,0 @@
-outs:
-- md5: e4773f14f5cb7931b5ea9bb4b3756c6c
-  size: 1498024
-  path: benchmark_rand_histo_expl.hdf5
