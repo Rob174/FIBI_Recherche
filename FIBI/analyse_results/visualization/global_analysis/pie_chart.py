@@ -290,5 +290,5 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
     # os.system("dvc remove "+path_out.resolve().as_posix()+".dvc")
     with open(path_out, 'w') as f:
         f.write(result)
-    os.system("dvc add "+path_out.resolve().as_posix())
+    # os.system("dvc add "+path_out.resolve().as_posix())
     

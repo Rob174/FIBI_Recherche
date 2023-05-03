@@ -346,8 +346,8 @@ if __name__ == "__main__":
     # check_tsp(
     #     existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
     # )
-    os.system("dvc unprotect "+(Path(".") / "data" / "analysis_results").as_posix())
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest"   
+    os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))
     print("TSP")
     print("quad")
     get_tsp("uniform_points", False, test_group=test_group)
@@ -362,6 +362,7 @@ if __name__ == "__main__":
     get_clustering("uniform_points_norm", profile=False, test_group=test_group)
     print("Franti")
     get_clustering("franti_benchmark", profile=False, test_group=test_group)
+    os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
     # # print("MAXSAT")
     # check_maxsat(
     #     existing_path(
