@@ -36,8 +36,8 @@ class InitCostVariation(MultiInstanceVisualization):
         
         path_img = folder / "initDistribution.png"
         path_html = folder / "initDistribution.html"
-        os.system("dvc remove "+path_html.resolve().as_posix())
-        os.system("dvc remove "+path_img.resolve().as_posix())
+        os.system("dvc remove "+path_html.resolve().as_posix()+".dvc")
+        os.system("dvc remove "+path_img.resolve().as_posix()+".dvc")
         fig.write_html(path_html)
         fig.write_image(path_img)
         os.system("dvc add "+path_html.resolve().as_posix())
