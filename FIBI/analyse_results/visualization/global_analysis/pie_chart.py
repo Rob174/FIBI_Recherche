@@ -287,6 +287,8 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
     )
     out_path.mkdir(parents=True, exist_ok=True)
     path_out = out_path / f'piechart_{dataset}.tex'
+    os.system("dvc unprotect"+path_out.resolve().as_posix()+".dvc")
     with open(path_out, 'w') as f:
         f.write(result)
+    os.system("dvc add "+path_out.resolve().as_posix())
     
