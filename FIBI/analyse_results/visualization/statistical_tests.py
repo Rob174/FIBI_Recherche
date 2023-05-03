@@ -208,7 +208,6 @@ class WilcoxonTest(AbstractStatisticMaker):
     def __call__(self, diff: np.ndarray):
         d = diff.astype(np.float64)  # type: ignore
         assert len(diff) >= 10, f"Warning: sample size too small {len(diff)}"
-        n = diff.shape[0]
 
         mode = "approx"
 
@@ -607,24 +606,23 @@ class EffectSizeMapping(AbstractClassMapping):
             return "es-nan"
         value = abs(value)
         if test == "ZTest":
-            if value < 0.5:
+            if value < 0.2:
                 return "es-small"
+            if 0.2 <= value < 0.5:
+                return "es-small-medium"
             elif 0.5 <= value < 0.8:
-                return "es-medium"
+                return "es-medium-big"
             else:
                 return "es-big"
         elif test == "Wilcoxon":
-            if value < 0.3:
+            if value < 0.1:
                 return "es-small"
+            if 0.1 <= value < 0.3:
+                return "es-small-medium"
             elif 0.3 <= value < 0.5:
-                return "es-medium"
+                return "es-medium-big"
             else:
                 return "es-big"
 
         else:
-            if value < 0.15:
-                return "es-small"
-            elif 0.15 <= value < 0.25:
-                return "es-medium"
-            else:
-                return "es-big"
+            raise Exception("Unknown test "+test)

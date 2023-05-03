@@ -47,10 +47,6 @@ class PieChartDistrib(MultiInstanceVisualization):
             fig = px.pie(df, values=df.index, names='distribution')
             path_html = self.out_path / f'distributions_{k}.html'
             path_img = self.out_path / f'distributions_{k}.png'
-            os.system("dvc remove "+path_html.resolve().as_posix()+".dvc")
-            os.system("dvc remove "+path_img.resolve().as_posix()+".dvc")
             fig.write_html(path_html)
             fig.write_image(path_img)
-            os.system("dvc add "+path_html.resolve().as_posix())
-            os.system("dvc add "+path_img.resolve().as_posix())
             

@@ -13,6 +13,44 @@ import textwrap
 from importlib import reload
 from string import Template
 
+def customwrap(s,width=30):
+    return "<br>".join(textwrap.wrap(s,width=width))
+def get_case(d: dict):
+    case_chosen = ""
+    main_case = ""
+    if d['avg'] == 'avgConclOk' and d['signif'] == 'pvalue-small' and (d['es'] != 'es-small'):
+        case_chosen = customwrap("Expected avg sign, significant difference with effect size not small")
+        color = "#09DB00"
+        main_case = "Verified"
+        case_letter = "A"
+    elif d['avg'] == 'avgConclOk' and d['signif'] == 'pvalue-small' and d['es'] == 'es-small':
+        case_chosen = customwrap("Expected avg sign, significant difference with small effect size")
+        main_case = "Verified"
+        color = "#09DB00"
+        case_letter = "B"
+    elif d['avg'] == 'avgConclKo' and d['signif'] == 'pvalue-small' and (d['es'] != 'es-small'):
+        case_chosen = customwrap("Opposite avg sign, significant difference with effect size not small")
+        color = "#FA1D00"
+        main_case = "Not verified"
+        case_letter = "C"
+    elif d['avg'] == 'nul':
+        case_chosen = "no difference at all"
+        color = "#FA1D00"
+        main_case = customwrap("Not verified")
+        case_letter = "D"
+    elif d['avg'] == 'avgConclKo' and d['signif'] == 'pvalue-small' and d['es'] == 'es-small':
+        case_chosen = customwrap("Opposite avg sign, significant difference with small effect size")
+        color = "#FA1D00"
+        main_case = "Not verified"
+        case_letter = "E"
+    elif d['signif'] == 'pvalue-big':
+        case_chosen = "no significant difference"
+        color = "#A100FF"
+        main_case = "Undetermined"
+        case_letter = "F"
+    else:
+        raise Exception("Case not found with dico: " + str(d))
+    return main_case,case_chosen,color,case_letter
 def make_cases(buffer):
     # create a dict counting the number of occurences of the following cases
     # Case Expected avg sign, significant difference with medium/big effect size
@@ -21,44 +59,7 @@ def make_cases(buffer):
     # Case no significant difference: classes contains pvalue-big
     # Case Expected avg sign, significant difference with small effect size
     # Case Opposite avg sign, significant difference with small effect size
-    def customwrap(s,width=30):
-        return "<br>".join(textwrap.wrap(s,width=width))
-    def get_case(d: dict):
-        case_chosen = ""
-        main_case = ""
-        if d['avg'] == 'avgConclOk' and d['signif'] == 'pvalue-small' and (d['es'] == 'es-big' or d['es'] == 'es-medium'):
-            case_chosen = customwrap("Expected avg sign, significant difference with medium/big effect size")
-            color = "#09DB00"
-            main_case = "Verified"
-            case_letter = "A"
-        elif d['avg'] == 'avgConclOk' and d['signif'] == 'pvalue-small' and d['es'] == 'es-small':
-            case_chosen = customwrap("Expected avg sign, significant difference with small effect size")
-            main_case = "Verified"
-            color = "#09DB00"
-            case_letter = "B"
-        elif d['avg'] == 'avgConclKo' and d['signif'] == 'pvalue-small' and (d['es'] == 'es-big' or d['es'] == 'es-medium'):
-            case_chosen = customwrap("Opposite avg sign, significant difference with medium/big effect size")
-            color = "#FA1D00"
-            main_case = "Not verified"
-            case_letter = "C"
-        elif d['avg'] == 'nul':
-            case_chosen = "no difference at all"
-            color = "#FA1D00"
-            main_case = customwrap("Not verified")
-            case_letter = "D"
-        elif d['avg'] == 'avgConclKo' and d['signif'] == 'pvalue-small' and d['es'] == 'es-small':
-            case_chosen = customwrap("Opposite avg sign, significant difference with small effect size")
-            color = "#FA1D00"
-            main_case = "Not verified"
-            case_letter = "E"
-        elif d['signif'] == 'pvalue-big':
-            case_chosen = "no significant difference"
-            color = "#A100FF"
-            main_case = "Undetermined"
-            case_letter = "F"
-        else:
-            raise Exception("Case not found with dico: " + str(d))
-        return main_case,case_chosen,color,case_letter
+    
     Ldico = {}
     for b in buffer:
         case_dict = {}
@@ -286,8 +287,6 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
     )
     out_path.mkdir(parents=True, exist_ok=True)
     path_out = out_path / f'piechart_{dataset}.tex'
-    os.system("dvc remove "+path_out.resolve().as_posix()+".dvc")
     with open(path_out, 'w') as f:
         f.write(result)
-    os.system("dvc add "+path_out.resolve().as_posix())
     
