@@ -66,7 +66,7 @@ def color_palet(n_colors: int, sat: float, lum: float = 0.8) -> List[str]:
 
 def soup_to_file(s: bs4.BeautifulSoup,p: Path):
     p.parent.mkdir(exist_ok=True,parents=True)
-    os.system("dvc remove "+p.resolve().as_posix()+".dvc")
+    # os.system("dvc remove "+p.resolve().as_posix()+".dvc")
     # Remove the file
     with open(p,'w') as f:
         f.write(str(s.prettify()))

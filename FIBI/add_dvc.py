@@ -13,7 +13,7 @@ def process_file(file_path, add, remove,i,tot):
             os.system("dvc add "+file_path.resolve().as_posix())
         elif remove:
             # Remove the file from the directory
-            os.system("dvc remove"+file_path.resolve().as_posix())
+            # os.system("dvc remove"+file_path.resolve().as_posix())
 #
 def dvc_manager(add_rmv: Optional[Literal['add','rmv']] = None, folder_path: Optional[pathlib.Path] = None):
     parser = argparse.ArgumentParser(description='Add or remove files in a directory.')

@@ -346,6 +346,7 @@ if __name__ == "__main__":
     # check_tsp(
     #     existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
     # )
+    os.system("dvc unprotect "+(Path(".") / "data" / "analysis_results").as_posix())
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest"   
     print("TSP")
     print("quad")
