@@ -605,7 +605,7 @@ class EffectSizeMapping(AbstractClassMapping):
         if np.isnan(value):
             return "es-nan"
         value = abs(value)
-        if test == "ZTest":
+        if test in ["ZTest","TTest"]:
             if value < 0.2:
                 return "es-small"
             if 0.2 <= value < 0.5:
@@ -614,7 +614,7 @@ class EffectSizeMapping(AbstractClassMapping):
                 return "es-medium-big"
             else:
                 return "es-big"
-        elif test == "Wilcoxon":
+        elif test in ["Wilcoxon","SignTest"]:
             if value < 0.1:
                 return "es-small"
             if 0.1 <= value < 0.3:

@@ -139,8 +139,38 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "dataset2.txt"
+                    / "dataset2_impr0.txt",
                 ),
+                existing_path(
+                    Path(".")
+                    / "data"
+                    / "algorithms_out"
+                    / "clustering"
+                    / "dataset2_impr1.txt"),
+                existing_path(
+                    Path(".")
+                    / "data"
+                    / "algorithms_out"
+                    / "clustering"
+                    / "dataset2_impr2.txt"),
+                existing_path(
+                    Path(".")
+                    / "data"
+                    / "algorithms_out"
+                    / "clustering"
+                    / "dataset2_impr3.txt"),
+                existing_path(
+                    Path(".")
+                    / "data"
+                    / "algorithms_out"
+                    / "clustering"
+                    / "dataset2_impr4.txt"),
+                existing_path(
+                    Path(".")
+                    / "data"
+                    / "algorithms_out"
+                    / "clustering"
+                    / "dataset2_impr5.txt"),
             ],
             mapping_inst=existing_path(
                 Path(".")
@@ -346,8 +376,8 @@ if __name__ == "__main__":
     # check_tsp(
     #     existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
     # )
-    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest"   
-    os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest"   
+    # os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))
     # profiler = cProfile.Profile()
     # profiler.enable()
     print("TSP")
