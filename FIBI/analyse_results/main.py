@@ -139,7 +139,7 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "dataset.txt"
+                    / "dataset2.txt"
                 ),
             ],
             mapping_inst=existing_path(
@@ -182,7 +182,7 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "dataset.txt"
+                    / "dataset0.txt"
                 ),
             ],
             out_folder=existing_path(
@@ -212,7 +212,7 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "dataset.txt"
+                    / "dataset3.txt"
                 )
             ],
             out_folder=existing_path(
@@ -250,7 +250,7 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "dataset.txt"
+                    / "dataset1.txt"
                 ),
             ],
             out_folder=existing_path(
@@ -348,29 +348,29 @@ if __name__ == "__main__":
     # )
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest"   
     os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))
-    profiler = cProfile.Profile()
-    profiler.enable()
+    # profiler = cProfile.Profile()
+    # profiler.enable()
     print("TSP")
     print("quad")
     get_tsp("uniform_points", False, test_group=test_group)
-    # print("tsplib")
-    # get_tsp("tsplib", False, test_group=test_group)
-    # print("Clustering")
-    # print("Aloise") 
-    # get_clustering("aloise_benchmark", profile=False, test_group=test_group)
-    # print("Quad")
-    # get_clustering("uniform_points", profile=False, test_group=test_group)  
-    # print("QuadNorm")
-    # get_clustering("uniform_points_norm", profile=False, test_group=test_group)
-    # print("Franti")
-    # get_clustering("franti_benchmark", profile=False, test_group=test_group)
-    profiler.disable() #type: ignore
-    profiler.dump_stats(
-        path_create(
-            Path(".")
-            / "profile.prof"
-        )
-    )
+    print("tsplib")
+    get_tsp("tsplib", False, test_group=test_group)
+    print("Clustering")
+    print("Aloise") 
+    get_clustering("aloise_benchmark", profile=False, test_group=test_group)
+    print("Quad")
+    get_clustering("uniform_points", profile=False, test_group=test_group)  
+    print("QuadNorm")
+    get_clustering("uniform_points_norm", profile=False, test_group=test_group)
+    print("Franti")
+    get_clustering("franti_benchmark", profile=False, test_group=test_group)
+    # profiler.disable() #type: ignore
+    # profiler.dump_stats(
+    #     path_create(
+    #         Path(".")
+    #         / "profile.prof"
+    #     )
+    # )
     os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
     # # print("MAXSAT")
     # check_maxsat(

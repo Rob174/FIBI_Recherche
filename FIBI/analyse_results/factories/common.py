@@ -168,6 +168,7 @@ def run_data_extractor(
             tests_used=tests
         ),
     ]
+    assert len(Ldata) > 0, "Expecting len(Ldata) > 0"
     DataExtractor(visualizations=visualizations)(Ldata)
     query_to_path.save()
 
