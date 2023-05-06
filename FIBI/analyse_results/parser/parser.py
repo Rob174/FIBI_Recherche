@@ -91,7 +91,6 @@ class MainParser:
     """
     def __init__(self, base_parser: AbstractBaseParser):
         self.base_parser = base_parser
-
     def __call__(
         self, path_in: List[Path], modifiers: Optional[List[AbstractModifier]] = None, filters: Optional[List[FilterParsedRun]] = None
     ) -> List[dict]:
@@ -115,6 +114,7 @@ class MainParser:
                         if len(d) == 0:
                             continue
                         dico = self.base_parser(p.stem, d)
+                        progress.next(description=f"{p.stem}/{dico['SEED_GLOB']}")
                         keep = True
                         for filter_run in filters:
                             keep = keep and filter_run.filter_before_modifiers(dico)
@@ -129,5 +129,6 @@ class MainParser:
                         if not keep:
                             continue
                         L.append(dico)
-                        progress.next(description=f"{p.stem}/{dico['SEED_GLOB']}")
+        for f in filters:
+            f.print_filtered()
         return L

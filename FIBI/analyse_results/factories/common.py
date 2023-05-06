@@ -60,7 +60,10 @@ def run_parser(
     mapping_datasets: Dict[int, str],
     dataset: int,
     additional_modifiers: List[AbstractModifier],
+    additionnal_filters: Optional[List[FilterParsedRun]] = None
 ):
+    if additionnal_filters is None:
+        additionnal_filters = []
     stats = MainParser(JSONParser())
     Ldata = stats(
         pathes_data,
@@ -69,9 +72,10 @@ def run_parser(
             *get_common_modifiers(mapping_datasets),
         ],  # type: ignore
         filters=[
+            *additionnal_filters,
             FilterMetricsObserved(),
             FilterDuplicatedKeysPerGroup(["DATASET", "IMPR"]),
-            FilterAttrValueInt(attr="DATASET", values_to_keep=[dataset]),
+            FilterAttrValueInt(attr="DATASET", values_to_keep=[dataset])
         ],
     )
     return Ldata
