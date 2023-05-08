@@ -368,10 +368,10 @@ def gather_latex(root: Path):
     dico_groups = {}
     for e in root.rglob('*.tex'):
         if e.parent not in dico_groups:
-            dico_groups[e.parent] = []
+            dico_groups[e.parent.parent.parent.stem] = []
         with open(e) as f:
             c = f.read()
-        dico_groups[e.parent].append(c)
+        dico_groups[e.parent.parent.parent.stem].append(c)
     for name, graphs_txts in dico_groups.items():
         with open(root/(name+".tex"),"w") as f:
             f.write("\n".join(graphs_txts))
@@ -393,20 +393,21 @@ if __name__ == "__main__":
     # os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))
     # profiler = cProfile.Profile()
     # profiler.enable()
-    print("TSP")
-    print("quad")
-    get_tsp("uniform_points", False, test_group=test_group)
-    print("tsplib")
-    get_tsp("tsplib", False, test_group=test_group)
-    print("Clustering")
-    print("Aloise") 
-    get_clustering("aloise_benchmark", profile=False, test_group=test_group)
-    print("Quad")
-    get_clustering("uniform_points", profile=False, test_group=test_group)  
-    print("QuadNorm")
-    get_clustering("uniform_points_norm", profile=False, test_group=test_group)
-    print("Franti")
-    get_clustering("franti_benchmark", profile=False, test_group=test_group)
+    # print("TSP")
+    # print("quad")
+    # get_tsp("uniform_points", False, test_group=test_group)
+    # print("tsplib")
+    # get_tsp("tsplib", False, test_group=test_group)
+    # print("Clustering")
+    # print("Aloise") 
+    # get_clustering("aloise_benchmark", profile=False, test_group=test_group)
+    # print("Quad")
+    # get_clustering("uniform_points", profile=False, test_group=test_group)  
+    # print("QuadNorm")
+    # get_clustering("uniform_points_norm", profile=False, test_group=test_group)
+    # print("Franti")
+    # get_clustering("franti_benchmark", profile=False, test_group=test_group)
+    gather_latex(Path("data/analysis_results/"))
     # profiler.disable() #type: ignore
     # profiler.dump_stats(
     #     path_create(
@@ -414,7 +415,7 @@ if __name__ == "__main__":
     #         / "profile.prof"
     #     )
     # )
-    os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
+    # os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
     # # print("MAXSAT")
     # check_maxsat(
     #     existing_path(
