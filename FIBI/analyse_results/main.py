@@ -364,6 +364,17 @@ def get_maxsat_problem_visualization(
     else:
         raise ValueError(f"Unknown subproblem {subproblem}")
 
+def gather_latex(root: Path):
+    dico_groups = {}
+    for e in root.rglob('*.tex'):
+        if e.parent not in dico_groups:
+            dico_groups[e.parent] = []
+        with open(e) as f:
+            c = f.read()
+        dico_groups[e.parent].append(c)
+    for name, graphs_txt in dico_groups.items():
+        
+    
 
 if __name__ == "__main__":
     folder_missing = path_create(Path(".")
