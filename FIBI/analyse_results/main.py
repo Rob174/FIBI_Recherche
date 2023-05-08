@@ -372,7 +372,9 @@ def gather_latex(root: Path):
         with open(e) as f:
             c = f.read()
         dico_groups[e.parent].append(c)
-    for name, graphs_txt in dico_groups.items():
+    for name, graphs_txts in dico_groups.items():
+        with open(root/(name+".tex"),"w") as f:
+            f.write("\n".join(graphs_txts))
         
     
 
