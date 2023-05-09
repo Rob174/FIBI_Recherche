@@ -365,35 +365,20 @@ def get_maxsat_problem_visualization(
         raise ValueError(f"Unknown subproblem {subproblem}")
 
 def gather_latex(root: Path):
-    dico_groups = {}
-    for e in root.rglob('*.tex'):
-        problem = e.parent.parent.parent.stem
-        if problem not in dico_groups:
-            dico_groups[problem] = []
-        with open(e) as f:
-            c = f.read()
-        dico_groups[problem].append(c)
-    for name, graphs_txts in dico_groups.items():
-        with open(root/(name+".tex"),"w") as f:
-            f.write("\n".join(graphs_txts))
+    orders = {"tsp":["quad","tsplib"],"clustering":["quad","quadNorm","benchmark_aloise","benchmark_franti"]}
+    for problem,l_dataset in orders.items():
+        txt = []
+        for dataset in l_dataset:
+            for texfile in (root / problem / dataset / "cases").rglob("*.tex"):
+                with open(texfile) as f:
+                    txt.append(f.read())
+        with open(root / (problem+".tex"),"w") as f:
+            f.write("\n".join(txt))
         
     
 
 if __name__ == "__main__":
-    folder_missing = path_create(Path(".")
-            / "data"
-            / "algorithms_out"
-            / "missing"
-            )
-    num_files = 2
-    server = "rmoine@132.207.72.24:/home/rmoine/"
-    # check_tsp(
-    #     existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset.txt")
-    # )
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest"   
-    # os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))
-    # profiler = cProfile.Profile()
-    # profiler.enable()
     # print("TSP")
     # print("quad")
     # get_tsp("uniform_points", False, test_group=test_group)
@@ -409,36 +394,7 @@ if __name__ == "__main__":
     # print("Franti")
     # get_clustering("franti_benchmark", profile=False, test_group=test_group)
     gather_latex(Path("data/analysis_results/"))
-    # profiler.disable() #type: ignore
-    # profiler.dump_stats(
-    #     path_create(
-    #         Path(".")
-    #         / "profile.prof"
-    #     )
-    # )
-    # os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
+    os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
     # # print("MAXSAT")
-    # check_maxsat(
-    #     existing_path(
-    #                 Path(".")
-    #                 / "data"
-    #                 / "algorithms_out"
-    #                 / "clustering"
-    #                 / "dataset.txt"
-    #             )
-    # )
     # # print("benchmark2021")
     # # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
-    
-    # check_clustering(
-    #     existing_path(
-    #         Path(".")
-    #         / "data"
-    #         / "algorithms_out"
-    #         / "clustering"
-    #         / "dataset.txt"
-    #     ),
-    #     folder_missing,
-    #     num_files,
-    #     server
-    # )
