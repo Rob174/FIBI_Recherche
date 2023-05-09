@@ -16,7 +16,7 @@ struct stats {
 	double B;
 };
 
-/** @brief Slack algorithm for MAXSAT
+/** @brief A simple randomized 3/4 approximation algorithm for MAXSAT
 *   Taken from paper Bounds on Greedy Algorithms for MAX SAT https://link.springer.com/content/pdf/10.1007/978-3-642-23719-5.pdf
 *   with explanations of https://diglib.tugraz.at/download.php?id=5b6d299d67215&location=browse
 *   main source https://people.orie.cornell.edu/mup3/Poloczek%20Schnitger%20Williamson%20van%20Zuylen%20-%20Greedy%20Algorithms%20for%20MAX%20SAT__SICOMP_2017.pdf p1038 and 1058-59
