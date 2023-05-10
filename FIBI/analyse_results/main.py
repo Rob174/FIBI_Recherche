@@ -376,10 +376,11 @@ def gather_latex(root: Path):
             f.write("\n".join(txt))
         
     
-import os
-def notify(status, message):
-    os.system("python "+(Path(".")/"notify.py").resolve().as_posix()+f' --status="analysis_results {status}" --message="{message}"')
+from pushbullet import Pushbullet
+api_key = "o.XYfKRFOC4VKqVEwcM0mAc8eIZhRAPGpB"
+pb = Pushbullet(api_key)
 if __name__ == "__main__":
+    notify = lambda status,message: pb.push_note(title="Script "+Path(__file__).stem+" "+status,body=message)
     notify("start","")
     try:
         test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest" 
