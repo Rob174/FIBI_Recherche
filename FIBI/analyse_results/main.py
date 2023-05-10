@@ -376,25 +376,44 @@ def gather_latex(root: Path):
             f.write("\n".join(txt))
         
     
-
+import os
+def notify(status, message):
+    os.system("python "+(Path(".")/"notify.py").resolve().as_posix()+f' --status="analysis_results {status}" --message="{message}"')
 if __name__ == "__main__":
-    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest"   
-    print("TSP")
-    print("quad")
-    get_tsp("uniform_points", False, test_group=test_group)
-    print("tsplib")
-    get_tsp("tsplib", False, test_group=test_group)
-    print("Clustering")
-    print("Aloise") 
-    get_clustering("aloise_benchmark", profile=False, test_group=test_group)
-    print("Quad")
-    get_clustering("uniform_points", profile=False, test_group=test_group)  
-    print("QuadNorm")
-    get_clustering("uniform_points_norm", profile=False, test_group=test_group)
-    print("Franti")
-    get_clustering("franti_benchmark", profile=False, test_group=test_group)
-    gather_latex(Path("data/analysis_results/"))
-    os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
+    notify("start","")
+    try:
+        test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest" 
+        os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))  
+        notify("wip","unprotect done")
+        print("TSP")
+        print("quad")
+        get_tsp("uniform_points", False, test_group=test_group)
+        notify("wip","tsp quad finished")
+        print("tsplib")
+        get_tsp("tsplib", False, test_group=test_group)
+        notify("wip","tsp tsplib finished")
+        print("Clustering")
+        print("Aloise") 
+        get_clustering("aloise_benchmark", profile=False, test_group=test_group)
+        notify("wip","clustering aloise_benchmark finished")
+        print("Quad")
+        get_clustering("uniform_points", profile=False, test_group=test_group)  
+        notify("wip","clustering Quad finished")
+        print("QuadNorm")
+        get_clustering("uniform_points_norm", profile=False, test_group=test_group)
+        notify("wip","clustering QuadNorm finished")
+        print("Franti")
+        get_clustering("franti_benchmark", profile=False, test_group=test_group)
+        notify("wip","clustering franti_benchmark finished")
+        gather_latex(Path("data/analysis_results/"))
+        os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
+    except Exception as e:
+        notify("exception code",str(e))
+    except:
+        notify("exception other","")
+    notify(status="finished",message="all good")
+        
+        
     # # print("MAXSAT")
     # # print("benchmark2021")
     # # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
