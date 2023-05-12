@@ -48,8 +48,13 @@ void test_gather_metadata(const int argc, char** argv) {
 		}
 	}
 	else if (arguments.problem == "maxsat") {
-		cout << "maxsat" << endl;
-		run_maxsat<-1>(arguments, missing);
+		cout << "maxsat " << arguments.all << endl;
+		if (arguments.all == "true") {
+			run_maxsat_full(arguments, missing);
+		}
+		else {
+			run_maxsat<-1>(arguments, missing);
+		}
 	}
 	else {
 		throw runtime_error("Unknown problem " + arguments.problem);

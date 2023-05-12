@@ -26,7 +26,7 @@ vector<pair<string, double>>* MAXSATfactory_run(map<string,long>* args, string r
 
 }
 template <int seed_stop = -1>
-vector<pair<string, double>> run_maxsat(Args arguments, const unique_ptr < set<int>>& missing) {
+void run_maxsat(Args arguments, const unique_ptr < set<int>>& missing) {
 	MergeMetadata merger(arguments.merge_size, arguments.fileout);
 	ThreadPool pool(merger, arguments.num_threads);
 	// Define possibilities
@@ -37,26 +37,40 @@ vector<pair<string, double>> run_maxsat(Args arguments, const unique_ptr < set<i
 	}
 	vector<int>l_FI_BI{ 0, 1 };
 	vector<int>l_impr{ 0, 1 };
-	vector<int> l_seeds_assign(arguments.num_rep, 0);
-	iota(l_seeds_assign.begin(), l_seeds_assign.end(), 0);
 
 	vector<int> values;
 	// Dataset 1: MAXSAT benchmark
-	ProductIterator it0({ l_seeds_assign, l_FI_BI, l_impr, seeds_problem });
-	while ((values = it0.next()).size() > 0) {
-		int seed_assign = values[0];
-		int FI_BI = values[1];
-		int impr = values[2];
-		int seed_problem = values[3];
-		i++;
+	if(arguments.dataset == 1) {
+		// Dataset 1: Maxsat evaluation benchmark 2021
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
+				for (int seed_problem_i = 0; seed_problem_i < seeds_problem.size(); seed_problem_i++) {
+					const int seed_problem = seeds_problem.at(seed_problem_i);
+					const int impr = arguments.impr;
+					i++;
+				}
+			}
+		}
+	}
+	else {
+		cout << "Unknow dataset" << endl;
 	}
 	const int num_poss = i;
 	Progress progress(num_poss, "\033[31m", "Queued");
-
 	auto add_queue = [&pool, &progress, &missing, &arguments](int i, int seed_problem, int seed_assign, int FI_BI, int impr, int num_variables, int num_clauses, int dataset) {
+		bool stop;
+		stop = i > arguments.end_seed && arguments.end_seed != -1;
+		stop = i > seed_stop && seed_stop != -1;
+		stop = stop || (i < arguments.start_seed);
+		stop = stop && missing->find(i) == missing->end();
+		if (stop) {
+			progress.skip();
+			return;
+		}
+		long seed_glob = i;
 		map<string,long>* args=new map<string,long>{
 			{"DATASET",dataset},
-			{"SEED_GLOB",i},
+			{"SEED_GLOB",seed_glob},
 			{"SEED_PROBLEM",seed_problem},
 			{"SEED_ASSIGN",seed_assign},
 			{"FI_BI",FI_BI},
@@ -64,30 +78,46 @@ vector<pair<string, double>> run_maxsat(Args arguments, const unique_ptr < set<i
 			{"NUM_VARIABLES",num_variables},
 			{"NUM_CLAUSES",num_clauses}
 		};
-		if (i > arguments.end_seed && arguments.end_seed != -1) return vector<pair<string, double>>{};
-		if (i >= arguments.start_seed || (missing->find(i) != missing->end())) {
-			if (pool.submit(MAXSATfactory_run, args, arguments.root_data)) {
-				cout << "Restarting..." << endl;
-				return vector<pair<string, double>>{};
+		pool.submit(MAXSATfactory_run, args, arguments.root_data);
+		progress.print(i);
+		return;
+	};
+	// Dataset 1: Uniform
+	i = 0;
+	if(arguments.dataset == 1) {
+		// Dataset 1: Maxsat evaluation benchmark 2021
+		for (int seed_assign = 0; seed_assign < 1000; seed_assign++) {
+			for (int FI_BI = 0; FI_BI < 2; FI_BI++) {
+				for (int seed_problem_i = 0; seed_problem_i < seeds_problem.size(); seed_problem_i++) {
+					const int seed_problem = seeds_problem.at(seed_problem_i);
+					add_queue(i,seed_problem,seed_assign,FI_BI,arguments.impr,-1,-1,arguments.dataset);
+					i++;
+				}
 			}
 		}
-		if (i < arguments.start_seed)progress.skip();
-		if constexpr (seed_stop != -1) {
-			if (seed_stop == i) return vector<pair<string, double>>{};
-		}
-		progress.print(i);
-		return vector<pair<string, double>>{};
-	};
-	// Dataset 0: Uniform
-	i = 0;
-	it0.restart();
-	while ((values = it0.next()).size() > 0) {
-		int seed_assign = values[0];
-		int FI_BI = values[1];
-		int impr = values[2];
-		int seed_problem = values[3];
-		add_queue(i,seed_problem, seed_assign, FI_BI, impr, -1, -1, 1);
-		i++;
 	}
-	return {};
+	else {
+		cout << "Unknow dataset" << endl;
+	}
+	return;
+}
+
+void run_maxsat_full(Args arguments, const unique_ptr < set<int>>& missing) {
+	if (arguments.dataset != -1 && arguments.impr == -1) {
+		cout << "DATASET per DATASET" << endl;
+		for (int impr = 0; impr < 2; impr++) {
+			arguments.set_impr(impr);
+			run_maxsat<-1>(arguments, missing);
+		}
+	}
+	else {
+		cout << "Full possibility" << endl;
+		for (int dataset = 1; dataset < 2; dataset++) {
+			for (int impr = 0; impr < 2; impr++) {
+				arguments.set_dataset(dataset);
+				arguments.set_impr(impr);
+				run_maxsat<-1>(arguments, missing);
+			}
+		}
+	}
 }
