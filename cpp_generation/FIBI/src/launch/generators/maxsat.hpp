@@ -78,7 +78,7 @@ void run_maxsat(Args arguments, const unique_ptr < set<int>>& missing) {
 			{"NUM_VARIABLES",num_variables},
 			{"NUM_CLAUSES",num_clauses}
 		};
-		MAXSATfactory_run(args, arguments.root_data,0);
+		pool.submit(MAXSATfactory_run, args, arguments.root_data);
 		progress.print(i);
 		return;
 	};
