@@ -188,3 +188,9 @@ def mapping_clustering_datasets():
         2: "Aloise benchmark",
         3: "Normaly distributed points",
     }
+
+def mapping_maxsat_datasets():
+    return {
+        0: "random",
+        1: "MAXSAT evaluation benchmark 2021"
+    }

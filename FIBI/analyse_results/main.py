@@ -325,14 +325,6 @@ def get_maxsat_problem_visualization(
 ):
     if subproblem == "maxsat_evaluation_benchmark2021":
         get_maxsat_instance_visualizations(
-            path_mapping=(
-                Path(".")
-                / "data"
-                / "algorithms_out"
-                / "maxsat"
-                / "benchmark"
-                / "mapping.json"
-            ),
             pathes_hdf5=[
                 existing_path(
                     Path(".")
@@ -407,7 +399,10 @@ if __name__ == "__main__":
         get_clustering("franti_benchmark", profile=False, test_group=test_group)
         notify("wip","clustering franti_benchmark finished")
         gather_latex(Path("data/analysis_results/"))
-        os.system("dvc add "+(Path("./data/analysis_results").as_posix()))
+        print("MAXSAT")
+        print("benchmark2021")
+        get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
+        os.system("dvc add "+(Path("./data/analysis_results").as_posix()+" --to-remote"))
     except Exception as e:
         notify("exception code",str(e))
     except:
@@ -415,6 +410,3 @@ if __name__ == "__main__":
     notify(status="finished",message="all good")
         
         
-    # # print("MAXSAT")
-    # # print("benchmark2021")
-    # # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
