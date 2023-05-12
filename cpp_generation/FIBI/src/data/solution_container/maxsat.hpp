@@ -30,7 +30,6 @@ public:
 	{
 		sat_clauses = new bool[num_clauses];
 		double obj_init = 0;
-		unordered_map<var_id_t, vector<clause_id_t>> var_in_clauses;
 		for (clause_id_t i = 0; i < num_clauses; i++)
 		{
 			const auto& c = clauses[i];

@@ -9,12 +9,12 @@ def get_maxsat_instance_visualizations(
     
     problem = "Weighted-MAXSAT"
     dataset = 1
-    fixed_attr = ["IMPR", "NUM_POINTS", "INSTANCE", "NUM_CLUST"]
+    fixed_attr = ["IMPR", "INSTANCE", "NUM_VARIABLES", "NUM_CLAUSES"]
     mapping_datasets = mapping_maxsat_datasets()
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
         mapping = json.load(f)
-    mapping_id_name = {v["ID"]: k for k, v in mapping.items()}
+    mapping_id_name = {int(e["id"]): "/".join(e["name"].split("--")[1:]) for e in mapping}
     additionnal_modifiers: List[AbstractModifier] = [
             ConvertToInteger(fields=["NUM_VARIABLES", "NUM_CLAUSES"]),
             ModifierIntMapping(
