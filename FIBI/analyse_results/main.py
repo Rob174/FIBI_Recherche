@@ -375,7 +375,7 @@ if __name__ == "__main__":
     notify = lambda status,message: pb.push_note(title="Script "+Path(__file__).stem+" "+status,body=message)
     notify("start","")
     # try:
-    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest" 
+    test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest" 
     os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))  
     notify("wip","unprotect done") 
         # print("TSP")
