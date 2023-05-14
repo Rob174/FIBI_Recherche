@@ -402,7 +402,7 @@ if __name__ == "__main__":
     print("MAXSAT")
     print("benchmark2021")
     notify("wip","maxsat benchmark2021")
-    get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021")
+    get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021",test_group)
     notify("done","maxsat benchmark2021")
     os.system("dvc add "+(Path("./data/analysis_results").as_posix()+" --to-remote"))
     # except Exception as e:
