@@ -377,6 +377,7 @@ tuple<vector<clause_t>*, vector<weight_t>*, n_vars_t> parse_maxsat(const vector<
 	int clause_size = 0; // to avoid 0%0 error
 
 	set<int> variables;
+	// taille is the size of the clause (number of variables inside) + 1 for weighted instances (if unweighted weight of 1)
 	int taille = 0;
 	bool skipNext = false; // because first is weight
 	for (int i = 0; i < data.size(); i++)
