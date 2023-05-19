@@ -83,9 +83,10 @@ void instance_to_file(const vector<data_t> &instance, const string path_out)
 }
 class FolderParser
 {
+public:
+    JSONStorage s;
 private:
     string command_7z;
-    JSONStorage s;
     int i_written;
     filesystem::path path_out;
 
@@ -96,6 +97,7 @@ public:
         command_7z = string("\"") + (path_7z_str) + string("\" e ");
         i_written = 0;
     }
+    template <bool stats_only = true>
     void parse_folder(filesystem::path folder)
     {
         for (const auto &entry : std::filesystem::directory_iterator(folder))
@@ -103,12 +105,12 @@ public:
             // If it is a file, parse it
             if (std::filesystem::is_regular_file(entry))
             {
-                parse_file(entry.path());
+                parse_file< stats_only>(entry.path());
             }
             // If it is a folder iterate in it
             else if (std::filesystem::is_directory(entry))
             {
-                parse_folder(entry.path());
+                parse_folder< stats_only>(entry.path());
             }
         }
     }
@@ -201,7 +203,6 @@ public:
         cout << "Wrote instance " << i_written << "/" << file_name.string() << endl;
         // Add the json content of the stats
         s.add_json(r.get_json());
-        s.save_json("stats.json");
     }
 };
 void main_write_data(int argc, char **argv)
@@ -260,5 +261,7 @@ void main_write_data(int argc, char **argv)
     }
     // Then recursive call to explore the folder and subfolders
     FolderParser p(path_out, path_7z);
-    p.parse_folder(path_in);
+    p.parse_folder<false>(path_in);
+
+    p.s.save_json("stats.json");
 }
