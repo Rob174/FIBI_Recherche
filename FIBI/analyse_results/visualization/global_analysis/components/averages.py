@@ -86,9 +86,11 @@ class AverageFIBIDiffTgt(AverageFIBIDiff):
         init = dfs[0]['df']['init_meth'].iloc[0]
         sign_expected = self.tgt_vals["expect_sign"] if init == self.tgt_vals["init_meth"] else -self.tgt_vals["expect_sign"]
         if agg['classes'][0] == "nul":
-            pass
+            agg['classes'].append("avgConclKo")
+            return [agg]
         elif (agg['classes'][0] == "positive" and sign_expected > 0) or (agg['classes'][0] == "negative" and sign_expected < 0):
             agg['classes'].append("avgConclOk")
+            return [agg]
         else:
             agg['classes'].append("avgConclKo")
-        return [agg]
+            return [agg]

@@ -18,36 +18,41 @@ def customwrap(s,width=30):
 def get_case(d: dict):
     case_chosen = ""
     main_case = ""
-    if d['avg'] == 'avgConclOk' and d['signif'] == 'pvalue-small' and (d['es'] != 'es-small'):
+    if (d['avg'] == 'avgConclOk') and (d['signif'] == 'pvalue-small') and (d['es'] != 'es-small'):
         case_chosen = customwrap("Expected avg sign, significant difference with effect size not small")
         color = "#09DB00"
         main_case = "Verified"
-        case_letter = "A"
-    elif d['avg'] == 'avgConclOk' and d['signif'] == 'pvalue-small' and d['es'] == 'es-small':
+        case_letter = "A1"
+    elif (d['avg'] == 'avgConclOk') and (d['signif'] == 'pvalue-small') and d['es'] == 'es-small':
         case_chosen = customwrap("Expected avg sign, significant difference with small effect size")
         main_case = "Verified"
         color = "#09DB00"
-        case_letter = "B"
-    elif d['avg'] == 'avgConclKo' and d['signif'] == 'pvalue-small' and (d['es'] != 'es-small'):
+        case_letter = "A2"
+    elif (d['avg'] == 'avgConclKo') and (d['signif'] == 'pvalue-small') and (d['es'] != 'es-small'):
         case_chosen = customwrap("Opposite avg sign, significant difference with effect size not small")
         color = "#FA1D00"
         main_case = "Not verified"
-        case_letter = "C"
-    elif d['avg'] == 'nul':
-        case_chosen = "no difference at all"
+        case_letter = "B1"
+    elif d['avg'] == 'nul' and d['signif'] == 'pvalue-small':
+        case_chosen = "No difference at all"
         color = "#FA1D00"
         main_case = customwrap("Not verified")
-        case_letter = "D"
+        case_letter = "B2"
     elif d['avg'] == 'avgConclKo' and d['signif'] == 'pvalue-small' and d['es'] == 'es-small':
         case_chosen = customwrap("Opposite avg sign, significant difference with small effect size")
         color = "#FA1D00"
-        main_case = "Not verified"
-        case_letter = "E"
+        main_case = customwrap("Not verified")
+        case_letter = "B3"
     elif d['signif'] == 'pvalue-big':
-        case_chosen = "no significant difference"
+        case_chosen = "No significant difference"
         color = "#A100FF"
         main_case = "Undetermined"
-        case_letter = "F"
+        case_letter = "C1"
+    elif d['signif'] == 'pvalue-nan':
+        case_chosen = "Impossible to compute pvalue"
+        color = "#A100FF"
+        main_case = "Undetermined"
+        case_letter = "C2"
     else:
         raise Exception("Case not found with dico: " + str(d))
     return main_case,case_chosen,color,case_letter
@@ -154,7 +159,7 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
         values: dict[str,int] the number of times each case as specified in the get_case function has been seen
         template_path: Path, path to the template to create the latex figure
         size_inner: int, the size of the inner pie chart (main categories: A, B, C)
-        size_outer: int, the size of the outer pie chart (main categories: A1, A2, B1, B2, B3, C1)
+        size_outer: int, the size of the outer pie chart (main categories: A1, A2, B1, B2, B3, C1,C2)
     # Out
         the latex code to show the sunburst pie chart
     """
@@ -167,9 +172,10 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
     b3 = values['b3']
     c = values['c']
     c1 = values['c1']
+    c2 = values['c2']
     tot = a+b+c
     # inner group
-    data: Dict[str,Tuple[float,Dict[str,float]]] = {"a":(a,{"a1":a1,"a2":a2}),"b":(b,{"b1":b1,"b2":b2,"b3":b3}),"c":(c,{"c1":c1})}
+    data: Dict[str,Tuple[float,Dict[str,float]]] = {"a":(a,{"a1":a1,"a2":a2}),"b":(b,{"b1":b1,"b2":b2,"b3":b3}),"c":(c,{"c1":c1, "c2":c2})}
     lines = []
     def generator_inner(data):
         angle = 0
@@ -247,15 +253,16 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
         df = pd.DataFrame(Ldico[k])[['main_case','case','letter','color']].groupby(['main_case','case','letter','color']).size().reset_index(name='number')            
         L = df.to_dict(orient='records')
         
-        a = sum(e['number'] for e in L if e['letter'] in ['A','B'])
-        a1 = sum(e['number'] for e in L if e['letter'] in ['A'])
-        a2 = sum(e['number'] for e in L if e['letter'] in ['B'])
-        b = sum(e['number'] for e in L if e['letter'] in ['C','D','E'])
-        b1 = sum(e['number'] for e in L if e['letter'] in ['C'])
-        b2 = sum(e['number'] for e in L if e['letter'] in ['D'])
-        b3 = sum(e['number'] for e in L if e['letter'] in ['E'])
-        c = sum(e['number'] for e in L if e['letter'] in ['F'])
-        c1 = sum(e['number'] for e in L if e['letter'] in ['F'])
+        a = sum(e['number'] for e in L if "A" in e['letter'])
+        a1 = sum(e['number'] for e in L if e['letter'] == 'A1')
+        a2 = sum(e['number'] for e in L if e['letter'] == 'A2')
+        b = sum(e['number'] for e in L if "B" in e['letter'])
+        b1 = sum(e['number'] for e in L if e['letter'] == 'B1')
+        b2 = sum(e['number'] for e in L if e['letter'] == 'B2')
+        b3 = sum(e['number'] for e in L if e['letter'] == 'B3')
+        c = sum(e['number'] for e in L if "C" in e['letter'])
+        c1 = sum(e['number'] for e in L if e['letter'] == "C1")
+        c2 = sum(e['number'] for e in L if e['letter'] == "C2")
         res = make_one_latex_piechart(
             dataset=dataset,
             problem=problem,
@@ -269,7 +276,8 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
                 "b2":b2,
                 "b3":b3,
                 "c":c,
-                "c1": c1
+                "c1": c1,
+                "c2": c2
             },
             template_path=template_sunburst
         )

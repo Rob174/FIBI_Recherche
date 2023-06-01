@@ -3,9 +3,11 @@ from FIBI.analyse_results.visualization.global_analysis.components.averages impo
     MinimizationTgtDiff,
 )
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import (
-    TestUsed,
+    TestUsed
 )
-from FIBI.analyse_results.visualization.global_analysis.pie_chart import PieChart
+from FIBI.analyse_results.visualization.global_analysis.pie_chart import (
+    PieChart,
+)
 from FIBI.analyse_results.visualization.global_analysis.pie_chart_distr import (
     PieChartDistrib,
 )
@@ -14,6 +16,9 @@ from FIBI.analyse_results.parser.parser import JSONParser
 from FIBI.analyse_results.visualization.statistical_tests import (
     tests_signtest_ztest,
     tests_wilcoxon_ttest,
+)
+from FIBI.analyse_results.visualization.global_analysis.components.CasesCol import (
+    CasesCol,
 )
 
 
@@ -60,7 +65,7 @@ def run_parser(
     mapping_datasets: Dict[int, str],
     dataset: int,
     additional_modifiers: List[AbstractModifier],
-    additionnal_filters: Optional[List[FilterParsedRun]] = None
+    additionnal_filters: Optional[List[FilterParsedRun]] = None,
 ):
     if additionnal_filters is None:
         additionnal_filters = []
@@ -75,7 +80,7 @@ def run_parser(
             *additionnal_filters,
             FilterMetricsObserved(),
             FilterDuplicatedKeysPerGroup(["DATASET", "IMPR"]),
-            FilterAttrValueInt(attr="DATASET", values_to_keep=[dataset])
+            FilterAttrValueInt(attr="DATASET", values_to_keep=[dataset]),
         ],
     )
     return Ldata
@@ -116,18 +121,21 @@ def run_data_extractor(
     ) as f:
         legend = json.load(f)
     cmp_attr = ["FI_BI"]
+    avg_tgt = AverageFIBIDiffTgt(
+        metric="ratio",
+        attr_diff="FI_BI",
+        diff_order=default_fibi_order(),
+        name=metric_latex,
+        tgt_vals=MinimizationTgtDiff,
+    )
+    pvalue_es = PValueEffectSize("ratio", **tests)
     aggregators = [
         AverageFIBI(metric="final_cost", name=lambda m: "$$" + m + "$$"),
         AverageFIBI(metric="ratio", name=metric_latex),
-        AverageFIBIDiffTgt(
-            metric="ratio",
-            attr_diff="FI_BI",
-            diff_order=default_fibi_order(),
-            name=metric_latex,
-            tgt_vals=MinimizationTgtDiff,
-        ),
-        TestUsed(metric="ratio",**tests),
-        PValueEffectSize("ratio", **tests),
+        avg_tgt,
+        TestUsed(metric="ratio", **tests),
+        pvalue_es,
+        CasesCol(avg_tgt, pvalue_es),
     ]
     visualizations = [
         InitCostVariation(
@@ -169,7 +177,7 @@ def run_data_extractor(
             path_create(out_folder / "stats"),
             fixed_attrs=fixed_attr,
             query_to_path=query_to_path,
-            tests_used=tests
+            tests_used=tests,
         ),
     ]
     assert len(Ldata) > 0, "Expecting len(Ldata) > 0"
@@ -189,8 +197,6 @@ def mapping_clustering_datasets():
         3: "Normaly distributed points",
     }
 
+
 def mapping_maxsat_datasets():
-    return {
-        0: "random",
-        1: "MAXSAT evaluation benchmark 2021"
-    }
+    return {0: "random", 1: "MAXSAT evaluation benchmark 2021"}
