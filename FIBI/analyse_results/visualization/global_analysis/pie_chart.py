@@ -37,12 +37,12 @@ def get_case(d: dict):
         case_chosen = "No difference at all"
         color = "#FA1D00"
         main_case = customwrap("Not verified")
-        case_letter = "B2"
+        case_letter = "B3"
     elif d['avg'] == 'avgConclKo' and d['signif'] == 'pvalue-small' and d['es'] == 'es-small':
         case_chosen = customwrap("Opposite avg sign, significant difference with small effect size")
         color = "#FA1D00"
         main_case = customwrap("Not verified")
-        case_letter = "B3"
+        case_letter = "B2"
     elif d['signif'] == 'pvalue-big':
         case_chosen = "No significant difference"
         color = "#A100FF"
@@ -295,8 +295,6 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
     )
     out_path.mkdir(parents=True, exist_ok=True)
     path_out = out_path / f'piechart_{dataset}.tex'
-    # os.system("dvc remove "+path_out.resolve().as_posix()+".dvc")
     with open(path_out, 'w') as f:
         f.write(result)
-    # os.system("dvc add "+path_out.resolve().as_posix())
     

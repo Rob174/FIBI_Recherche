@@ -582,7 +582,7 @@ class PValueMapping(AbstractClassMapping):
     def __call__(self, value: float, test: str) -> str:
         if np.isnan(value):
             return "pvalue-nan"
-        if value < 1e-5:
+        if value < 0.05:
             return "pvalue-small"
         else:
             return "pvalue-big"
