@@ -91,8 +91,8 @@ void run_tests(const int argc, char** argv)
 	REGISTER(test_thread_pool_hdf5_write);
 	REGISTER(test_thread_pool_TSPFactory);
 	*/
-	REGISTER(main_write_data);
-	// REGISTER(test_gather_metadata);
+	//REGISTER(main_write_data);
+	REGISTER(test_gather_metadata);
 #define DEBUG
 	for (int i = 0; i < functions_names.size(); i++)
 	{
