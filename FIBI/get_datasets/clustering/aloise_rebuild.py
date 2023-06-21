@@ -106,6 +106,26 @@ class Ionosphere(AbstractGetter):
         clusters = df[len(df.columns)-1].unique()
         attrs = df[list(range(len(df.columns)-1))].to_numpy()
         return attrs, len(clusters), attrs.shape[1]
+class Iris(AbstractGetter):
+    """ Attributes description of the file
+        1. sepal length in cm
+        2. sepal width in cm
+        3. petal length in cm
+        4. petal width in cm
+        5. class: 
+            -- Iris Setosa
+            -- Iris Versicolour
+            -- Iris Virginica
+    """
+    def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
+        path = root / "iris"/ "iris.data"
+        cols = [
+            "sepal-length", "sepal-width", "petal-length", "petal-width", "class"
+        ]
+        df = pd.read_csv(path,sep=",",header=None,names=cols)
+        clusters = df[cols[-1]].unique()
+        attrs = df[cols[:-1]].to_numpy()
+        return attrs, len(clusters), attrs.shape[1]
 if __name__ == "__main__":
     root = Path("data/src_datasets/clustering/benchmark_aloise/rebuild/src/")
-    Ionosphere()(root)
+    Iris()(root)
