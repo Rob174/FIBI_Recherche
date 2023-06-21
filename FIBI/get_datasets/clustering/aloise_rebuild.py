@@ -126,6 +126,39 @@ class Iris(AbstractGetter):
         clusters = df[cols[-1]].unique()
         attrs = df[cols[:-1]].to_numpy()
         return attrs, len(clusters), attrs.shape[1]
+class LibrasMovement(AbstractGetter):
+    """Attributes description of the file
+    1. 1� coordinate abcissa
+    2. 1� coordinate ordinate
+    3. 2� coordinate abcissa
+    4. 2� coordinate ordinate
+    ...
+    89. 45� coordinate abcissa
+    90. 45� coordinate ordinate
+    91. class: 
+        -- 1: curved swing
+        -- 2: horizontal swing
+        -- 3: vertical swing
+        -- 4: anti-clockwise arc
+        -- 5: clockwise arc
+        -- 6: circle
+        -- 7: horizontal straight-line
+        -- 8: vertical straight-line
+        -- 9: horizontal zigzag
+        -- 10: vertical zigzag
+        -- 11: horizontal wavy
+        -- 12: vertical wavy
+        -- 13: face-up curve
+        -- 14: face-down curve 
+        -- 15: tremble
+    """
+    def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
+        path = root / "libras+movement"/ "movement_libras.data"
+        cols = list(range(91))
+        df = pd.read_csv(path,sep=",",header=None,names=list(range(91)))
+        clusters = df[cols[-1]].unique()
+        attrs = df[cols[:-1]].to_numpy()
+        return attrs, len(clusters), attrs.shape[1]
 if __name__ == "__main__":
     root = Path("data/src_datasets/clustering/benchmark_aloise/rebuild/src/")
-    Iris()(root)
+    LibrasMovement()(root)
