@@ -9,6 +9,7 @@ NumClusters = int
 NumDims = int
 class AbstractGetter(abc.ABC):
     def __call__(self, path: Path) -> Tuple[Points,NumClusters,NumDims] :
+        """Extract the data from the files .data provided inside the folder path"""
         pass
 
 class Glass(AbstractGetter):
@@ -100,13 +101,11 @@ class Ionosphere(AbstractGetter):
    -- All 34 predictor attributes are continuous
    """
     def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
-        path = root / "image+segmentation"/"segmentation.data"
-        with open(path) as f:
-            file = [{k:v for k,v in zip(cols,e.strip().split(','))} for e in f.readlines()[5:]] # delete the first five rows to be able to parse
-        df = pd.DataFrame(file)
-        clusters = df['Class'].unique()
-        attrs = df[cols[1:-1]].to_numpy()
+        path = root / "ionosphere"/"ionosphere.data"
+        df = pd.read_csv(path,sep=",",header=None)
+        clusters = df[len(df.columns)-1].unique()
+        attrs = df[list(range(len(df.columns)-1))].to_numpy()
         return attrs, len(clusters), attrs.shape[1]
 if __name__ == "__main__":
     root = Path("data/src_datasets/clustering/benchmark_aloise/rebuild/src/")
-    ImageSegmentation()(root)
+    Ionosphere()(root)
