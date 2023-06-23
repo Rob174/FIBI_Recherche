@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from typing import *
 import abc
+import re
+from itertools import islice
 
 Points = np.ndarray
 NumClusters = int
@@ -34,16 +36,20 @@ class Glass(AbstractGetter):
             -- 5 containers
             -- 6 tableware
             -- 7 headlamps
+        Note: Include the Id as was in the paper eventhough not really relevant...
+        A class that is not present in this dataset....
+        In the given file 9 attributes (exclude the id) with no class
     """
     def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
+        print("WARNING: Include the Id as was in the paper even though not really relevant...")
         path = root / "glass+identification" / "glass.data"
         cols = [
             "Id", "RI", "Na", "Mg", "Al", "Si", "K", "Ca", "Ba", "Fe", "Class"
         ]
         df = pd.read_csv(path,sep=",",header=None,names=cols)
         clusters = df['Class'].unique()
-        attrs = df[cols[1:-1]].to_numpy()
-        return attrs, len(clusters), attrs.shape[1]
+        attrs = df[cols[:-1]].to_numpy()
+        return attrs, attrs.shape[0], 7, attrs.shape[1]
 
 class ImageSegmentation(AbstractGetter):
     
@@ -77,7 +83,8 @@ class ImageSegmentation(AbstractGetter):
     18. saturatoin-mean:  (see 17)
     19. hue-mean:  (see 17)"""
     def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
-        path = root / "image+segmentation"/"segmentation.data"
+        path1 = root / "image+segmentation"/"segmentation.data"
+        path2 = root / "image+segmentation"/"segmentation.test"
         cols = [
             "Class",
             "region-centroid-col", "region-centroid-row", "region-pixel-count",
@@ -87,12 +94,17 @@ class ImageSegmentation(AbstractGetter):
             "exblue-mean", "exgreen-mean", "value-mean", "saturatoin-mean",
             "hue-mean"
         ]
-        with open(path) as f:
-            file = [{k:v for k,v in zip(cols,e.strip().split(','))} for e in f.readlines()[5:]] # delete the first five rows to be able to parse
-        df = pd.DataFrame(file)
-        clusters = df['Class'].unique()
-        attrs = df[cols[1:-1]].to_numpy()
-        return attrs, len(clusters), attrs.shape[1]
+        def to_df(path) -> pd.DataFrame:
+            with open(path) as f:
+                file = [{k:v for k,v in zip(cols,e.strip().split(','))} for e in f.readlines()[5:]] # delete the first five rows to be able to parse
+            df = pd.DataFrame(file)
+            clusters = df['Class'].unique()
+            attrs = df[cols[1:]].to_numpy()
+            return df, clusters, attrs
+        df1, clusters1, attrs1 = to_df(path1)
+        df2, clusters2, attrs2 = to_df(path2)
+        attrs = np.concatenate([attrs1,attrs2],axis=0)
+        return attrs, attrs.shape[0], len(set(clusters1).union(set(clusters2))), attrs1.shape[1]
     
 class Ionosphere(AbstractGetter):
     
@@ -105,7 +117,7 @@ class Ionosphere(AbstractGetter):
         df = pd.read_csv(path,sep=",",header=None)
         clusters = df[len(df.columns)-1].unique()
         attrs = df[list(range(len(df.columns)-1))].to_numpy()
-        return attrs, len(clusters), attrs.shape[1]
+        return attrs, attrs.shape[0], len(clusters), attrs.shape[1]
 class Iris(AbstractGetter):
     """ Attributes description of the file
         1. sepal length in cm
@@ -125,7 +137,7 @@ class Iris(AbstractGetter):
         df = pd.read_csv(path,sep=",",header=None,names=cols)
         clusters = df[cols[-1]].unique()
         attrs = df[cols[:-1]].to_numpy()
-        return attrs, len(clusters), attrs.shape[1]
+        return attrs, attrs.shape[0], len(clusters), attrs.shape[1]
 class LibrasMovement(AbstractGetter):
     """Attributes description of the file
     1. 1� coordinate abcissa
@@ -158,7 +170,168 @@ class LibrasMovement(AbstractGetter):
         df = pd.read_csv(path,sep=",",header=None,names=list(range(91)))
         clusters = df[cols[-1]].unique()
         attrs = df[cols[:-1]].to_numpy()
-        return attrs, len(clusters), attrs.shape[1]
+        return attrs, attrs.shape[0], len(clusters), attrs.shape[1]
+class SyntheticControlChart(AbstractGetter):
+    """Attributes description of the file
+    The data is stored in an ASCII file, 600 rows, 60 columns, with a single chart per line. The classes are organized as follows:
+    1-100   Normal
+    101-200 Cyclic
+    201-300 Increasing trend
+    301-400 Decreasing trend
+    401-500 Upward shift
+    501-600 Downward shift
+    No class columns we need to infer from the line number above
+    Separator is " +" in regex
+    """
+    def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
+        path = root / "synthetic+control+chart+time+series"/ "synthetic_control.data"
+        # read
+        with open(path) as f:
+            file = [list(map(float,re.split(" +",e))) for e in f.readlines()]
+        intervals = [i*100 for i in range(7)]
+        for i in range(len(file)):
+            for _class, (start,end) in enumerate(zip(intervals,[intervals[i+1]-1 for i in range(len(intervals)-1)])):
+                if i>=start and i<=end:
+                    file[i] = np.array(file[i] + [_class])
+                    break
+        data = np.stack(file,axis=0)
+        # extract classes
+        clusters = np.unique(data[:,-1])
+        attrs = data[:,:-1]
+        return attrs, attrs.shape[0], len(clusters), attrs.shape[1]
+class WaterTreatment(AbstractGetter):
+    """Attributes description of the file
+     N. Attrib.   N. of Missings --> excluded
+        1  Q-E:	18  
+        2  ZN-E:	 3
+        3  PH-E:	 0
+        4  DBO-E:	23
+        5  DQO-E:	 6
+        6  SS-E:	 1
+        7  SSV-E:	11
+        8  SED-E:	25
+        9  COND-E:	 0
+        10  PH-P:	 0
+        11  DBO-P:	40
+        12  SS-P:	 0
+        13  SSV-P:	11
+        14  SED-P:	24
+        15  COND-P:	 0
+        16  PH-D:	 0
+        17  DBO-D:	28
+        18  DQO-D:	 9
+        19  SS-D:	 2
+        20  SSV-D:	13
+        21  SED-D:	25
+        22  COND-D:	 0
+        23  PH-S:	 1
+        24  DBO-S:	23
+        25  DQO-S:	18
+        26  SS-S:	 5
+        27  SSV-S:      17
+        28  SED-S:      28
+        29  COND-S:	 1
+        30  RD-DBO-P:   62
+        31  RD-SS-P:     4
+        32  RD-SED-P:   27
+        33  RD-DBO-S:   40
+        34  RD-DQO-S:   26
+        35  RD-DBO-G:   36
+        36  RD-DQO-G:   25
+        37  RD-SS-G:     8
+        38  RD-SSED-G:  31
+    """
+    def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
+        path = root / "water+treatment+plant"/ "water-treatment.data"
+        # read
+        df = pd.read_csv(path,sep=",",header=None)
+        attrs = df[df.columns[1:]].to_numpy()
+        return attrs, attrs.shape[0], 13, attrs.shape[1]
+class Wine(AbstractGetter):
+    """Attributes description of the file
+     	1) Alcohol
+        2) Malic acid
+        3) Ash
+        4) Alcalinity of ash  
+        5) Magnesium
+        6) Total phenols
+        7) Flavanoids
+        8) Nonflavanoid phenols
+        9) Proanthocyanins
+        10)Color intensity
+        11)Hue
+        12)OD280/OD315 of diluted wines
+        13)Proline       
+    """
+    def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
+        path = root / "wine"/ "wine.data"
+        # read
+        df = pd.read_csv(path,sep=",",header=None)
+        attrs = df[df.columns[1:]].to_numpy()
+        return attrs, attrs.shape[0], 3, attrs.shape[1]
+
+class Yeast(AbstractGetter):
+    """Extracted from the files provided in the zip    
+    """
+    def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
+        path = root / ".." / ".." / "old" / "yeast1484.dat"
+        # read
+        with open(path) as f:
+            lines = [[float(a) for a in l.split(" ")] for i,l in enumerate(f.readlines()) if i > 0]
+        df = pd.DataFrame(lines)
+        attrs = df.to_numpy()
+        return attrs, attrs.shape[0], 10, attrs.shape[1]
+
+class Yeast(AbstractGetter):
+    """Extracted from the files provided in the zip    
+    """
+    def __call__(self, root: Path) -> Tuple[Points,NumClusters,NumDims] :
+        path = root / ".." / ".." / "old" / "yeast1484.dat"
+        # read
+        with open(path) as f:
+            lines = [[float(a) for a in l.split(" ")] for i,l in enumerate(f.readlines()) if i > 0]
+        df = pd.DataFrame(lines)
+        attrs = df.to_numpy()
+        return attrs, attrs.shape[0], 10, attrs.shape[1]
+
+class BodyMeasurement(AbstractGetter):
+    """Extracted from the files provided in the zip    
+    """
+    def __call__(self, root: Path) -> Tuple[Points, int, NumClusters,NumDims] :
+        path = root / ".." / ".." / "old" / "body507_s5.dat"
+        # read
+        with open(path) as f:
+            lines = [[float(a) for a in l.split("\t") if a != ''] for i,l in enumerate(f.readlines()) if i > 0]
+        df = pd.DataFrame(lines)
+        attrs = df.to_numpy()
+        return attrs, attrs.shape[0], 2, attrs.shape[1]
+
 if __name__ == "__main__":
     root = Path("data/src_datasets/clustering/benchmark_aloise/rebuild/src/")
-    LibrasMovement()(root)
+    path_out = Path("data/algorithms_in/clustering/benchmark_aloise/")
+    classes = [
+        Glass,
+        ImageSegmentation,
+        Ionosphere,
+        Iris,
+        LibrasMovement,
+        SyntheticControlChart,
+        Wine,
+        Yeast,
+        BodyMeasurement
+    ]
+    elems = [[*e()(root), e.__name__] for e in classes]
+    for c in sorted(elems,key=lambda x:x[1]):
+        print(c[1:])
+    folders = ["dims","num_clusters","points"]
+    for i in range(len(folders)):
+        folders[i] = path_out / folders[i]
+        folders[i].mkdir(exist_ok=True, parents=True)
+    for i,(data,n_points,n_clust,n_dims, class_name) in enumerate(elems):
+        with open(folders[0] / f"{i}.txt", "w") as f:
+            f.write(f"{n_dims}")
+        with open(folders[1] / f"{i}.txt", "w") as f:
+            f.write(f"{n_clust}")
+        with open(folders[2] / f"{i}.txt", "w") as f:
+            data = "\n".join(["\n".join([str(a) for a in d]) for d in data])
+            f.write(f"{data}")
