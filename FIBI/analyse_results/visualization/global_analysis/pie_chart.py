@@ -212,7 +212,7 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
     lines.append(f"% Outer pie labels")
     for outerCat, innerCat, nbVals, frac,perc, start_angle, end_angle, middle in generator_outer(data):
         lines.append(f"\\node at ({middle}:\\posRadLabOuter) {{{innerCat.upper()}}};")
-        lines.append(f"\\node [below] at ({middle}:\\posRadLabOuter) {{{perc:.2f}\\%}};")
+        lines.append(f"\\node [below] at ({middle}:\\posRadLabOuter) {{{perc:.0f}\\%}};")
         if perc < 0.01:
             lines[-1] = "% "+lines[-1]
             lines[-2] = "% "+lines[-2]
@@ -220,7 +220,7 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
     lines.append(f"% inner pie labels")
     for innerCat, nbVals, frac,perc, start_angle, end_angle, middle, dico in generator_inner(data):
         lines.append(f"\\node at ({middle}:\\posRadLabInner) {{{innerCat.upper()}}};")
-        lines.append(f"\\node [below] at ({middle}:\\posRadLabInner) {{{perc:.2f}\\%}};")
+        lines.append(f"\\node [below] at ({middle}:\\posRadLabInner) {{{perc:.0f}\\%}};")
         if perc < 0.01:
             lines[-1] = "% "+lines[-1]
             lines[-2] = "% "+lines[-2]
@@ -235,7 +235,7 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
         sizeInner=size_inner,
         sizeFig="\\sizeFig",
         sizeFigCaption="\\sizeFigCaption",
-        title=f"{dataset}, {init}",
+        title=f"\\emph{{{problem}::{dataset}::{init}}}",
         reference=f"res{format_identifier(problem).capitalize()}{format_identifier(dataset).capitalize()}{format_identifier(init)}"
     )
     return result
@@ -249,6 +249,7 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
         template = f.read()
     template = Template(template)
     diagrams = {}
+    total = 0
     for k in Ldico:
         df = pd.DataFrame(Ldico[k])[['main_case','case','letter','color']].groupby(['main_case','case','letter','color']).size().reset_index(name='number')            
         L = df.to_dict(orient='records')
@@ -263,6 +264,7 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
         c = sum(e['number'] for e in L if "C" in e['letter'])
         c1 = sum(e['number'] for e in L if e['letter'] == "C1")
         c2 = sum(e['number'] for e in L if e['letter'] == "C2")
+        total = a+b+c
         res = make_one_latex_piechart(
             dataset=dataset,
             problem=problem,
@@ -290,7 +292,7 @@ def make_latex_piechart(Ldico, out_path, dataset, problem, template_sunburst: Op
     diagrams = [diagrams[k] for k in sorted(diagrams,key=sort_fn)]
     result = template.substitute(
         sunbursts="\n    ".join([d.replace("\n","\n    ") for d in diagrams]),
-        title=f"{problem}, {dataset}",
+        title=f"\\emph{{{problem}::{dataset}}}\\\\ {total} hyperparameters",
         reference=f"res{format_identifier(problem).capitalize()}{format_identifier(dataset).capitalize()}",
     )
     out_path.mkdir(parents=True, exist_ok=True)

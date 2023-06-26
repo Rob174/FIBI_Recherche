@@ -9,7 +9,7 @@ def get_clustering_benchmark_aloise_visualizations(
 ):
     problem = "Clustering"
     dataset = 2
-    fixed_attr = ["IMPR", "NUM_POINTS", "INSTANCE", "NUM_CLUST"]
+    fixed_attr = ["IMPR", "NUM_POINTS", "NUM_CLUST", "SEED_PROBLEM", "INSTANCE"]
     mapping_datasets = mapping_clustering_datasets()
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
@@ -21,11 +21,15 @@ def get_clustering_benchmark_aloise_visualizations(
                 name="SEED_PROBLEM", new_name="INSTANCE", mapping=mapping_id_name
             ),
     ]
+    additionnal_filters = [
+        # FilterAttrValueInt("SEED_PROBLEM",values_to_keep=[0,3,5,6,8,11,13,14,15,10,17],after=True)
+    ]
     Ldata = run_parser(
         pathes_data=pathes_hdf5,
         mapping_datasets=mapping_datasets,
         dataset=dataset,
-        additional_modifiers=additionnal_modifiers
+        additional_modifiers=additionnal_modifiers,
+        additionnal_filters=additionnal_filters
     )
     run_data_extractor(
         dataset_name=mapping_datasets[dataset], 
@@ -33,5 +37,6 @@ def get_clustering_benchmark_aloise_visualizations(
         out_folder=out_folder,
         fixed_attr=fixed_attr,
         Ldata=Ldata,
-        test_group=test_group
+        test_group=test_group,
+        clust_col=False
     )

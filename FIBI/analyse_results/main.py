@@ -139,44 +139,16 @@ def get_clustering(
                     / "data"
                     / "algorithms_out"
                     / "clustering"
-                    / "dataset2_impr0.txt",
-                ),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "clustering"
-                    / "dataset2_impr1.txt"),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "clustering"
-                    / "dataset2_impr2.txt"),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "clustering"
-                    / "dataset2_impr3.txt"),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "clustering"
-                    / "dataset2_impr4.txt"),
-                existing_path(
-                    Path(".")
-                    / "data"
-                    / "algorithms_out"
-                    / "clustering"
-                    / "dataset2_impr5.txt"),
+                    / "benchmark_aloise"
+                    / "dataset1.txt",
+                )
             ],
             mapping_inst=existing_path(
                 Path(".")
                 / "data"
                 / "algorithms_in"
                 / "clustering"
+                / "benchmark_aloise"
                 / "benchmark_aloise"
                 / "metadata.json"
             ),
@@ -384,9 +356,9 @@ if __name__ == "__main__":
     # print("tsplib")
     # get_tsp("tsplib", False, test_group=test_group)
     # notify("wip","tsp tsplib finished")
-    # print("Clustering")
-    # print("Aloise") 
-    # get_clustering("aloise_benchmark", profile=False, test_group=test_group)
+    print("Clustering")
+    print("Aloise") 
+    get_clustering("aloise_benchmark", profile=False, test_group=test_group)
     # notify("wip","clustering aloise_benchmark finished")
     # print("Quad")
     # get_clustering("uniform_points", profile=False, test_group=test_group)  
@@ -398,11 +370,11 @@ if __name__ == "__main__":
     # get_clustering("franti_benchmark", profile=False, test_group=test_group)
     # notify("wip","clustering franti_benchmark finished")
     # gather_latex(Path("data/analysis_results/"))
-    print("MAXSAT")
-    print("benchmark2021")
-    notify("wip","maxsat benchmark2021")
-    get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021",test_group)
-    notify("done","maxsat benchmark2021")
+    # print("MAXSAT")
+    # print("benchmark2021")
+    # notify("wip","maxsat benchmark2021")
+    # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021",test_group)
+    # notify("done","maxsat benchmark2021")
     os.system("dvc add "+(Path("./data/analysis_results").as_posix()+" --to-remote"))
     notify(status="finished",message="all good")
         

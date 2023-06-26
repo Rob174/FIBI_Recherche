@@ -55,7 +55,7 @@ def get_common_modifiers(mapping_dataset: Dict[int, str]):
         ),
         ModifierOperation(
             dst_name="ratio",
-            operation=lambda d: d["final_cost"] / d["init_cost"],
+            operation=lambda d: np.round(d["final_cost"] / d["init_cost"],decimals=5)
         ),
     ]
 
@@ -94,6 +94,7 @@ def run_data_extractor(
     Ldata: List[dict],
     minimization: Optional[bool] = True,
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
+    clust_col: bool = False
 ):
     metric_latex = lambda m: "$$\\frac{" + m + "}{initCost}$$"
     if test_group == "signtest_ztest":
@@ -137,6 +138,13 @@ def run_data_extractor(
         pvalue_es,
         CasesCol(avg_tgt, pvalue_es),
     ]
+    rows = []
+    for a in fixed_attr:
+        if a != "NUM_CLUST" or (a == "NUM_CLUST" and not clust_col):
+            rows.append(a)
+    cols = []
+    if clust_col and "NUM_CLUST" in fixed_attr:
+        cols.append("NUM_CLUST")
     visualizations = [
         InitCostVariation(
             path_create(out_folder / "initDistr"), fixed_attrs=[*fixed_attr, *cmp_attr]
@@ -170,8 +178,8 @@ def run_data_extractor(
             mappings_attr_names=mappings_attr_names,
             legend=Legend(legend),
             query_to_path=query_to_path,
-            rows=[a for a in fixed_attr if a != "NUM_CLUST"],
-            cols=["NUM_CLUST"] if "NUM_CLUST" in fixed_attr else [],
+            rows=rows,
+            cols=cols,
         ),
         PageInstance(
             path_create(out_folder / "stats"),
