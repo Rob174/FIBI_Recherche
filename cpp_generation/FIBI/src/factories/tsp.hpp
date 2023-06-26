@@ -34,6 +34,7 @@ public:
 			towns_pos_ptr = open_tsplib(cf.SEED_PROBLEM.get(), root_data + dataset_name, &cf);
 			break;
 		default:
+			cout << "Invalid IMPR argument, Valid values are 0->1" << endl;
 			throw invalid_argument("Invalid DATASET argument, Valid values are 0->1");
 			break;
 		}
@@ -67,6 +68,7 @@ public:
 			tour_ptr = init_tsp_greedy_topk(cf.NUM_TOWNS.get(), cf.SEED_ASSIGN.get(), m, 5);
 			break;
 		default:
+			cout << "Invalid IMPR argument, Valid values are 0->5" << endl;
 			throw invalid_argument("Invalid IMPR argument, Valid values are 0->5");
 			break;
 		}

@@ -11,20 +11,21 @@
 
 using namespace std;
 
-class ClusteringFactory : public AbstractFactory<ClusteringConfig> {
+class ClusteringFactory : public AbstractFactory<ClusteringConfig>
+{
 public:
-	vector<pair<string, double>>* run(ClusteringConfig& cf, string root_data = "./") override
+	vector<pair<string, double>> *run(ClusteringConfig &cf, string root_data = "./") override
 	{
 		// setup
-		const vector<double>* points_pos_ptr;
+		const vector<double> *points_pos_ptr;
 		string dataset_name;
 		switch (cf.DATASET.get())
 		{
 		case 0:
 			/* Uniformly distrbuted points */
 			points_pos_ptr = uniform_points(cf.NUM_POINTS.get(),
-				cf.NUM_DIM.get(),
-				cf.SEED_PROBLEM.get());
+											cf.NUM_DIM.get(),
+											cf.SEED_PROBLEM.get());
 			break;
 		case 1:
 #if HDF5save
@@ -40,14 +41,13 @@ public:
 #else
 			dataset_name = "aloise_benchmark/";
 #endif
-			points_pos_ptr = open_clustering(cf.SEED_PROBLEM.get(), root_data + dataset_name, &cf, false);
+			points_pos_ptr = open_clustering(cf.SEED_PROBLEM.get(), root_data + dataset_name, &cf, true);
 			break;
 		case 3:
 			points_pos_ptr = get<0>(normal_points(cf.NUM_POINTS.get(),
-				cf.NUM_DIM.get(),
-				cf.NUM_CLUST.get(),
-				cf.SEED_PROBLEM.get())
-			);
+												  cf.NUM_DIM.get(),
+												  cf.NUM_CLUST.get(),
+												  cf.SEED_PROBLEM.get()));
 			break;
 		default:
 			string error = "Invalid DATASET argument, Valid values are 0->3";
@@ -57,14 +57,15 @@ public:
 		}
 		if (cf.NUM_POINTS.get() <= cf.NUM_CLUST.get())
 		{
-			vector<pair<string, double>>*res = new vector<pair<string, double>>;
-			for (pair<string, double> p : cf.get_json()) {
+			vector<pair<string, double>> *res = new vector<pair<string, double>>;
+			for (pair<string, double> p : cf.get_json())
+			{
 				res->push_back(p);
 			}
 			return res;
 		}
 		unique_ptr<const vector<double>> points_pos(points_pos_ptr);
-		vector<int>* assignements_ptr = random_clust(cf.NUM_CLUST.get(), cf.NUM_POINTS.get(), cf.SEED_ASSIGN.get());
+		vector<int> *assignements_ptr = random_clust(cf.NUM_CLUST.get(), cf.NUM_POINTS.get(), cf.SEED_ASSIGN.get());
 		auto [centroids_ptr, npts_per_clust_ptr] = cmpt_centroids_and_npts_per_clust(*points_pos, *assignements_ptr, cf.NUM_DIM.get(), cf.NUM_CLUST.get());
 		switch (cf.IMPR.get())
 		{
@@ -81,7 +82,7 @@ public:
 			break;
 		case 3:
 			/* KMeans++ super glutton */
-			init_clustering_greedy_topk(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get(),3);
+			init_clustering_greedy_topk(*centroids_ptr, *points_pos, *assignements_ptr, *npts_per_clust_ptr, cf.NUM_DIM.get(), cf.SEED_ASSIGN.get(), 3);
 			break;
 		case 4:
 			/* KMeans++ super glutton */
@@ -104,11 +105,11 @@ public:
 
 		Metrics<ClusteringSwap, ClusteringSolutionContainer<>> metrics;
 		// algorithms execution
-		vector<clustering_obs_t* > obs;
+		vector<clustering_obs_t *> obs;
 		obs.push_back(&metrics);
 		unique_ptr<typename clust_ls_t::ls_t> ls(getClusteringLocalSearch(obs, (bool)cf.FI_BI.get()));
 		ls->run(co, cf);
-		vector<pair<string, double>>* res = get_results<ClusteringSwap, ClusteringSolutionContainer<>>(&metrics, &cf);
+		vector<pair<string, double>> *res = get_results<ClusteringSwap, ClusteringSolutionContainer<>>(&metrics, &cf);
 		return res;
 	}
 };

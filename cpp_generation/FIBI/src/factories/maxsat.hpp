@@ -40,6 +40,7 @@ public:
 			weights_ptr = weights_ptr_tmp;
 		}
 		else {
+			cout << "Invalid DATASET argument, Valid values are 0->1" << endl;
 			throw invalid_argument("Invalid DATASET argument, Valid values are 0->1");
 		}
 		assignements_ptr = random_assignements(cf.NUM_VARIABLES.get(), cf.SEED_ASSIGN.get());
@@ -55,6 +56,7 @@ public:
 			assignements.reset(improve_maxsat(*var_to_clauses, *clauses, *weights, cf.NUM_VARIABLES.get(), cf.SEED_ASSIGN.get()));
 		}
 		else if (cf.IMPR.get() > 1) {
+			cout << "Invalid IMPR argument, Valid values are 0->1" << endl;
 			throw invalid_argument("Invalid IMPR argument, Valid values are 0->1");
 		}
 		MAXSATSolutionContainer co(*weights, *assignements, *clauses);
