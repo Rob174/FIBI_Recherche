@@ -16,13 +16,13 @@ def get_clustering_benchmark_aloise_visualizations(
         mapping = json.load(f)
     mapping_id_name = {v["ID"]: k for k, v in mapping.items()}
     additionnal_modifiers: List[AbstractModifier] = [
-            ConvertToInteger(fields=["NUM_POINTS", "NUM_CLUST"]),
+            ConvertToInteger(fields=["NUM_POINTS", "NUM_CLUST", "SEED_PROBLEM"]),
             ModifierIntMapping(
                 name="SEED_PROBLEM", new_name="INSTANCE", mapping=mapping_id_name
             ),
     ]
     additionnal_filters = [
-        # FilterAttrValueInt("SEED_PROBLEM",values_to_keep=[0,3,5,6,8,11,13,14,15,10,17],after=True)
+        FilterAttrValueInt("SEED_PROBLEM",values_to_keep=[0,3,5,6,8,11,13,14,15,16,18,10,17],after=True)
     ]
     Ldata = run_parser(
         pathes_data=pathes_hdf5,

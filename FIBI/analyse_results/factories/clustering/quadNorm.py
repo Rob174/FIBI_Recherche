@@ -25,5 +25,6 @@ def get_clustering_uniform_norm_visualizations(
         out_folder=out_folder,
         fixed_attr=fixed_attr,
         Ldata=Ldata,
-        test_group=test_group
+        test_group=test_group,
+        clust_col=True
     )
