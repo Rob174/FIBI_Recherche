@@ -8,12 +8,13 @@ def get_clustering_uniform_norm_visualizations(
 ):
     problem = "Clustering"
     dataset = 3
-    fixed_attr = ["IMPR", "NUM_POINTS", "NUM_CLUST"]
+    fixed_attr = ["PROBLEM","DATASET","IMPR", "NUM_POINTS", "NUM_CLUST"]
     mapping_datasets = mapping_clustering_datasets()
     additionnal_modifiers: List[AbstractModifier] = [
             ConvertToInteger(fields=["NUM_POINTS", "NUM_CLUST"]),
     ]
     Ldata = run_parser(
+        problem=problem,
         pathes_data=pathes_hdf5,
         mapping_datasets=mapping_datasets,
         dataset=dataset,

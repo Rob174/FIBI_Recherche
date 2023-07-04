@@ -1,5 +1,6 @@
 from FIBI.analyse_results.factories.clustering.__init__ import *
 from FIBI.analyse_results.factories.common import *
+from FIBI.analyse_results.visualization.global_analysis.components.instance import open_clustering, visualize_scatter
 
 def get_clustering_benchmark_aloise_visualizations(
     pathes_hdf5: List[Path],
@@ -9,7 +10,7 @@ def get_clustering_benchmark_aloise_visualizations(
 ):
     problem = "Clustering"
     dataset = 2
-    fixed_attr = ["IMPR", "NUM_POINTS", "NUM_CLUST", "SEED_PROBLEM", "INSTANCE"]
+    fixed_attr = ["PROBLEM","DATASET","IMPR", "NUM_POINTS", "NUM_CLUST", "SEED_PROBLEM", "INSTANCE"]
     mapping_datasets = mapping_clustering_datasets()
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
@@ -22,9 +23,10 @@ def get_clustering_benchmark_aloise_visualizations(
             ),
     ]
     additionnal_filters = [
-        FilterAttrValueInt("SEED_PROBLEM",values_to_keep=[0,3,5,6,8,11,13,14,15,16,18,10,17],after=True)
+        # FilterAttrValueInt("SEED_PROBLEM",values_to_keep=[0,3,5,6,8,11,13,14,15,16,18,10,17],after=True)
     ]
     Ldata = run_parser(
+        problem=problem,
         pathes_data=pathes_hdf5,
         mapping_datasets=mapping_datasets,
         dataset=dataset,

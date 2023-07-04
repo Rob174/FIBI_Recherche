@@ -1,14 +1,16 @@
 from FIBI.analyse_results.factories.tsp.__init__ import *
 from FIBI.analyse_results.factories.common import *
+from FIBI.analyse_results.visualization.global_analysis.components.instance import open_tsplib, visualize_scatter
 
 
 def get_tsplib_visualizations(
     pathes_hdf5: List[Path], out_folder: Path, mapping_inst: Path,
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
+    problem = "TSP"
     mapping_datasets = mapping_tsp_datasets()
     dataset = 1
-    fixed_attr = ["IMPR", "NUM_TOWNS", "INSTANCE"]
+    fixed_attr = ["PROBLEM","DATASET","IMPR", "NUM_TOWNS", "INSTANCE"]
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
         mapping_id_name = {int(k): v for k, v in json.load(f).items()}
@@ -19,6 +21,7 @@ def get_tsplib_visualizations(
         ),
     ]
     Ldata = run_parser(
+        problem=problem,
         pathes_data=pathes_hdf5,
         mapping_datasets=mapping_datasets,
         dataset=dataset,

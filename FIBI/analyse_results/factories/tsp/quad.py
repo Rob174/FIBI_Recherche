@@ -11,13 +11,15 @@ def get_tsp_uniform_visualizations(
     pathes_hdf5: List[Path], out_folder: Path,
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
+    problem = "TSP"
     mapping_datasets = mapping_tsp_datasets()
     dataset = 0
-    fixed_attr = ["IMPR", "NUM_TOWNS"]
+    fixed_attr = ["PROBLEM","DATASET","IMPR", "NUM_TOWNS"]
     additionnal_modifiers: List[AbstractModifier] = [
         ConvertToInteger(fields=["NUM_TOWNS"]),
     ]
     Ldata = run_parser(
+        problem=problem,
         pathes_data=pathes_hdf5,
         mapping_datasets=mapping_datasets,
         dataset=dataset,
