@@ -11,7 +11,16 @@ class AbstractModifier(abc.ABC):
         """
     def __call__(self, dico: dict) -> dict:
         return self.call(dico)
-    
+class ConstantField(AbstractModifier):
+    """
+    """
+    def __init__(self,name: str, value: str):
+        self.name = name
+        self.value = value
+    def call(self,dico: dict):
+        """Modify the results of a parsed hdf5 file, mapping an integer attribute to a new value."""
+        dico[self.name] = self.value
+        return dico
 class ModifierIntMapping(AbstractModifier):
     """Map an integer attribute to a new value.
     
