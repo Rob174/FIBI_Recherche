@@ -134,9 +134,13 @@ vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var
 		if (!b.found)
 		{
 			// If no improvement found choose a random variable
-			b.variable = gen() % num_variables;
+			std::uniform_int_distribution<> dis_var(0, undecided_variables.size() - 1);
+			auto it = undecided_variables.begin();
+    		std::advance(it, dis_var(gen));
+			b.variable = *it;
 			// And a random assignement
-			b.assignement = gen() % 2;
+			std::uniform_int_distribution<> dis_affect(0, 1);
+			b.assignement = dis_affect(gen);
 			// Compute the variation of bound
 			b.increase_bound = 0;
 			stats currStats = {.SAT = formerStats.SAT, .UNSAT = formerStats.UNSAT, .B = formerStats.B};
