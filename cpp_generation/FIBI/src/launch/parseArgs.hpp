@@ -2,6 +2,7 @@
 #include <string>
 #include <filesystem>
 #include <fstream>
+#include <exception>
 #include <iostream>
 #include <optional>
 char* getCmdOption(char** begin, char** end, const std::string& option)
@@ -96,9 +97,15 @@ constexpr std::optional<T> parseVar(const string& name, const int argc, char** a
 
     std::cout << "Using " << name << ": ";
     if constexpr (std::is_same_v<T, int>) {
-        int v = std::stoi(getCmdOption(argv, argv + argc, argName.c_str()));
-        std::cout << v << std::endl;
-        return v;
+        std::string v_str = getCmdOption(argv, argv + argc, argName.c_str());
+        try {
+            int v = std::stoi(v_str);
+            std::cout << v << std::endl;
+            return v;
+        } catch ( std::exception& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            throw std::runtime_error("Invalid value for " + name);
+        }
     }
     else if constexpr (std::is_same_v<T, std::string>) {
         std::string v = getCmdOption(argv, argv + argc, argName.c_str());

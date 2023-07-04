@@ -57,6 +57,7 @@ void test_gather_metadata(const int argc, char** argv) {
 		}
 	}
 	else {
+		cout << "Unknown problem " << arguments.problem << endl;
 		throw runtime_error("Unknown problem " + arguments.problem);
 	}
 }
