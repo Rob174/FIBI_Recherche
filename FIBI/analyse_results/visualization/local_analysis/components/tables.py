@@ -1,16 +1,20 @@
 from FIBI.analyse_results.data_extractor.types import DfExtract
+from FIBI.analyse_results.visualization.local_analysis.components.generic import GenericComponent
 from FIBI.analyse_results.visualization.types import HTMLDataOut
 from FIBI.analyse_results.visualization.local_analysis.components.__init__ import *
 from FIBI.analyse_results.visualization.utils import default_fibi_order, dicos_fibi_diff
 
 class TableAttrFIBI:
-    def __init__(self, metric: str,name = ''):
+    def __init__(self, metric: str, observable: Optional[GenericComponent] = None, name = ''):
         self.metric = metric
         self.name = name
         self.type = 'stats_'+self.metric
+        self.observable = observable
 
     def __call__(self, keys: dict, dfs: List[DfExtract]) -> HTMLDataOut:
         dico_stats = {k:pd.Series(v).describe().to_dict() for k, v in dicos_fibi_diff(dfs,self.metric).items()}
+        if self.observable is not None:
+            self.observable.on_table_ready(keys, self.metric, dico_stats)
         s = bs4.BeautifulSoup('<div><div/>', features="html.parser")
         t = HTMLTable(s)
         t.new_line()

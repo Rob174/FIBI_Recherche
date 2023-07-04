@@ -8,30 +8,31 @@ from FIBI.analyse_results.visualization.local_analysis.components.register_seeds
 from FIBI.analyse_results.visualization.local_analysis.components.tables import TableAttrFIBI
 from FIBI.analyse_results.visualization.local_analysis.components.test_viewer import TestViewer
 from FIBI.analyse_results.visualization.statistical_tests import AbstractStatisticMaker
+from FIBI.analyse_results.visualization.local_analysis.components.generic import GenericComponent
 
 
-def analyse_attr(attr: str, folder_out: Path) -> List:
+def analyse_attr(attr: str, folder_out: Path, observable: Optional[GenericComponent] = None) -> List:
     folder_script = str(Path('../../../').as_posix()+ '/'+ 'scripts' +'/'+ 'show_hovertext.js')
     folder_script = "C:/Users/robin/Documents/Cours/Poly/Recherche/FIBI_Recherche/data/analysis_results/scripts/show_hovertext.js"
     return [
-        TableAttrFIBI(attr),
+        TableAttrFIBI(attr,observable=observable),
         HistoFIBI(attr),
         HistoFIBIDiff(attr, postscript_path=folder_script)
     ]
 
 class PageInstance(SingleInstanceVisualization):
     def __init__(self, folder_out: Path, fixed_attrs: List[str], 
-                 query_to_path: DicoPathConverter, tests_used: Dict[str,AbstractStatisticMaker]):
+                 query_to_path: DicoPathConverter, tests_used: Dict[str,AbstractStatisticMaker], observable: Optional[GenericComponent] = None):
         self.components = [
             RegisterSeeds(),
-            *analyse_attr('num_iter',folder_out=folder_out),
-            *analyse_attr('num_iter_glob',folder_out=folder_out),
+            *analyse_attr('num_iter',folder_out=folder_out,observable=observable),
+            *analyse_attr('num_iter_glob',folder_out=folder_out,observable=observable),
             *analyse_attr('duration',folder_out=folder_out),
-            *analyse_attr('init_cost',folder_out=folder_out),
-            *analyse_attr('final_cost',folder_out=folder_out),
-            *analyse_attr('ratio',folder_out=folder_out),
+            *analyse_attr('init_cost',folder_out=folder_out,observable=observable),
+            *analyse_attr('final_cost',folder_out=folder_out,observable=observable),
+            *analyse_attr('ratio',folder_out=folder_out,observable=observable),
             QQPlot('ratio'),
-            TestViewer('ratio',**tests_used)
+            TestViewer('ratio',**tests_used,observable=observable)
         ]
         self.order = [c.type for c in (self.components)]
         super(PageInstance, self).__init__(fixed_attrs,['FI_BI'])

@@ -5,6 +5,7 @@ from FIBI.analyse_results.visualization.global_analysis.components.stat_tests im
 from FIBI.analyse_results.visualization.global_analysis.page_multiinstances import (
     Aggregator,
 )
+from FIBI.analyse_results.visualization.local_analysis.components.generic import AbstractComponentObserver, GenericComponent
 from FIBI.analyse_results.visualization.utils import default_fibi_order, dicos_fibi_diff
 from FIBI.analyse_results.visualization.statistical_tests import AbstractStatisticMaker, SignTest, ZTest, WilcoxonTest, TTest
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import (
@@ -13,9 +14,10 @@ from FIBI.analyse_results.visualization.global_analysis.components.init_distr_sh
 from FIBI.analyse_results.visualization.global_analysis.pie_chart import get_case
 
 class CasesCol(Aggregator):
-    def __init__(self, avg_ratio: AverageFIBIDiffTgt, pvalue_es: PValueEffectSize):
+    def __init__(self, avg_ratio: AverageFIBIDiffTgt, pvalue_es: PValueEffectSize, observable: Optional[GenericComponent] = None):
         self.avg_ratio = avg_ratio
         self.pvalue_es = pvalue_es
+        self.observable = observable
 
     def aggregate(
         self, keys: dict, dfs: List[DfExtract]
@@ -34,6 +36,8 @@ class CasesCol(Aggregator):
             "signif": pvalue,
             "es": es
         }) 
+        if self.observable is not None:
+            self.observable.on_case_found(keys, case_letter)
         return [
             {
                 "type": "case",

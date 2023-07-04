@@ -1,4 +1,5 @@
 from FIBI.analyse_results.data_extractor.types import DfExtract
+from FIBI.analyse_results.visualization.local_analysis.components.generic import GenericComponent
 from FIBI.analyse_results.visualization.types import HTMLDataOut
 from FIBI.analyse_results.visualization.local_analysis.components.__init__ import *
 from FIBI.analyse_results.visualization.statistical_tests import (
@@ -9,12 +10,13 @@ from FIBI.analyse_results.utils.stats import check_in_inter, qqplot
 
 
 class TestViewer:
-    def __init__(self, metric: str, test_gauss: AbstractStatisticMaker, test_nongauss: AbstractStatisticMaker, name=""):
+    def __init__(self, metric: str, test_gauss: AbstractStatisticMaker, test_nongauss: AbstractStatisticMaker, observable: Optional[GenericComponent] = None, name=""):
         self.metric = metric
         self.name = name
         self.type = "qqplot_" + self.metric
         self.test_gauss = test_gauss
         self.test_nongauss = test_nongauss
+        self.observable = observable
 
     def __call__(self, keys: dict, dfs: List[DfExtract]) -> HTMLDataOut:
         dico_fibi = dicos_fibi_diff(dfs, self.metric, diff=True)
@@ -22,6 +24,8 @@ class TestViewer:
         try:
             theor, fit_val, observed, upper, lower = qqplot(diff)  # type: ignore
             init = check_in_inter(theor, observed, upper, lower)
+            if self.observable is not None:
+                self.observable.on_distribution_found(keys,init)
         except Exception as e:
             init = "ng"
         if init in ["ng"]:
@@ -33,8 +37,10 @@ class TestViewer:
         else:
             raise ValueError("Unknown initialization: %s" % init)
         s = bs4.BeautifulSoup("<div><div/>", features="html.parser")
-        for test, name in zip([first_test, second_test], ["used", "not used"]):
+        for i,(test, name) in enumerate(zip([first_test, second_test], ["used", "not used"])):
             test_res = test(diff)
+            if self.observable is not None:
+                self.observable.on_statistical_test_ready(keys, test.name, test_res, i==0)
             title = s.new_tag("h3")
             title.string = f"Test {name}: " + test.name
             s.append(title)
