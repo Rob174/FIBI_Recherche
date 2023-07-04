@@ -77,6 +77,7 @@ class PageMultiInstance(MultiInstanceVisualization):
             for e in l:
                 txt = e['content']
                 classes = []
+                link = '../stats/'+self.query_to_path.to_path(e['content']['query'])+'.html' if e['type_elem'] in ['data'] and e['content'] is not None else None
                 if e['type_elem'] != 'data' and isinstance(e['content'],dict):
                     txt = str(list(txt.values())[0])
                     if 'classes' in e['content']:
@@ -91,6 +92,9 @@ class PageMultiInstance(MultiInstanceVisualization):
                             classes.extend(e['content']['classes'])
                         if e['content']['type'] == 'init_shape':
                             txt = ''
+                        elif e['content']['type'] == 'instance':
+                            link = e['content']['data']
+                            txt = 'view'
                         else:
                             txt = str(e['content']['data'])
                 else:
@@ -98,11 +102,12 @@ class PageMultiInstance(MultiInstanceVisualization):
                 classes = [e['type_elem'],*classes ]
                 if e['first_child'] == 'true':
                     classes.append("first_child")
+                
                 html_t.cell(txt,
                             cell_type='th' if 'header' in e['type_elem'] else 'td',
                             colspan=e['width'],
                             rowspan=e['height'],
-                            link='../stats/'+self.query_to_path.to_path(e['content']['query'])+'.html' if e['type_elem'] in ['data'] and e['content'] is not None else None,
+                            link=link,
                             classes=classes)
         html_t.new_line()
         s.append(html_t.out())

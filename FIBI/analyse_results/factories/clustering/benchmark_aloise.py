@@ -33,6 +33,8 @@ def get_clustering_benchmark_aloise_visualizations(
         additional_modifiers=additionnal_modifiers,
         additionnal_filters=additionnal_filters
     )
+    path_instance = out_folder / "instances"
+    path_instance.mkdir(exist_ok=True,parents=True)
     run_data_extractor(
         dataset_name=mapping_datasets[dataset], 
         problem=problem,
@@ -40,5 +42,11 @@ def get_clustering_benchmark_aloise_visualizations(
         fixed_attr=fixed_attr,
         Ldata=Ldata,
         test_group=test_group,
-        clust_col=False
+        clust_col=False,
+        instance_saver=(
+            Path("data") / "algorithms_in" / "aloise_benchmark",
+            path_instance,
+            open_clustering,
+            visualize_scatter
+        )
     )

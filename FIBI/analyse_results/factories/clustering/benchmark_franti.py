@@ -28,11 +28,19 @@ def get_clustering_franti_visualizations(
         dataset=dataset,
         additional_modifiers=additionnal_modifiers
     )
+    path_instance = out_folder / "instances"
+    path_instance.mkdir(exist_ok=True,parents=True)
     run_data_extractor(
         dataset_name=mapping_datasets[dataset], 
         problem=problem,
         out_folder=out_folder,
         fixed_attr=fixed_attr,
         Ldata=Ldata,
-        test_group=test_group
+        test_group=test_group,
+        instance_saver=(
+            Path("data") / "algorithms_in" / "aloise_benchmark",
+            path_instance,
+            open_clustering,
+            visualize_scatter
+        )
     )

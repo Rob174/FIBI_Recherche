@@ -3,7 +3,7 @@ from FIBI.analyse_results.visualization.global_analysis.components.averages impo
     MinimizationTgtDiff,
 )
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import (
-    TestUsed
+    TestUsed,
 )
 from FIBI.analyse_results.visualization.global_analysis.pie_chart import (
     PieChart,
@@ -20,9 +20,16 @@ from FIBI.analyse_results.visualization.statistical_tests import (
 from FIBI.analyse_results.visualization.global_analysis.components.CasesCol import (
     CasesCol,
 )
+from FIBI.analyse_results.visualization.global_analysis.components.instance import (
+    Instance,
+)
+from FIBI.analyse_results.visualization.local_analysis.components.generic import (
+    CaseExplainer,
+    GenericComponent,
+)
 
 
-def get_common_modifiers(mapping_dataset: Dict[int, str]):
+def get_common_modifiers(mapping_dataset: Dict[int, str], problem: str):
     mapping_impr = {
         0: "RAND",
         1: "GREEDY randomized",
@@ -32,6 +39,7 @@ def get_common_modifiers(mapping_dataset: Dict[int, str]):
         5: "GREEDY TOP5",
     }
     return [
+        ConstantField(name="PROBLEM", value=problem),
         ModifierIntMapping(
             name="IMPR",
             mapping=mapping_impr,
@@ -55,12 +63,13 @@ def get_common_modifiers(mapping_dataset: Dict[int, str]):
         ),
         ModifierOperation(
             dst_name="ratio",
-            operation=lambda d: np.round(d["final_cost"] / d["init_cost"],decimals=5)
+            operation=lambda d: np.round(d["final_cost"] / d["init_cost"], decimals=5),
         ),
     ]
 
 
 def run_parser(
+    problem: str,
     pathes_data: List[Path],
     mapping_datasets: Dict[int, str],
     dataset: int,
@@ -74,7 +83,7 @@ def run_parser(
         pathes_data,
         modifiers=[
             *additional_modifiers,
-            *get_common_modifiers(mapping_datasets),
+            *get_common_modifiers(mapping_datasets, problem),
         ],  # type: ignore
         filters=[
             *additionnal_filters,
@@ -94,7 +103,8 @@ def run_data_extractor(
     Ldata: List[dict],
     minimization: Optional[bool] = True,
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
-    clust_col: bool = False
+    clust_col: bool = False,
+    instance_saver: Optional[Tuple[Path,Path,Callable[[Path,int],Any],Callable[[Any],None]]] = None
 ):
     metric_latex = lambda m: "$$\\frac{" + m + "}{initCost}$$"
     if test_group == "signtest_ztest":
@@ -130,14 +140,20 @@ def run_data_extractor(
         tgt_vals=MinimizationTgtDiff,
     )
     pvalue_es = PValueEffectSize("ratio", **tests)
+    explainer_out = out_folder / "explainer"
+    explainer_out.mkdir(exist_ok=True, parents=True)
+    explainer = CaseExplainer(path_out=explainer_out)
+    observable = GenericComponent([explainer])
     aggregators = [
         AverageFIBI(metric="final_cost", name=lambda m: "$$" + m + "$$"),
         AverageFIBI(metric="ratio", name=metric_latex),
         avg_tgt,
         TestUsed(metric="ratio", **tests),
         pvalue_es,
-        CasesCol(avg_tgt, pvalue_es),
+        CasesCol(avg_tgt, pvalue_es,observable),
     ]
+    if instance_saver is not None:
+        aggregators.append(Instance(*instance_saver))
     rows = []
     for a in fixed_attr:
         if a != "NUM_CLUST" or (a == "NUM_CLUST" and not clust_col):
@@ -186,11 +202,13 @@ def run_data_extractor(
             fixed_attrs=fixed_attr,
             query_to_path=query_to_path,
             tests_used=tests,
+            observable=observable,
         ),
     ]
     assert len(Ldata) > 0, "Expecting len(Ldata) > 0"
     DataExtractor(visualizations=visualizations)(Ldata)
     query_to_path.save()
+    explainer.explain(["PROBLEM", "DATASET"])
 
 
 def mapping_tsp_datasets():
@@ -202,9 +220,9 @@ def mapping_clustering_datasets():
         0: "Uniformly distr. points",
         1: "Franti benchmark",
         2: "Aloise benchmark",
-        3: "Normaly distributed points",
+        3: "Normaly distr. points",
     }
 
 
 def mapping_maxsat_datasets():
-    return {0: "random", 1: "MAXSAT evaluation benchmark 2021"}
+    return {0: "random", 1: "Evaluation benchmark 2021"}
