@@ -39,7 +39,7 @@ void test_TSPSolutionContainer_compute_quality_metric_1() {
 	for (int i = 0; i < num_towns; i++) {
 		tour.push_back(i);
 	}
-	TSPSolutionContainer c(tour, m);
+	TSPSolutionContainer c(tour, m, TwoOptFlip(m));
 	const double quality = c.compute_quality_metric();
 	// Check that the compute_quality_metric gives the same result if we shift the tour
 	for (int shift = 0; shift < num_towns; shift++) {
@@ -81,7 +81,7 @@ void test_TSPSolutionContainer_compute_quality_metric_2() {
 		tour.push_back(i);
 	}
 	// The distance expected is the difference between the first and last x coordinates times 2
-	TSPSolutionContainer c(tour, m);
+	TSPSolutionContainer c(tour, m, TwoOptFlip(m));
 	const double quality = c.compute_quality_metric();
 	if ((quality - (x_coords.back() - x_coords.front()) * 2) >= EPSILON) {
 		throw runtime_error("The quality metric is not correct for a toy example: expected " + to_string((x_coords.back() - x_coords.front()) * 2) + " but got " + to_string(quality));
@@ -128,7 +128,7 @@ void test_TSPSolutionContainer_test_flip() {
 		tour.push_back(i);
 	}
 	// The distance expected is the difference between the first and last x coordinates times 2
-	TSPSolutionContainer c(tour, m);
+	TSPSolutionContainer c(tour, m, TwoOptFlip(m));
 	const double quality = c.compute_quality_metric();
 	TSPSwap s(1, num_towns - 2);
 	const double delta = c.test_flip(s);
@@ -193,7 +193,7 @@ void test_TSPSolutionContainer_flip() {
 		tour.push_back(i);
 	}
 	// The distance expected is the difference between the first and last x coordinates times 2
-	TSPSolutionContainer c(tour, m);
+	TSPSolutionContainer c(tour, m, TwoOptFlip(m));
 	const double quality = c.compute_quality_metric();
 	TSPSwap s(1, num_towns - 2);
 	const double delta = c.test_flip(s);

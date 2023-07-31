@@ -7,6 +7,7 @@
 #include <vector>
 #include "../../types.h"
 #include "../../utils.h"
+#include <queue>
 
 using namespace std;
 
@@ -24,9 +25,13 @@ struct best_assignement
 	bool found;
 };
 
-void assign_variable(const best_assignement &b, stats &former_stats, vector<bool> *assignement)
+class AbstractContainerMAXSAT
 {
-}
+public:
+	virtual void insert(best_assignement &element) = 0;
+	virtual void reset() = 0;
+	virtual best_assignement choose() = 0;
+};
 /** @brief A simple randomized 3/4 approximation algorithm for MAXSAT
  *   Taken from paper Bounds on Greedy Algorithms for MAX SAT https://link.springer.com/content/pdf/10.1007/978-3-642-23719-5.pdf
  *   with explanations of https://diglib.tugraz.at/download.php?id=5b6d299d67215&location=browse
@@ -38,7 +43,7 @@ void assign_variable(const best_assignement &b, stats &former_stats, vector<bool
  * * @param seed: seed for random number generator
  * * @return vector of bools representing the assignments for the variables
  */
-vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var_in_clauses, const vector<clause_t> &clauses, const vector<double> &weights, const unsigned int num_variables, const unsigned int seed)
+vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var_in_clauses, const vector<clause_t> &clauses, const vector<double> &weights, const unsigned int num_variables, const unsigned int seed, AbstractContainerMAXSAT &container)
 {
 	vector<bool> *assignement = new vector<bool>(num_variables, false);
 	mt19937 gen{seed};
@@ -80,6 +85,7 @@ vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var
 			0,
 			false,
 			false};
+		container.reset();
 		for (var_id_t var_id : cpy_undecided_variables)
 		{
 			// ti: if we set xi to true, all clauses with only one variable left
@@ -122,6 +128,7 @@ vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var
 				b.variable = var_id;
 				b.assignement = true;
 				b.found = true;
+				container.insert(b);
 			}
 			if (fi > b.increase_bound)
 			{
@@ -129,6 +136,7 @@ vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var
 				b.variable = var_id;
 				b.assignement = false;
 				b.found = true;
+				container.insert(b);
 			}
 		}
 		if (!b.found)
@@ -136,7 +144,7 @@ vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var
 			// If no improvement found choose a random variable
 			std::uniform_int_distribution<> dis_var(0, undecided_variables.size() - 1);
 			auto it = undecided_variables.begin();
-    		std::advance(it, dis_var(gen));
+			std::advance(it, dis_var(gen));
 			b.variable = *it;
 			// And a random assignement
 			std::uniform_int_distribution<> dis_affect(0, 1);
@@ -158,6 +166,10 @@ vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var
 			}
 			currStats.B = cmptB(currStats);
 			b.increase_bound = currStats.B - formerStats.B;
+		}
+		else
+		{
+			b = container.choose();
 		}
 		// Remove the variable from the ones to decide
 		undecided_variables.erase(b.variable);
@@ -189,3 +201,113 @@ vector<bool> *improve_maxsat(const map<const var_id_t, vector<clause_id_t>> &var
 
 	return assignement;
 }
+
+// Define a comparison function for the priority queue
+struct Compare
+{
+	bool operator()(const best_assignement &e1, const best_assignement &e2)
+	{
+		return e1.increase_bound < e2.increase_bound; // Min heap (smallest priority at top)
+	}
+};
+class GREEDYContainer : public AbstractContainerMAXSAT
+{
+private:
+	best_assignement container;
+
+public:
+	GREEDYContainer() : AbstractContainerMAXSAT(){};
+
+	void insert(best_assignement &element) override
+	{
+		if (element.increase_bound > container.increase_bound)
+		{
+			container = element;
+		}
+	};
+	void reset() override
+	{
+		container = {
+			-1e16,
+			0,
+			false,
+			false};
+	}
+	best_assignement choose() override
+	{
+		return container;
+	};
+};
+template <int k>
+class TOPKContainer : public AbstractContainerMAXSAT
+{
+private:
+	priority_queue<best_assignement, vector<best_assignement>, Compare> pq;
+	mt19937 gen;
+
+public:
+	TOPKContainer(const int seed) : gen(seed), AbstractContainerMAXSAT(){};
+
+	void insert(best_assignement &element) override
+	{
+		best_assignement copy(element);
+		pq.push(copy);
+		if (pq.size() > k)
+		{
+			pq.pop();
+		}
+	};
+	void reset()
+	{
+		pq = priority_queue<best_assignement, vector<best_assignement>, Compare>();
+	}
+	best_assignement choose() override
+	{
+		vector<best_assignement> data;
+		while (!pq.empty())
+		{
+			data.push_back(pq.top());
+			pq.pop();
+		}
+		std::uniform_int_distribution<> dis_top(0, data.size() - 1);
+		auto it = data.begin();
+		std::advance(it, dis_top(gen));
+		return *it;
+	};
+};
+class RandomizedContainer : public AbstractContainerMAXSAT
+{
+private:
+	vector<best_assignement> container;
+	mt19937 gen;
+
+public:
+	RandomizedContainer(const int seed) : gen(seed), AbstractContainerMAXSAT(){};
+
+	void insert(best_assignement &element) override
+	{
+		best_assignement copy(element);
+		container.push_back(copy);
+	}
+	void reset()
+	{
+		container.clear();
+	}
+	best_assignement choose() override
+	{
+		// Create the probabilities
+		vector<double> probabilities;
+		double sum = 0;
+		for (const auto &e : container)
+		{
+			sum += e.increase_bound;
+		}
+		for (const auto &e : container)
+		{
+			probabilities.push_back(e.increase_bound / sum);
+		}
+		// Create a random index choice with randdom distribution following probabilities
+		std::discrete_distribution<> dist(probabilities.begin(), probabilities.end());
+		return container.at(dist(gen));
+	}
+};

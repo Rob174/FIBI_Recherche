@@ -18,7 +18,7 @@
 #include "../data/constants/maxsat.hpp"
 #include "../utils.h"
 
-using tsp_obs_t = AlgorithmObserver<TSPSwap, TSPSolutionContainer<>>;
+using tsp_obs_t = AlgorithmObserver<TSPSwap, TSPSolutionContainer>;
 using clustering_obs_t = AlgorithmObserver<ClusteringSwap, ClusteringSolutionContainer<>>;
 using maxsat_obs_t = AlgorithmObserver<MAXSATSwap, MAXSATSolutionContainer>;
 using namespace std;
@@ -26,7 +26,7 @@ using namespace std;
 // Types with templates
 
 struct tsp_ls_t {
-	using ls_t = LocalSearch<TSPSwap, TSPSolutionContainer<>,
+	using ls_t = LocalSearch<TSPSwap, TSPSolutionContainer,
 		TSPNeighbourhoodExplorer,
 		TSPConfig>;
 };
@@ -39,7 +39,7 @@ struct maxsat_ls_t {
 
 
 typename tsp_ls_t::ls_t* getTSPLocalSearch(vector < tsp_obs_t*>& obs, bool FI = false) {
-	AlgorithmObservable<TSPSwap, TSPSolutionContainer<>>* o = new AlgorithmObservable<TSPSwap, TSPSolutionContainer<>>(obs);
+	AlgorithmObservable<TSPSwap, TSPSolutionContainer>* o = new AlgorithmObservable<TSPSwap, TSPSolutionContainer>(obs);
 	return new (typename tsp_ls_t::ls_t)(new TSPNeighbourhoodExplorer(o, FI), o);
 };
 

@@ -121,7 +121,6 @@ vector<double> *read_file_txt_multiprocessing(const long instance, string folder
 		}
 		throw runtime_error("Unable to open file " + filename);
 	}
-	cout << "step11" << endl;
 	vector<double> *points = new vector<double>();
 	string elem;
 	// Each element is separated by a space
@@ -140,7 +139,6 @@ vector<double> *read_file_txt_multiprocessing(const long instance, string folder
 		cout << "step12" << endl;
 		throw runtime_error("Unable to read file " + filename + "\n" + e.what());
 	}
-	cout << "step13" << endl;
 	return points;
 }
 #endif

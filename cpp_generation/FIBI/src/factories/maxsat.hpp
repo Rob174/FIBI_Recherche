@@ -27,11 +27,7 @@ public:
 			weights_ptr = random_weights(cf.NUM_CLAUSES.get(), cf.SEED_PROBLEM.get());
 		}
 		else if (cf.DATASET.get() == 1) {
-#if HDF5save
-			dataset_name = "maxsat_benchmark.hdf5";
-#else
 			dataset_name = "maxsat_benchmark/";
-#endif
 			unique_ptr<const vector<double>> data(open_maxsat_benchmark(cf.SEED_PROBLEM.get(), root_data + dataset_name));
 			auto [clauses_ptr_tmp, weights_ptr_tmp, n_vars] = parse_maxsat(*data);
 			cf.NUM_VARIABLES.set(n_vars);
@@ -49,11 +45,24 @@ public:
 		unique_ptr<const vector<double>> weights(weights_ptr);
 		unique_ptr< const map<const var_id_t, vector<clause_id_t>>> var_to_clauses(get_var_to_clauses(*clauses));
 
-		if (cf.IMPR.get() == 1)
+		if (cf.IMPR.get() >= 1)
 		{
 			/* Slack improvement algorithm for MAXSAT */
 			// Override the assignements with the improved ones
-			assignements.reset(improve_maxsat(*var_to_clauses, *clauses, *weights, cf.NUM_VARIABLES.get(), cf.SEED_ASSIGN.get()));
+			AbstractContainerMAXSAT *c;
+			if(cf.IMPR.get() == 2) {
+				c = new GREEDYContainer(); 
+			} else if(cf.IMPR.get() == 3) {
+				c = new TOPKContainer<3>(cf.SEED_ASSIGN.get());
+			} else if(cf.IMPR.get() == 4) {
+				c = new TOPKContainer<4>(cf.SEED_ASSIGN.get());
+			} else if(cf.IMPR.get() == 5) {
+				c = new TOPKContainer<5>(cf.SEED_ASSIGN.get());
+			} else if(cf.IMPR.get() == 1) {
+				c = new RandomizedContainer(cf.SEED_ASSIGN.get());
+			}
+			assignements.reset(improve_maxsat(*var_to_clauses, *clauses, *weights, cf.NUM_VARIABLES.get(), cf.SEED_ASSIGN.get(),*c));
+			delete c;
 		}
 		else if (cf.IMPR.get() > 1) {
 			cout << "Invalid IMPR argument, Valid values are 0->1" << endl;

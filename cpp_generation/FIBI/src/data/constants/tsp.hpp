@@ -12,7 +12,8 @@ public:
 		FI_BI,
 		IMPR,
 		NUM_TOWNS,
-		NUM_DIM;
+		NUM_DIM,
+		OPT;
 
 public:
 	TSPConfig(map<string,long>* args)
@@ -25,6 +26,7 @@ public:
 		addCst(IMPR);
 		addCst(NUM_TOWNS);
 		addCst(NUM_DIM);
+		addCst(OPT);
 	}
 	vector<pair<string, double>> get_json() const override {
 		return vector<pair<string, double>>{
@@ -35,7 +37,8 @@ public:
 				jMk(FI_BI),
 				jMk(IMPR),
 				jMk(NUM_TOWNS),
-				jMk(NUM_DIM)
+				jMk(NUM_DIM),
+				jMk(OPT)
 		};
 	}
 	const int num_choices() const

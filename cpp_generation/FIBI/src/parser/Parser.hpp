@@ -134,7 +134,11 @@ public:
         }
         string command = command_7z + file_path + string(" -so > " + out_file);
         // Run the command
-        std::system(command.c_str());
+        if(std::system(command.c_str()) == -1)
+        {
+            cout << "Failed to extract " << file_path << endl;
+            return;
+        }
         // Parse what is inside the folder created
         ifstream file(out_file);
         if (!file.is_open())

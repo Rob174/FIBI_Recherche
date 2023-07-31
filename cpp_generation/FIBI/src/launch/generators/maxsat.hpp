@@ -82,7 +82,7 @@ void run_maxsat(Args arguments, const unique_ptr < set<int>>& missing) {
 		progress.print(i);
 		return;
 	};
-	// Dataset 1: Uniform
+	// Dataset 1: benchmark
 	i = 0;
 	if(arguments.dataset == 1) {
 		// Dataset 1: Maxsat evaluation benchmark 2021
@@ -97,7 +97,7 @@ void run_maxsat(Args arguments, const unique_ptr < set<int>>& missing) {
 		}
 	}
 	else {
-		cout << "Unknow dataset" << endl;
+		cout << "Unknow dataset " << arguments.dataset << endl;
 	}
 	return;
 }
@@ -105,7 +105,7 @@ void run_maxsat(Args arguments, const unique_ptr < set<int>>& missing) {
 void run_maxsat_full(Args arguments, const unique_ptr < set<int>>& missing) {
 	if (arguments.dataset != -1 && arguments.impr == -1) {
 		cout << "DATASET per DATASET" << endl;
-		for (int impr = 0; impr < 2; impr++) {
+		for (int impr = 0; impr < 6; impr++) {
 			arguments.set_impr(impr);
 			run_maxsat<-1>(arguments, missing);
 		}
@@ -113,7 +113,7 @@ void run_maxsat_full(Args arguments, const unique_ptr < set<int>>& missing) {
 	else {
 		cout << "Full possibility" << endl;
 		for (int dataset = 1; dataset < 2; dataset++) {
-			for (int impr = 0; impr < 2; impr++) {
+			for (int impr = 0; impr < 6; impr++) {
 				arguments.set_dataset(dataset);
 				arguments.set_impr(impr);
 				run_maxsat<-1>(arguments, missing);

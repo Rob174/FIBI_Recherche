@@ -10,10 +10,10 @@
 class TSPNeighbourhoodExplorer
 {
 private:
-	AlgorithmObservable<TSPSwap, TSPSolutionContainer<>>* o;
+	AlgorithmObservable<TSPSwap, TSPSolutionContainer>* o;
 	bool FI;
 public:
-	TSPNeighbourhoodExplorer(AlgorithmObservable<TSPSwap, TSPSolutionContainer<>>* o, bool FI = false) : o(o), FI(FI) {
+	TSPNeighbourhoodExplorer(AlgorithmObservable<TSPSwap, TSPSolutionContainer>* o, bool FI = false) : o(o), FI(FI) {
 
 	};
 
@@ -40,7 +40,7 @@ public:
 	# done with https://arthursonzogni.com/Diagon/#Math
 	*
 	*/
-	bool explore_flips(TSPSolutionContainer<>& co, const TSPConfig& cf) const
+	bool explore_flips(TSPSolutionContainer& co, const TSPConfig& cf) const
 	{
 		double delta = 0;
 		TSPSwap chosen_swap;
@@ -49,7 +49,7 @@ public:
 			int n_prime = i == 0 ? cf.num_choices() - 2 : cf.num_choices() - 1;
 			for (town_in_tour_id_t j = i + 2; j <= n_prime; j++)
 			{
-				TSPSwap tmp_swap(co.cycle_id(i), co.cycle_id(j));
+				TSPSwap tmp_swap(cycle_id(i,co.tour), cycle_id(j,co.tour));
 				double delta_ij = co.test_flip(tmp_swap);
 				o->on_test_end(co, delta_ij, tmp_swap);
 				if (delta_ij < -EPSILON && delta_ij < delta)
@@ -76,4 +76,69 @@ public:
 		o->on_iter_end(co, chosen_swap);
 		return false;
 	}
+};
+
+
+class TSP3OptNeighbourhoodExplorer
+{
+private:
+	AlgorithmObservable<TSPSwap, TSPSolutionContainer>* o;
+	bool FI;
+public:
+	TSP3OptNeighbourhoodExplorer(AlgorithmObservable<TSPSwap, TSPSolutionContainer>* o, bool FI = false) : o(o), FI(FI) {
+
+	};
+
+	~TSP3OptNeighbourhoodExplorer()
+	{
+		delete o;
+	}
+	/** @brief {Explore all possible flips and choose the best one (first clustering with improving cost if @tparam FI = true, best solution otherwise).}
+	* * Important note: all moves are not equal to all combinations of edges:
+	* * Applying the 3-opt heuristic
+	*/
+	bool explore_flips(TSPSolutionContainer& co, const TSPConfig& cf) const
+	{
+        double delta = 0;
+        TSPSwap chosen_swap(0, 0, 0);
+
+        for (town_in_tour_id_t i = 0; i <= cf.num_choices() - 3; i++)
+        {
+            int n_prime = i == 0 ? cf.num_choices() - 2 : cf.num_choices() - 1;
+
+            for (town_in_tour_id_t j = i + 2; j <= n_prime; j++)
+            {
+                for (town_in_tour_id_t k = j + 2; k <= cf.num_choices(); k++)
+                {
+                    // Perform 3-opt swap: (i, i+1) -> (j, j+1) -> (k, k+1)
+                    TSPSwap tmp_swap(i, j, k);
+                    double delta_3opt = co.test_flip(tmp_swap);
+                    o->on_test_end(co, delta_3opt, tmp_swap);
+
+                    if (delta_3opt < -EPSILON && delta_3opt < delta)
+                    {
+                        delta = delta_3opt;
+                        chosen_swap = tmp_swap;
+                        o->on_glob_iter_end(co, delta, tmp_swap);
+                        if (FI)
+                        {
+                            co.flip(chosen_swap, delta);
+                            o->on_iter_end(co, chosen_swap);
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (abs(delta) < EPSILON)
+        {
+            o->on_iter_end(co, chosen_swap);
+            return true;
+        }
+
+        co.flip(chosen_swap, delta);
+        o->on_iter_end(co, chosen_swap);
+        return false;
+    }
 };

@@ -10,20 +10,21 @@
 
 using namespace std;
 
-class TSPFactory : public AbstractFactory<TSPConfig> {
+class TSPFactory : public AbstractFactory<TSPConfig>
+{
 public:
-	vector<pair<string, double>>* run(TSPConfig& cf, string root_data = "./") override
+	vector<pair<string, double>> *run(TSPConfig &cf, string root_data = "./") override
 	{
 		// setup
-		const vector<double>* towns_pos_ptr;
+		const vector<double> *towns_pos_ptr;
 		string dataset_name;
 		switch (cf.DATASET.get())
 		{
 		case 0:
 			/* Uniformly distrbuted points */
 			towns_pos_ptr = uniform_points(cf.NUM_TOWNS.get(),
-				cf.NUM_DIM.get(),
-				cf.SEED_PROBLEM.get());
+										   cf.NUM_DIM.get(),
+										   cf.SEED_PROBLEM.get());
 			break;
 		case 1:
 #if HDF5save
@@ -40,7 +41,7 @@ public:
 		}
 		unique_ptr<const vector<double>> towns_pos(towns_pos_ptr);
 		DistanceMatrix m(cf.NUM_TOWNS.get(), cf.NUM_DIM.get(), *towns_pos);
-		vector<int>* tour_ptr;
+		vector<int> *tour_ptr;
 		switch (cf.IMPR.get())
 		{
 		case 0:
@@ -73,15 +74,25 @@ public:
 			break;
 		}
 		unique_ptr<vector<int>> tour(tour_ptr);
-		TSPSolutionContainer<> co(*tour, m);
-		Metrics<TSPSwap, TSPSolutionContainer<>> metrics;
+		OptFlip *flipOp;
+		if (cf.OPT.get() == 2)
+		{
+			flipOp = new TwoOptFlip<>(m);
+		}
+		if (cf.OPT.get() == 3)
+		{
+			flipOp = new ThreeOptFlip<>(m);
+		}
+		TSPSolutionContainer co(*tour, m, *flipOp);
+		Metrics<TSPSwap, TSPSolutionContainer> metrics;
+
 		// algorithms execution
-		vector<tsp_obs_t* > obs;
+		vector<tsp_obs_t *> obs;
 		obs.push_back(&metrics);
-		unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs,(bool)cf.FI_BI.get()));
+		unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs, (bool)cf.FI_BI.get()));
 		ls->run(co, cf);
 		// writing the results
-		vector<pair<string, double>>* res = get_results<TSPSwap, TSPSolutionContainer<>>(&metrics, &cf);
+		vector<pair<string, double>> *res = get_results<TSPSwap, TSPSolutionContainer>(&metrics, &cf);
 		return res;
 	}
 };
