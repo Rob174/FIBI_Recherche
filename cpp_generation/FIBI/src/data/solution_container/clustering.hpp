@@ -42,7 +42,7 @@ public:
 	ClusteringSolutionContainer(ClusteringSolutionContainer& other) : AbstractSolutionContainer(other), p_c(other.p_c), c_a(other.c_a), n_p_p_c(other.n_p_p_c), c_c(other.c_c), conf(other.conf) {}
 
 	// Flips
-	quality_delta_t test_flip(const ClusteringSwap& test_swap) const {
+	quality_delta_t test_flip(ClusteringSwap& test_swap) const {
 		// f: source cluster
 		// t: destination cluster
 		const int n_f = n_p_p_c[test_swap.cluster_src];

@@ -102,7 +102,7 @@ public:
 		delete[] sat_clauses;
 	}
 	// Flips
-	[[nodiscard]] quality_delta_t test_flip(const MAXSATSwap& test_swap) const {
+	quality_delta_t test_flip(MAXSATSwap& test_swap) const {
 		double objective_cost_delta = 0;
 		if (var_in_clauses.find(test_swap.var_id) == var_in_clauses.end())
 		{

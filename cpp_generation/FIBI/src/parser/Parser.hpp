@@ -123,14 +123,14 @@ public:
             return;
         }
         string out_file = "in.wcnf";
-        // Extract the archive
+        // Extract the archive   
         string file_path = filesystem::absolute(file_name).string();
 
         size_t pos = file_path.find('/');
         while (pos != std::string::npos)
-        {
-            file_path.replace(pos, 1, "--");
-            pos = file_path.find('/', pos + 2);
+        { 
+            file_path.replace(pos, 1, "--"); 
+            pos = file_path.find('/', pos + 2); 
         }
         string command = command_7z + file_path + string(" -so > " + out_file);
         // Run the command

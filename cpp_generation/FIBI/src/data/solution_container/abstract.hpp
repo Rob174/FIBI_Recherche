@@ -31,7 +31,7 @@ public:
 		this->quality_metric = this->compute_quality_metric();
 	};
 	// Flips
-	virtual quality_delta_t test_flip(const T_Swap &test_swap) const = 0;
+	virtual quality_delta_t test_flip(T_Swap &test_swap) const = 0;
 	virtual void flip(const T_Swap &swap, const quality_delta_t delta) = 0;
 	// Objective
 	[[nodiscard]] quality_t get_quality_metric() const noexcept

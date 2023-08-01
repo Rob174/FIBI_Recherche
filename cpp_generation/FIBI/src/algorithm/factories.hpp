@@ -38,9 +38,15 @@ struct maxsat_ls_t {
 };
 
 
-typename tsp_ls_t::ls_t* getTSPLocalSearch(vector < tsp_obs_t*>& obs, bool FI = false) {
+typename tsp_ls_t::ls_t* getTSPLocalSearch(vector < tsp_obs_t*>& obs, bool FI = false, const int opt = 2) {
 	AlgorithmObservable<TSPSwap, TSPSolutionContainer>* o = new AlgorithmObservable<TSPSwap, TSPSolutionContainer>(obs);
-	return new (typename tsp_ls_t::ls_t)(new TSPNeighbourhoodExplorer(o, FI), o);
+	if(opt == 2) {
+		return new (typename tsp_ls_t::ls_t)(new TSPNeighbourhoodExplorer(o, FI), o);
+	}
+	else if(opt == 3) {
+		return new (typename tsp_ls_t::ls_t)(new TSP3OptNeighbourhoodExplorer(o, FI), o);
+	}
+	else throw runtime_error("Invalid TSP local search option");
 };
 
 typename clust_ls_t::ls_t* getClusteringLocalSearch(vector < clustering_obs_t*>& obs, bool FI = false) {

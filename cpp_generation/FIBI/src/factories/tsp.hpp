@@ -89,7 +89,7 @@ public:
 		// algorithms execution
 		vector<tsp_obs_t *> obs;
 		obs.push_back(&metrics);
-		unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs, (bool)cf.FI_BI.get()));
+		unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs, (bool)cf.FI_BI.get(), cf.OPT.get()));
 		ls->run(co, cf);
 		// writing the results
 		vector<pair<string, double>> *res = get_results<TSPSwap, TSPSolutionContainer>(&metrics, &cf);

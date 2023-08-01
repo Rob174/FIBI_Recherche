@@ -34,15 +34,16 @@ public:
     int start_seed;
     int end_seed;
     int num_rep;
+    int opt;
 
     Args(optional<string> problem = nullopt, optional<string> fileout = nullopt, optional<string> root_data = nullopt, 
         optional<int> num_threads = nullopt, optional<int> merge_size = nullopt, optional<int> start_seed = nullopt, 
         optional<int> end_seed = nullopt, optional<int> num_rep = nullopt, optional<int> dataset = nullopt, optional<int> impr = nullopt, 
-        optional<string> all = nullopt) :
+        optional<string> all = nullopt, optional<int> opt = nullopt) :
         problem(problem.value_or("tsp")), fileout(fileout.value_or("./merged.txt")), 
         root_data(root_data.value_or("./data/folder/")), num_threads(num_threads.value_or(-1)), 
         merge_size(merge_size.value_or(100)), start_seed(start_seed.value_or(0)), end_seed(end_seed.value_or(-1)), 
-        num_rep(num_rep.value_or(1000)), dataset(dataset.value_or(-1)), impr(impr.value_or(-1)), all(all.value_or("")) {
+        num_rep(num_rep.value_or(1000)), dataset(dataset.value_or(-1)), impr(impr.value_or(-1)), all(all.value_or("")), opt(opt.value_or(2)) {
         // Check if fileout exists
         if (!std::filesystem::exists(this->fileout)) {
             cout << "Creating output file " << this->fileout << endl;
@@ -86,6 +87,10 @@ public:
         cout << "Setting IMPR " << value << endl;
         impr = value;
     }
+    void set_opt(const int value) {
+        cout << "Setting OPT " << value << endl;
+        opt = value;
+    }
 };
 template <typename T>
 constexpr std::optional<T> parseVar(const string& name, const int argc, char** argv) {
@@ -127,7 +132,8 @@ Args parseArguments(const int argc, char** argv) {
         parseVar<int>("num_rep", argc, argv),
         parseVar<int>("dataset", argc, argv),
         parseVar<int>("impr", argc, argv),
-        parseVar<string>("all", argc, argv)
+        parseVar<string>("all", argc, argv),
+        parseVar<int>("opt", argc, argv)
     );
     return args;
 }
