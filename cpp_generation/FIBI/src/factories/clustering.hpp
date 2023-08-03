@@ -101,15 +101,16 @@ public:
 		unique_ptr<vector<int>> assignements(assignements_ptr);
 		unique_ptr<vector<double>> centroids(centroids_ptr);
 		unique_ptr<vector<int>> npts_per_clust(npts_per_clust_ptr);
-		ClusteringSolutionContainer<> co(*points_pos, *assignements, cf);
-
-		Metrics<ClusteringSwap, ClusteringSolutionContainer<>> metrics;
-		// algorithms execution
-		vector<clustering_obs_t *> obs;
+		ClusteringSolutionContainer co(*points_pos, *assignements, cf);
+		Metrics<ClusteringSolutionContainer> metrics;
+		vector<AlgorithmObserver<ClusteringSolutionContainer> *> obs;
 		obs.push_back(&metrics);
-		unique_ptr<typename clust_ls_t::ls_t> ls(getClusteringLocalSearch(obs, (bool)cf.FI_BI.get()));
-		ls->run(co, cf);
-		vector<pair<string, double>> *res = get_results<ClusteringSwap, ClusteringSolutionContainer<>>(&metrics, &cf);
+		AlgorithmObservable<ClusteringSwap, ClusteringSolutionContainer>o(obs);
+		ClusteringNeighbourhoodExplorer n(o, (bool)cf.FI_BI.get()); 
+		FlipClustering f;
+		LocalSearch<ClusteringSwap,ClusteringSolutionContainer,ClusteringNeighbourhoodExplorer,ClusteringConfig,FlipClustering> ls(n, o);
+		ls.run(co,cf,f);
+		vector<pair<string, double>>* res = get_results<ClusteringSolutionContainer>(&metrics, &cf);
 		return res;
 	}
 };

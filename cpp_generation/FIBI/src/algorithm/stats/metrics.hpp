@@ -11,8 +11,8 @@
 using namespace std;
 using json = nlohmann::json;
 
-template <typename T_Swap, typename T_Container>
-class Metrics : public AlgorithmObserver<T_Swap, T_Container>
+template <typename T_Container>
+class Metrics : public AlgorithmObserver<T_Container>
 {
 public:
 	unsigned long num_iter;
@@ -23,24 +23,24 @@ public:
 	double duration;
 
 public:
-	void on_start(const T_Container& c, const optional<T_Swap>& s = nullopt) override {
+	void on_start(const T_Container& c, const optional<SwapChoice>& s = nullopt) override {
 		init_cost = c.get_quality_metric();
 		final_cost = this->init_cost;
 		num_iter = 0;
 		num_iter_glob = 0;
 		time_start = get_time();
 	};
-	void on_test_end(const T_Container& c, const optional<double>& delta = nullopt, const optional<T_Swap>& s = nullopt) override {
+	void on_test_end(const T_Container& c, const optional<double>& delta = nullopt, const optional<SwapChoice>& s = nullopt) override {
 		return;
 	};
-	void on_glob_iter_end(const T_Container& c, const optional<double>& delta = nullopt, const optional<T_Swap>& s = nullopt) override {
+	void on_glob_iter_end(const T_Container& c, const optional<double>& delta = nullopt, const optional<SwapChoice>& s = nullopt) override {
 		num_iter_glob++;
 	};
-	void on_iter_end(const T_Container& c, const optional<T_Swap>& s = nullopt) override {
+	void on_iter_end(const T_Container& c, const optional<SwapChoice>& s = nullopt) override {
 		num_iter++;
 		final_cost = c.get_quality_metric();
 	};
-	void on_end(const T_Container& c, const optional<T_Swap>& s = nullopt) override {
+	void on_end(const T_Container& c, const optional<SwapChoice>& s = nullopt) override {
 		final_cost = c.get_quality_metric();
 		duration = get_final_time();
 	};

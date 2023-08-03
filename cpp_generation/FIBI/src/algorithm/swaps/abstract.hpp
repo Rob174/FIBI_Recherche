@@ -1,9 +1,10 @@
 #pragma once
 #include <map>
+#include <string>
 using namespace std;
 class SwapChoice
 {
 public:
 	SwapChoice() {};
-	virtual map<string,long> get_dict() = 0;
+	virtual std::map<std::string,long> get_dict(){return {};};
 };

@@ -69,14 +69,15 @@ public:
 			throw invalid_argument("Invalid IMPR argument, Valid values are 0->1");
 		}
 		MAXSATSolutionContainer co(*weights, *assignements, *clauses);
-
-		Metrics<MAXSATSwap, MAXSATSolutionContainer> metrics;
-		// algorithms execution
-		vector<maxsat_obs_t* > obs;
+		Metrics<MAXSATSolutionContainer> metrics;
+		vector<AlgorithmObserver<MAXSATSolutionContainer> *> obs;
 		obs.push_back(&metrics);
-		unique_ptr<typename maxsat_ls_t::ls_t> ls(getMAXSATLocalSearch(obs, (bool)cf.FI_BI.get()));
-		ls->run(co, cf);
-		vector<pair<string, double>>* res = get_results<MAXSATSwap, MAXSATSolutionContainer>(&metrics, &cf);
+		AlgorithmObservable<MAXSATSwap, MAXSATSolutionContainer>o(obs);
+		MAXSATNeighbourhoodExplorer n(o, (bool)cf.FI_BI.get()); 
+		FlipMAXSAT f;
+		LocalSearch<MAXSATSwap,MAXSATSolutionContainer,MAXSATNeighbourhoodExplorer,MAXSATConfig,FlipMAXSAT> ls(n, o);
+		ls.run(co,cf,f);
+		vector<pair<string, double>>* res = get_results<MAXSATSolutionContainer>(&metrics, &cf);
 		return res;
 	}
 };

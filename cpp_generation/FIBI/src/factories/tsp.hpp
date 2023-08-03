@@ -74,25 +74,35 @@ public:
 			break;
 		}
 		unique_ptr<vector<int>> tour(tour_ptr);
-		OptFlip *flipOp;
-		if (cf.OPT.get() == 2)
-		{
-			flipOp = new TwoOptFlip<>(m);
-		}
-		if (cf.OPT.get() == 3)
-		{
-			flipOp = new ThreeOptFlip<>(m);
-		}
-		TSPSolutionContainer co(*tour, m, *flipOp);
-		Metrics<TSPSwap, TSPSolutionContainer> metrics;
-
-		// algorithms execution
-		vector<tsp_obs_t *> obs;
+		TSPSolutionContainer co(*tour, m);
+		Metrics<TSPSolutionContainer> metrics;
+		vector<AlgorithmObserver<TSPSolutionContainer> *> obs;
 		obs.push_back(&metrics);
-		unique_ptr<typename tsp_ls_t::ls_t> ls(getTSPLocalSearch(obs, (bool)cf.FI_BI.get(), cf.OPT.get()));
-		ls->run(co, cf);
+		if (cf.OPT.get() == 1) {
+			AlgorithmObservable<TSPInsertionSwap, TSPSolutionContainer>o(obs);
+			InsertionNeighbourhood n(o, (bool)cf.FI_BI.get()); 
+			FlipTSPInsertion f;
+			LocalSearch<TSPInsertionSwap,TSPSolutionContainer,InsertionNeighbourhood,TSPConfig,FlipTSPInsertion> ls(n, o);
+			ls.run(co,cf,f);
+		}
+		else if (cf.OPT.get() == 2)
+		{
+			AlgorithmObservable<TSPTwoOptSwap, TSPSolutionContainer>o(obs);
+			TwoOptNeighbourhood n(o, (bool)cf.FI_BI.get()); 
+			FlipTSPTwoOpt f;
+			LocalSearch<TSPTwoOptSwap,TSPSolutionContainer,TwoOptNeighbourhood,TSPConfig,FlipTSPTwoOpt> ls(n, o);
+			ls.run(co,cf,f);
+		}
+		else if (cf.OPT.get() == 3)
+		{
+			AlgorithmObservable<TSPThreeOptSwap, TSPSolutionContainer>o(obs);
+			ThreeOptNeighbourhood n(o, (bool)cf.FI_BI.get()); 
+			FlipTSPThreeOpt f;
+			LocalSearch<TSPThreeOptSwap,TSPSolutionContainer,ThreeOptNeighbourhood,TSPConfig,FlipTSPThreeOpt> ls(n, o);
+			ls.run(co,cf,f);
+		}
 		// writing the results
-		vector<pair<string, double>> *res = get_results<TSPSwap, TSPSolutionContainer>(&metrics, &cf);
+		vector<pair<string, double>> *res = get_results<TSPSolutionContainer>(&metrics, &cf);
 		return res;
 	}
 };

@@ -2,20 +2,19 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "../../utils.h"
 #include <string>
 #include <iostream>
-#include "../../../src/data/constants/abstract.hpp"
 #include "../../algorithm/swaps/abstract.hpp"
+#include "../../utils.h"
+#include "../../../src/data/constants/abstract.hpp"
 #include "../../types.h"
 
 using namespace std;
 
-template <typename T_Swap>
 class AbstractSolutionContainer
 {
 public:
-	T_Swap last_choice;
+	optional<SwapChoice> last_choice; 
 	quality_t quality_metric;
 
 public: 
@@ -23,16 +22,22 @@ public:
 	AbstractSolutionContainer(const AbstractSolutionContainer &other)
 	{
 		this->quality_metric = other.quality_metric;
-		this->last_choice = other.last_choice;
+		last_choice = optional<SwapChoice>(other.last_choice);
+	};
+	std::map<std::string, long> get_last_choice() 
+	{
+		if (last_choice.has_value()) {
+			return last_choice.value().get_dict();
+		}
+
+		else
+			throw std::runtime_error("No last choice available");
 	};
 	// Setup
 	void on_improvement_done()
 	{
 		this->quality_metric = this->compute_quality_metric();
 	};
-	// Flips
-	virtual quality_delta_t test_flip(T_Swap &test_swap) const = 0;
-	virtual void flip(const T_Swap &swap, const quality_delta_t delta) = 0;
 	// Objective
 	[[nodiscard]] quality_t get_quality_metric() const noexcept
 	{
@@ -49,8 +54,4 @@ public:
 	};
 	// Utility
 	virtual void print() = 0;
-	std::map<std::string, int> get_last_choice()
-	{
-		return last_choice->get_dict();
-	};
 };
