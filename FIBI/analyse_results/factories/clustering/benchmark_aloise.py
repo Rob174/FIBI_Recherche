@@ -23,7 +23,7 @@ def get_clustering_benchmark_aloise_visualizations(
             ),
     ]
     additionnal_filters = [
-        # FilterAttrValueInt("SEED_PROBLEM",values_to_keep=[0,3,5,6,8,11,13,14,15,16,18,10,17],after=True)
+        FilterAttrValueInt("SEED_PROBLEM",values_to_keep=[0,3,5,6,8,11,13,14,15,16,18,10,17],after=True)
     ]
     Ldata = run_parser(
         problem=problem,
@@ -44,7 +44,7 @@ def get_clustering_benchmark_aloise_visualizations(
         test_group=test_group,
         clust_col=False,
         instance_saver=(
-            Path("data") / "algorithms_in" / "aloise_benchmark",
+            Path("data") / "algorithms_in" / "folder" / "aloise_benchmark",
             path_instance,
             open_clustering,
             visualize_scatter

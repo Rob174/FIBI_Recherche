@@ -10,13 +10,13 @@ def get_clustering_franti_visualizations(
 ):
     problem = "Clustering"
     dataset = 1
-    fixed_attr = ["PROBLEM","DATASET","IMPR", "NUM_POINTS", "INSTANCE", "NUM_CLUST"]
+    fixed_attr = ["PROBLEM","DATASET","IMPR", "NUM_POINTS", "SEED_PROBLEM", "INSTANCE", "NUM_CLUST"]
     mapping_datasets = mapping_clustering_datasets()
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
         mapping_id_name = {int(k): v for k, v in json.load(f).items()}
     additionnal_modifiers: List[AbstractModifier] = [
-            ConvertToInteger(fields=["NUM_POINTS", "NUM_CLUST"]),
+            ConvertToInteger(fields=["NUM_POINTS", "NUM_CLUST","SEED_PROBLEM"]),
             ModifierIntMapping(
                 name="SEED_PROBLEM", new_name="INSTANCE", mapping=mapping_id_name
             ),
@@ -38,7 +38,7 @@ def get_clustering_franti_visualizations(
         Ldata=Ldata,
         test_group=test_group,
         instance_saver=(
-            Path("data") / "algorithms_in" / "aloise_benchmark",
+            Path("data") / "algorithms_in" / "folder" / "franti_benchmark",
             path_instance,
             open_clustering,
             visualize_scatter

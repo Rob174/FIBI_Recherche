@@ -10,12 +10,12 @@ def get_tsplib_visualizations(
     problem = "TSP"
     mapping_datasets = mapping_tsp_datasets()
     dataset = 1
-    fixed_attr = ["PROBLEM","DATASET","IMPR", "NUM_TOWNS", "INSTANCE"]
+    fixed_attr = ["PROBLEM","DATASET","IMPR", "NUM_TOWNS", "SEED_PROBLEM", "INSTANCE"]
     # mapping names index in hdf5 to names of the attributes
     with open(mapping_inst, "r") as f:
         mapping_id_name = {int(k): v for k, v in json.load(f).items()}
     additionnal_modifiers: List[AbstractModifier] = [
-        ConvertToInteger(fields=["NUM_TOWNS"]),
+        ConvertToInteger(fields=["NUM_TOWNS","SEED_PROBLEM"]),
         ModifierIntMapping(
             name="SEED_PROBLEM", new_name="INSTANCE", mapping=mapping_id_name
         ),
@@ -37,8 +37,8 @@ def get_tsplib_visualizations(
         Ldata=Ldata,
         test_group=test_group,
         instance_saver=(
-            Path("data") / "algorithms_in" / "aloise_benchmark",
-            path_instance,
+            Path("data") / "algorithms_in" / "folder" / "tsplib",
+            path_instance.resolve(),
             open_tsplib,
             visualize_scatter
         )

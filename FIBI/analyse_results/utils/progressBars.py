@@ -36,5 +36,7 @@ class DefaultProgressBar(Progress):
         self.task = self.add_task("[green]{task.description}", total=n)
     def next(self,description: str, advance: int = 1):
         """Indicates that one step has been completed. The description is updated with the provided string"""
+        # limit the size of the description to 150 characters
+        description = description[-10:]
         self.update(self.task, description=f"[green]{description} ...", advance=advance)
     

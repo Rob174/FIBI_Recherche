@@ -143,14 +143,19 @@ def run_data_extractor(
     explainer_out = out_folder / "explainer"
     explainer_out.mkdir(exist_ok=True, parents=True)
     explainer = CaseExplainer(path_out=explainer_out)
-    observable = GenericComponent([explainer])
+    observable = GenericComponent(
+        [
+            #explainer
+        ])
+    cases_agg = CasesCol(avg_tgt, pvalue_es,observable)
+    test_used_agg = TestUsed(metric="ratio", **tests)
     aggregators = [
         AverageFIBI(metric="final_cost", name=lambda m: "$$" + m + "$$"),
         AverageFIBI(metric="ratio", name=metric_latex),
         avg_tgt,
-        TestUsed(metric="ratio", **tests),
+        test_used_agg,
         pvalue_es,
-        CasesCol(avg_tgt, pvalue_es,observable),
+        cases_agg,
     ]
     if instance_saver is not None:
         aggregators.append(Instance(*instance_saver))
@@ -170,7 +175,7 @@ def run_data_extractor(
             problem=problem,
             out_path=path_create(out_folder / "cases"),
             fixed_attrs=fixed_attr,
-            aggregators=aggregators,
+            aggregators=[cases_agg],
             mappings_attr_names=mappings_attr_names,
             legend=Legend(legend),
             query_to_path=query_to_path,
@@ -180,7 +185,7 @@ def run_data_extractor(
         PieChartDistrib(
             out_path=path_create(out_folder / "distributions"),
             fixed_attrs=fixed_attr,
-            aggregators=aggregators,
+            aggregators=[test_used_agg],
             mappings_attr_names=mappings_attr_names,
             legend=Legend(legend),
             query_to_path=query_to_path,

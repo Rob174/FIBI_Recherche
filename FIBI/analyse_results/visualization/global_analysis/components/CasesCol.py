@@ -11,7 +11,7 @@ from FIBI.analyse_results.visualization.statistical_tests import AbstractStatist
 from FIBI.analyse_results.visualization.global_analysis.components.init_distr_shape import (
     InitDistrShape)
 
-from FIBI.analyse_results.visualization.global_analysis.pie_chart import get_case
+import FIBI.analyse_results.visualization.global_analysis.pie_chart as pie_chart
 
 class CasesCol(Aggregator):
     def __init__(self, avg_ratio: AverageFIBIDiffTgt, pvalue_es: PValueEffectSize, observable: Optional[GenericComponent] = None):
@@ -31,7 +31,7 @@ class CasesCol(Aggregator):
             avg = "nul"
         else:
             avg = [c for c in agg_avg['classes'] if "avgConcl" in c][0]
-        main_case,case_chosen,color,case_letter = get_case({
+        main_case,case_chosen,color,case_letter = pie_chart.get_case({
             "avg": avg,
             "signif": pvalue,
             "es": es
@@ -42,6 +42,7 @@ class CasesCol(Aggregator):
             {
                 "type": "case",
                 "data": case_letter,
+                "additionnal_data": (main_case,case_chosen,color,case_letter),
                 "query": keys,
                 "name": "Case",
                 "classes": [case_letter],

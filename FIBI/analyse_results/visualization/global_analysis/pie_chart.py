@@ -1,5 +1,6 @@
 from FIBI.analyse_results.data_extractor.types import DfExtract
 from FIBI.analyse_results.utils.conversions import DicoPathConverter
+from FIBI.analyse_results.visualization.global_analysis.components import CasesCol
 from FIBI.analyse_results.visualization.global_analysis.page_multiinstances import Aggregator
 from FIBI.analyse_results.visualization.legend import Legend
 from FIBI.analyse_results.visualization.local_analysis.__init__ import *
@@ -12,6 +13,7 @@ import pandas as pd
 import textwrap
 from importlib import reload
 from string import Template
+from FIBI.analyse_results.visualization.global_analysis.components.CasesCol import CasesCol
 
 def customwrap(s,width=30):
     return "<br>".join(textwrap.wrap(s,width=width))
@@ -67,27 +69,10 @@ def make_cases(buffer):
     
     Ldico = {}
     for b in buffer:
-        case_dict = {}
-        for f in b['fields']:
-            if f['type'] == 'avg_diff_ratio':
-                c = [c for c in f['classes'] if "avg" in c]
-                case_dict['avg'] = c[0] if len(c) == 1 else 'nul'
-            elif f['type'] == 'pvalue':
-                c = [c for c in f['classes'] if re.match("pvalue",c)]
-                if len(c) == 1:
-                    case_dict['signif'] = c[0]
-                else:
-                    raise Exception("pvalue should have only one class with "+str(f))
-            elif f['type'] == 'effect_size':
-                c = [c for c in f['classes'] if re.match("es",c)]
-                if len(c) == 1:
-                    case_dict['es'] = c[0]
-                else:
-                    raise Exception("effect_size should have only one class with "+str(f))
-                if f['query']['IMPR'] not in Ldico:
-                    Ldico[f['query']['IMPR']] = []
-        main_case,case_chosen,color,case_letter = get_case(case_dict)
-        Ldico[f['query']['IMPR']].append({'case':case_chosen,'main_case':main_case,'color':color,'letter':case_letter, 'query': f['query']})
+        main_case,case_chosen,color,case_letter = b['fields'][0]['additionnal_data']
+        if b['query']['IMPR'] not in Ldico:
+            Ldico[b['query']['IMPR']] = []
+        Ldico[b['query']['IMPR']].append({'case':case_chosen,'main_case':main_case,'color':color,'letter':case_letter, 'query': b['query']})
     return Ldico
 
 def make_plotly_piechart(Ldico, out_path):
@@ -141,7 +126,8 @@ class PieChart(MultiInstanceVisualization):
     ): 
         elems: List[AggregatedData] = []
         for c in self.aggregators:
-            elems.extend(c.aggregate(keys,dfs))
+            if isinstance(c,CasesCol):
+                elems.extend(c.aggregate(keys,dfs))
         self.buffer.append(BufferDataAggr(query=keys,fields=elems))
     def on_end(self):
         Ldico = make_cases(self.buffer)
@@ -212,7 +198,7 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
     lines.append(f"% Outer pie labels")
     for outerCat, innerCat, nbVals, frac,perc, start_angle, end_angle, middle in generator_outer(data):
         lines.append(f"\\node at ({middle}:\\posRadLabOuter) {{{innerCat.upper()}}};")
-        lines.append(f"\\node [below] at ({middle}:\\posRadLabOuter) {{{perc:.0f}\\%}};")
+        lines.append(f"\\node [below] at ({middle}:\\posRadLabOuter) {{{perc:.2f}\\%}};")
         if perc < 0.01:
             lines[-1] = "% "+lines[-1]
             lines[-2] = "% "+lines[-2]
@@ -220,8 +206,8 @@ def make_one_latex_piechart(problem: str, dataset: str, init: str, values:dict, 
     lines.append(f"% inner pie labels")
     for innerCat, nbVals, frac,perc, start_angle, end_angle, middle, dico in generator_inner(data):
         lines.append(f"\\node at ({middle}:\\posRadLabInner) {{{innerCat.upper()}}};")
-        lines.append(f"\\node [below] at ({middle}:\\posRadLabInner) {{{perc:.0f}\\%}};")
-        if perc < 0.01:
+        lines.append(f"\\node [below] at ({middle}:\\posRadLabInner) {{{perc:.2f}\\%}};")
+        if perc < 0.1 or len([v for v in dico_inner.values() if v > 0.01]) == 1:
             lines[-1] = "% "+lines[-1]
             lines[-2] = "% "+lines[-2]
     

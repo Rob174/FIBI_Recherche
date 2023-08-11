@@ -50,10 +50,11 @@ from FIBI.analyse_results.factories.tsp.tsplib import get_tsplib_visualizations
 from FIBI.analyse_results.test.datasets import check_clustering, check_maxsat, check_tsp
 from FIBI.analyse_results.utils.conversions import path_create
 from FIBI.analyse_results.test.datasets import check_clustering, check_maxsat, check_tsp
-
+import matplotlib
+matplotlib.use('agg')
 
 def get_tsp(
-    subproblem: Literal["uniform_points", "tsplib"], profile: Optional[bool] = False,
+    subproblem: Literal["uniform_points", "tsplib", "3opt"], profile: Optional[bool] = False,
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "signtest_ztest",
 ):
     if profile:
@@ -103,6 +104,54 @@ def get_tsp(
             test_group=test_group
         )
         folder_profiler = "tsplib"
+    elif subproblem == "3opt":
+        path_dataset = existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "dataset3opt.txt")
+        get_tsp_uniform_visualizations(
+            pathes_hdf5=[
+                path_dataset,
+            ],
+            out_folder=existing_path(
+                path_create(Path(".") / "data" / "analysis_results" / "tsp" / "quad_3opt")
+            ),
+            test_group=test_group
+        )
+        folder_profiler = "quad_3opt"
+        if profile:
+            profiler.disable()
+            profiler.dump_stats(
+                path_create(
+                    Path(".")
+                    / "data"
+                    / "analysis_results"
+                    / "tsp"
+                    / "quad"
+                    / "profile.prof"
+                )
+            )
+    elif subproblem == "insertion":
+        path_dataset = existing_path(Path(".") / "data" / "algorithms_out" / "tsp" / "datasetInsertion.txt")
+        get_tsp_uniform_visualizations(
+            pathes_hdf5=[
+                path_dataset,
+            ],
+            out_folder=existing_path(
+                path_create(Path(".") / "data" / "analysis_results" / "tsp" / "quad_insertion")
+            ),
+            test_group=test_group
+        )
+        folder_profiler = "quad_3opt"
+        if profile:
+            profiler.disable()
+            profiler.dump_stats(
+                path_create(
+                    Path(".")
+                    / "data"
+                    / "analysis_results"
+                    / "tsp"
+                    / "quad_insertion"
+                    / "profile.prof"
+                )
+            )
     else:
         raise ValueError(f"Unknown subproblem {subproblem}")
     
@@ -349,33 +398,34 @@ if __name__ == "__main__":
     test_group: Literal["signtest_ztest", "wilcoxon_ttest"] = "wilcoxon_ttest" 
     os.system("dvc unprotect "+(Path("./data/analysis_results").as_posix()))  
     notify("wip","unprotect done") 
-    # print("TSP")
-    # print("quad")
-    # get_tsp("uniform_points", False, test_group=test_group)
-    # notify("wip","tsp quad finished")
-    # print("tsplib")
-    # get_tsp("tsplib", False, test_group=test_group)
-    # notify("wip","tsp tsplib finished")
     # print("Clustering")
     # print("Aloise") 
     # get_clustering("aloise_benchmark", profile=False, test_group=test_group)
     # notify("wip","clustering aloise_benchmark finished")
-    # print("Quad")
-    # get_clustering("uniform_points", profile=False, test_group=test_group)  
-    # notify("wip","clustering Quad finished")
-    print("QuadNorm")
-    get_clustering("uniform_points_norm", profile=False, test_group=test_group)
-    notify("wip","clustering QuadNorm finished")
-    # print("Franti")
-    # get_clustering("franti_benchmark", profile=False, test_group=test_group)
-    # notify("wip","clustering franti_benchmark finished")
-    # gather_latex(Path("data/analysis_results/"))
     # print("MAXSAT")
     # print("benchmark2021")
     # notify("wip","maxsat benchmark2021")
     # get_maxsat_problem_visualization("maxsat_evaluation_benchmark2021",test_group)
     # notify("done","maxsat benchmark2021")
+    # print("Quad")
+    # get_clustering("uniform_points", profile=False, test_group=test_group)  
+    # # notify("wip","clustering Quad finished")
+    # print("QuadNorm")
+    # get_clustering("uniform_points_norm", profile=False, test_group=test_group)
+    # # notify("wip","clustering QuadNorm finished")
+    # print("Franti")
+    # get_clustering("franti_benchmark", profile=False, test_group=test_group)
+    # # notify("wip","clustering franti_benchmark finished")
+    # print("TSP")
+    # print("quad")
+    # get_tsp("uniform_points", False, test_group=test_group)
+    get_tsp("3opt", False, test_group=test_group)
+    # get_tsp("insertion", False, test_group=test_group)
+    # # notify("wip","tsp quad finished")
+    # print("tsplib")
+    # get_tsp("tsplib", False, test_group=test_group)
+    # # notify("wip","tsp tsplib finished")
     os.system("dvc add "+(Path("./data/analysis_results").as_posix()+" --to-remote"))
-    notify(status="finished",message="all good")
+    # notify(status="finished",message="all good")
         
         
