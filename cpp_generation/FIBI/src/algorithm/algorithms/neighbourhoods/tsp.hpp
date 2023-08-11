@@ -75,7 +75,7 @@ public:
 	}
 };
 
-class ThreeOptNeighbourhood : public NeighbourhoodExplorer<TSPSolutionContainer, TSPConfig, FlipTSPThreeOpt>
+class ThreeOptNeighbourhood : public NeighbourhoodExplorer<TSPSolutionContainer, TSPConfig, FlipTSPThreeOpt<>>
 {
 private:
 	AlgorithmObservable<TSPThreeOptSwap, TSPSolutionContainer> &o;
@@ -88,16 +88,16 @@ public:
 	 * * Important note: all moves are not equal to all combinations of edges:
 	 * * Applying the 3-opt heuristic
 	 */
-	bool explore_flips(TSPSolutionContainer &co, const TSPConfig &cf, FlipTSPThreeOpt& f) const
+	bool explore_flips(TSPSolutionContainer &co, const TSPConfig &cf, FlipTSPThreeOpt<>& f) const
 	{
 		double delta = 0;
 		TSPThreeOptSwap chosen_swap;
 
 		for (town_in_tour_id_t i = 0; i <= cf.num_choices() - 4; i++)
 		{
-			for (town_in_tour_id_t j = i + 2; j <= cf.num_choices() - 2; j++)
+			for (town_in_tour_id_t j = i + 2; j <= cf.num_choices() - 1; j++)
 			{
-				for (town_in_tour_id_t k = j + 2; k <= cf.num_choices(); k++)
+				for (town_in_tour_id_t k = j + 2; k <= cf.num_choices() + (int)(i>0) - 1; k++)
 				{
 					// Perform the 3-opt move on the tour
 					TSPThreeOptSwap tmp_swap(cycle_id(i, co.tour), cycle_id(j, co.tour), cycle_id(k, co.tour));

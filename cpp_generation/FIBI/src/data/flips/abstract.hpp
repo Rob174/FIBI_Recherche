@@ -37,7 +37,7 @@ class FlipTSPTwoOpt : public Flip<TSPTwoOptSwap, TSPSolutionContainer>
 		c.last_choice = swap;
 	}
 };
-
+template <bool debug = true>
 class FlipTSPThreeOpt : public Flip<TSPThreeOptSwap, TSPSolutionContainer>
 {public:
 	quality_delta_t test_flip(TSPThreeOptSwap &test_swap, const TSPSolutionContainer &c) const override
@@ -52,6 +52,14 @@ class FlipTSPThreeOpt : public Flip<TSPThreeOptSwap, TSPSolutionContainer>
 	{
 		fn_flip(swap, c.tour);
 		c.update_with_delta_cost(delta);
+		if constexpr (debug) {
+			double real_cost = c.compute_quality_metric();
+			double cost = c.quality_metric;
+			if (abs(real_cost - cost) > EPSILON) {
+				cout << "cost:" << cost << " is diff from real_cost" << real_cost << endl;
+				throw std::runtime_error("Different value");
+			}
+		}
 		c.last_choice = swap;
 	}
 };

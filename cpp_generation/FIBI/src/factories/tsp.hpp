@@ -97,8 +97,8 @@ public:
 		{
 			AlgorithmObservable<TSPThreeOptSwap, TSPSolutionContainer>o(obs);
 			ThreeOptNeighbourhood n(o, (bool)cf.FI_BI.get()); 
-			FlipTSPThreeOpt f;
-			LocalSearch<TSPThreeOptSwap,TSPSolutionContainer,ThreeOptNeighbourhood,TSPConfig,FlipTSPThreeOpt> ls(n, o);
+			FlipTSPThreeOpt<> f;
+			LocalSearch<TSPThreeOptSwap,TSPSolutionContainer,ThreeOptNeighbourhood,TSPConfig,FlipTSPThreeOpt<>> ls(n, o);
 			ls.run(co,cf,f);
 		}
 		// writing the results
