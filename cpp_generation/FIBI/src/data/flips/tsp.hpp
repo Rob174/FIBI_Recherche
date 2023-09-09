@@ -50,59 +50,56 @@ quality_delta_t fn_test_flip(TSPThreeOptSwap &test_swap, const vector<town_in_to
     town_in_tour_id_t e = test_swap.k;
     town_in_tour_id_t f = (test_swap.k + 1) % tour.size();
 
-    // Reorder the indices for simplicity
-    if (b > d)
-    {
-        std::swap(b, d);
-    }
-    if (d > f)
-    {
-        std::swap(d, f);
-    }
-    if (b > d)
-    {
-        std::swap(b, d);
-    }
-
     // Calculate the cost before and after the flip
-    double cost_before = dist.get(tour[a], tour[b]) + dist.get(tour[c], tour[d]) + dist.get(tour[e], tour[f]);
-    double cost_after;
+    double var = 0;
+    test_swap.possibility_idx = 0;
 
-    if (test_swap.possibility_idx == 0)
-    {
-        // No change (identity)
-        cost_after = cost_before;
+    double tmp_var = 0;
+    // ACBEDF
+    tmp_var = - dist.get(tour[a], tour[b]) - dist.get(tour[c], tour[d]) - dist.get(tour[e], tour[f]) + dist.get(tour[a], tour[c]) + dist.get(tour[b], tour[e]) + dist.get(tour[d], tour[f]);
+    if (tmp_var < var) {
+        var = tmp_var;
+        test_swap.possibility_idx = 1;
     }
-    else if (test_swap.possibility_idx == 1)
-    {
-        cost_after = cost_before - dist.get(tour[b], tour[d]) - dist.get(tour[c], tour[e]) + dist.get(tour[b], tour[c]) + dist.get(tour[d], tour[e]);
+    // ADEBCF
+    tmp_var = - dist.get(tour[a], tour[b]) - dist.get(tour[c], tour[d]) - dist.get(tour[e], tour[f]) + dist.get(tour[a], tour[d]) + dist.get(tour[e], tour[b]) + dist.get(tour[c], tour[f]);
+    if (tmp_var < var) {
+        var = tmp_var;
+        test_swap.possibility_idx = 2;
     }
-    else if (test_swap.possibility_idx == 2)
-    {
-        cost_after = cost_before - dist.get(tour[d], tour[f]) - dist.get(tour[a], tour[b]) + dist.get(tour[a], tour[d]) + dist.get(tour[b], tour[f]);
+    // AEDBCF
+    tmp_var = - dist.get(tour[a], tour[b]) - dist.get(tour[c], tour[d]) - dist.get(tour[e], tour[f]) + dist.get(tour[a], tour[e]) + dist.get(tour[d], tour[b]) + dist.get(tour[c], tour[f]);
+    if (tmp_var < var) {
+        var = tmp_var;
+        test_swap.possibility_idx = 3;
     }
-    else if (test_swap.possibility_idx == 3)
-    {
-        cost_after = cost_before - dist.get(tour[b], tour[d]) - dist.get(tour[c], tour[e]) - dist.get(tour[a], tour[b]) + dist.get(tour[a], tour[d]) + dist.get(tour[b], tour[c]) + dist.get(tour[c], tour[e]);
+    // AEDCBF
+    tmp_var = - dist.get(tour[a], tour[b]) - dist.get(tour[e], tour[f]) + dist.get(tour[b], tour[f]) + dist.get(tour[a], tour[e]);
+    if (tmp_var < var) {
+        var = tmp_var;
+        test_swap.possibility_idx = 4;
     }
-    else if (test_swap.possibility_idx == 4)
-    {
-        cost_after = cost_before - dist.get(tour[b], tour[c]) - dist.get(tour[d], tour[e]) - dist.get(tour[a], tour[d]) + dist.get(tour[a], tour[b]) + dist.get(tour[c], tour[e]) + dist.get(tour[d], tour[f]);
+    // FDECBA
+    tmp_var = - dist.get(tour[c], tour[d]) - dist.get(tour[e], tour[f]) + dist.get(tour[e], tour[c]) + dist.get(tour[f], tour[d]);
+    if (tmp_var < var) {
+        var = tmp_var;
+        test_swap.possibility_idx = 5;
     }
-    else if (test_swap.possibility_idx == 5)
-    {
-        cost_after = cost_before - dist.get(tour[a], tour[d]) - dist.get(tour[c], tour[f]) - dist.get(tour[b], tour[d]) + dist.get(tour[a], tour[b]) + dist.get(tour[c], tour[e]) + dist.get(tour[d], tour[e]);
+    // ACBDEF
+    tmp_var = - dist.get(tour[a], tour[b]) - dist.get(tour[c], tour[d]) + dist.get(tour[a], tour[c]) + dist.get(tour[b], tour[d]);
+    if (tmp_var < var) {
+        var = tmp_var;
+        test_swap.possibility_idx = 6;
     }
-    else if (test_swap.possibility_idx == 6)
-    {
-        cost_after = cost_before - dist.get(tour[a], tour[d]) - dist.get(tour[b], tour[c]) - dist.get(tour[d], tour[f]) + dist.get(tour[a], tour[b]) + dist.get(tour[c], tour[d]) + dist.get(tour[e], tour[f]);
+    // ADECBF
+    tmp_var = - dist.get(tour[a], tour[b]) - dist.get(tour[c], tour[d]) - dist.get(tour[e], tour[f]) + dist.get(tour[a], tour[d]) + dist.get(tour[b], tour[f]) + dist.get(tour[e], tour[c]);
+    if (tmp_var < var) {
+        var = tmp_var;
+        test_swap.possibility_idx = 7;
     }
-    else if (test_swap.possibility_idx == 7)
-    {
-        cost_after = cost_before - dist.get(tour[c], tour[e]) + dist.get(tour[a], tour[c]) + dist.get(tour[e], tour[f]);
-    }
+    
 
-    return cost_after - cost_before;
+    return var;
 }
 
 void fn_flip(const TSPThreeOptSwap &swap, vector<town_in_tour_id_t> &tour)
@@ -114,57 +111,96 @@ void fn_flip(const TSPThreeOptSwap &swap, vector<town_in_tour_id_t> &tour)
     town_in_tour_id_t e = swap.k;
     town_in_tour_id_t f = (swap.k + 1) % tour.size();
 
-    // Reorder the indices for simplicity
-    if (b > d)
-    {
-        std::swap(b, d);
-    }
-    if (d > f)
-    {
-        std::swap(d, f);
-    }
-    if (b > d)
-    {
-        std::swap(b, d);
-    }
+    // Assuming that a < b < c < d < e < f
 
     // Perform the 3-opt move based on possibility_idx
     if (swap.possibility_idx == 0)
     {
         // Do nothing (identity)
     }
-    else if (swap.possibility_idx == 1)
-    {
-        reverse(tour.begin() + b, tour.begin() + d);
-    }
-    else if (swap.possibility_idx == 2)
-    {
-        reverse(tour.begin() + d, tour.begin() + f);
-    }
-    else if (swap.possibility_idx == 3)
-    {
+    else if (swap.possibility_idx == 1) {
+        // Flip possibility 1: ABCDEF -> ACBEDF
         reverse(tour.begin() + b, tour.begin() + d);
         reverse(tour.begin() + d, tour.begin() + f);
-    }
-    else if (swap.possibility_idx == 4)
-    {
-        reverse(tour.begin() + b, tour.begin() + d);
-        reverse(tour.begin() + c, tour.begin() + e);
-    }
-    else if (swap.possibility_idx == 5)
-    {
-        reverse(tour.begin() + d, tour.begin() + f);
-        reverse(tour.begin() + c, tour.begin() + e);
-    }
-    else if (swap.possibility_idx == 6)
-    {
-        reverse(tour.begin() + b, tour.begin() + d);
-        reverse(tour.begin() + c, tour.begin() + e);
-        reverse(tour.begin() + d, tour.begin() + f);
-    }
-    else if (swap.possibility_idx == 7)
-    {
-        reverse(tour.begin() + c, tour.begin() + e);
+
+    } else if (swap.possibility_idx == 2) {
+        // Flip possibility 2: ABCDEF -> ADEBCF
+        vector<int> idx{tour[a]};
+        for(int q=d; q<e+1; q++) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=b; q<c+1; q++) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=f; q<tour.size()+a; q++) {
+            idx.push_back(tour[q%tour.size()]);
+        }
+        tour = idx;
+    } else if (swap.possibility_idx == 3) {
+        // Flip possibility 3: ABCDEF -> AEDBCF
+        vector<int> idx{tour[a]};
+        for(int q=e; q>=d; q--) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=b; q<c+1; q++) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=f; q<tour.size()+a; q++) {
+            idx.push_back(tour[q%tour.size()]);
+        }
+        tour = idx;
+    } else if (swap.possibility_idx == 4) {
+        // Flip possibility 4: ABCDEF -> AEDCBF
+        vector<int> idx{tour[a]};
+        for(int q=e; q>=d; q--) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=c; q>=b; q--) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=f; q<tour.size()+a; q++) {
+            idx.push_back(tour[q%tour.size()]);
+        }
+        tour = idx;
+    } else if (swap.possibility_idx == 5) {
+        // Flip possibility 5: ABCDEF -> FDECBA
+        vector<int> idx{};
+        for(int q=a; q>=(int)(f-tour.size()); q--) {
+            idx.push_back(tour[(q+tour.size())%tour.size()]);
+        }
+        for(int q=d; q<e+1; q++) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=c; q>=b; q--) {
+            idx.push_back(tour[q]);
+        }
+        tour = idx;
+    } else if (swap.possibility_idx == 6) {
+        // Flip possibility 6: ABCDEF -> ACBDEF
+        vector<int> idx{tour[a]};
+        for(int q=c; q>=b; q--) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=d; q<e+1; q++) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=f; q<tour.size()+a; q++) {
+            idx.push_back(tour[q%tour.size()]);
+        }
+        tour = idx;
+    } else if (swap.possibility_idx == 7) {
+        // Flip possibility 6: ABCDEF -> ADECBF
+        vector<int> idx{tour[a]};
+        for(int q=d; q<e+1; q++) {
+            idx.push_back(tour[q]);
+        }
+        for(int q=c; q>=b; q--) {
+            idx.push_back(tour[q]);
+        }
+        for (int q = f; q < (a > f ? a : tour.size() + a); q++) {
+            idx.push_back(tour[q%tour.size()]);
+        }
+        tour = idx;
     }
 }
 

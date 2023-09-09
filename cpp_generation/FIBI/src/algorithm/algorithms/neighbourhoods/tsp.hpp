@@ -93,11 +93,11 @@ public:
 		double delta = 0;
 		TSPThreeOptSwap chosen_swap;
 
-		for (town_in_tour_id_t i = 0; i <= cf.num_choices() - 4; i++)
+		for (town_in_tour_id_t i = 0; i < cf.num_choices() - 4; i++)
 		{
-			for (town_in_tour_id_t j = i + 2; j <= cf.num_choices() - 1; j++)
+			for (town_in_tour_id_t j = i + 2; j < cf.num_choices() - 4; j++)
 			{
-				for (town_in_tour_id_t k = j + 2; k <= cf.num_choices() + (int)(i>0) - 1; k++)
+				for (town_in_tour_id_t k = j + 2; k < cf.num_choices() - 1; k++)
 				{
 					// Perform the 3-opt move on the tour
 					TSPThreeOptSwap tmp_swap(cycle_id(i, co.tour), cycle_id(j, co.tour), cycle_id(k, co.tour));
