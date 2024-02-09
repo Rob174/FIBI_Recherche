@@ -1,0 +1,133 @@
+[
+    {
+        "expression": "others",
+        "type": "tag",
+        "children": [
+            {
+                "expression": "mention-concl-FIvsBI",
+                "type": "tag",
+                "children": [
+                    {
+                        "expression": "useDirect-FIvsBI",
+                        "type": "tag",
+                        "children": [],
+                        "id": "6fddc554-676b-4480-80c3-4d1adcc30bd4"
+                    },
+                    {
+                        "expression": "redoExp",
+                        "type": "tag",
+                        "children": [
+                            {
+                                "expression": "sameRes",
+                                "type": "tag",
+                                "children": [],
+                                "id": "f7add400-d557-48d8-ad8a-b728108d7071"
+                            },
+                            {
+                                "expression": "diffRes",
+                                "type": "tag",
+                                "children": [],
+                                "id": "fa795111-895e-4557-9f31-04c623ad4f18"
+                            },
+                            {
+                                "expression": "others",
+                                "type": "tag",
+                                "children": [],
+                                "id": "fa795111-895e-4557-9f31-aac623ad4f18"
+                            }
+                        ],
+                        "id": "65328865-486e-461f-97da-933b571a403c"
+                    },
+                    {
+                        "expression": "others",
+                        "type": "tag",
+                        "children": [
+                            {
+                                "expression": "exclLanguage",
+                                "type": "tag",
+                                "children": [],
+                                "id": "d69403c1-9625-4699-9638-0007944e7b46"
+                            },
+                            {
+                                "expression": "exclAccess",
+                                "type": "tag",
+                                "children": [],
+                                "id": "b7dd9edd-e6bb-4cbc-9f59-da502a463610"
+                            },
+                            {
+                                "expression": "exclBook",
+                                "type": "tag",
+                                "children": [],
+                                "id": "22b351a8-38dc-4eab-aea4-344e8b978db8"
+                            },
+                            {
+                                "expression": "deadlink",
+                                "type": "tag",
+                                "children": [],
+                                "id": "0902630c-228a-4042-8a6d-6c4e77771ae5"
+                            },
+                            {
+                                "expression": "notCited",
+                                "type": "tag",
+                                "children": [],
+                                "id": "faf15e2d-3c4f-455f-a0f9-2446fd168ea3"
+                            },
+                            {
+                                "expression": "others",
+                                "type": "tag",
+                                "children": [],
+                                "id": "2504c33e-8a19-45e5-bd6c-adc2ccf92fd4"
+                            }
+                        ],
+                        "id": "c59ee8bb-057b-4dff-af43-afe57834f5f8"
+                    }
+                ],
+                "id": "d16a8755-79a5-403b-8617-f84d0155c885"
+            },
+            {
+                "expression": "others",
+                "type": "tag",
+                "children": [
+                    {
+                        "expression": "exclLanguage",
+                        "type": "tag",
+                        "children": [],
+                        "id": "87bd4718-7a09-4433-ad95-204109161363"
+                    },
+                    {
+                        "expression": "exclAccess",
+                        "type": "tag",
+                        "children": [],
+                        "id": "839715a8-1751-4a4c-a778-ade82e8bc344"
+                    },
+                    {
+                        "expression": "exclBook",
+                        "type": "tag",
+                        "children": [],
+                        "id": "89fe9eed-72b4-4db6-b739-dfa35a04b9aa"
+                    },
+                    {
+                        "expression": "deadlink",
+                        "type": "tag",
+                        "children": [],
+                        "id": "17a3ce73-5bae-4a9b-b1a5-59e6c5a2d735"
+                    },
+                    {
+                        "expression": "notCited",
+                        "type": "tag",
+                        "children": [],
+                        "id": "235204dd-d925-4dab-8d36-24b00a079725"
+                    },
+                    {
+                        "expression": "others",
+                        "type": "tag",
+                        "children": [],
+                        "id": "0a337365-c1ff-4029-81ad-e3ff2399ee04"
+                    }
+                ],
+                "id": "cfe699ec-536a-4079-8e0e-aa2eed897400"
+            }
+        ],
+        "id": "40f81c63-a6b3-48f6-8c76-b0fdb991e08a"
+    }
+]
