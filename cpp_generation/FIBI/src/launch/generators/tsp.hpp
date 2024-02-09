@@ -16,21 +16,21 @@ vector<pair<string, double>> *tspfactory_run(map<string, long> *args, string roo
 	TSPFactory f;
 	TSPConfig cf(args);
 	// Define start time for performanest measurement
-	chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
+	// chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
 	vector<pair<string, double>> *success = f.run(cf, root_data);
 	// Get end time for performance measurement
-	chrono::time_point<chrono::system_clock> end = chrono::system_clock::now();
+	// chrono::time_point<chrono::system_clock> end = chrono::system_clock::now();
 	// Print performance in format Duration: x seconds y milliseconds z microseconds
-	int milliseconds = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+	// int milliseconds = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
-	cout << "| " << cf.NUM_TOWNS.get() << " | " << milliseconds << " | " << endl;
-	/*
+	// cout << "| " << cf.NUM_TOWNS.get() << " | " << milliseconds << " | " << endl;
+
 	if (args->at("SEED_GLOB") % 100 == 0)
 	{
 		cout << "\x1B[32m \tOK ";
 		cf.print();
 		cout << "\033[0m " << endl;
-	}*/
+	}
 	return success;
 }
 template <int seed_stop = -1>
@@ -51,6 +51,8 @@ void run_tsp(Args arguments, const unique_ptr<set<int>> &missing)
 			{
 				for (int NUM_TOWNS : num_towns)
 				{
+					if (arguments.town_max != -1 && NUM_TOWNS > arguments.town_max)
+						continue;
 					i++;
 				}
 			}
@@ -82,10 +84,31 @@ void run_tsp(Args arguments, const unique_ptr<set<int>> &missing)
 						 long i,
 						 int seed_problem, int seed_assign, int FI_BI, int impr, int num_dim, int num_towns, int dataset)
 	{
-		bool stop;
-		stop = i > arguments.end_seed && arguments.end_seed != -1;
-		stop = stop || (i < arguments.start_seed);
-		if (stop)
+		bool to_execute;
+		const bool in_interval = (i <= arguments.end_seed || arguments.end_seed == -1) && (i >= arguments.start_seed);
+		const bool not_in_interval = !in_interval;
+		const bool is_missing = missing->find(i) != missing->end();
+		if (arguments.do_missings == 0)
+		{
+			// do not do missing
+			to_execute = in_interval;
+		}
+		else if (arguments.do_missings == 1)
+		{
+			// do missing no matter interval
+			to_execute = is_missing;
+		}
+		else if (arguments.do_missings == 2)
+		{
+			// do missing in interval
+			to_execute = (in_interval && is_missing);
+		}
+		else
+		{
+			cout << "Unknown do_missings option: " << arguments.do_missings << endl;
+			throw runtime_error("Unknown do_missings option");
+		}
+		if (!to_execute)
 		{
 			progress.skip();
 			return;
@@ -112,6 +135,8 @@ void run_tsp(Args arguments, const unique_ptr<set<int>> &missing)
 			{
 				for (int NUM_TOWNS : num_towns)
 				{
+					if (arguments.town_max != -1 && NUM_TOWNS > arguments.town_max)
+						continue;
 					add_queue(i, seed_assign, seed_assign, FI_BI, arguments.impr, 2, NUM_TOWNS, arguments.dataset);
 					i++;
 				}

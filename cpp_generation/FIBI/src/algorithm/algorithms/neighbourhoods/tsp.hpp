@@ -154,9 +154,10 @@ public:
 
 		for (town_in_tour_id_t i = 0; i < cf.num_choices(); i++)
 		{
-			for (int j = 0; i < cf.num_choices() - 1; i++)
+			for (int j = 0; j < cf.num_choices() - 1; j++)
 			{
 				const int dest_pos = (i + j) % cf.num_choices();
+				if (i == dest_pos)continue;
 				// Perform the 3-opt move on the tour
 				TSPInsertionSwap tmp_swap(i, dest_pos);
 				double delta_ijk = f.test_flip(tmp_swap, co);
@@ -187,6 +188,9 @@ public:
 		// Update tour with the chosen swap and apply the delta improvement
 		f.flip(chosen_swap, delta, co);
 		o.on_iter_end(co, chosen_swap);
+		if (abs(co.quality_metric - co.compute_quality_metric()) > EPSILON) {
+			int b = 0;
+		}
 		return false;
 	}
 };

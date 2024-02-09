@@ -207,26 +207,44 @@ void fn_flip(const TSPThreeOptSwap &swap, vector<town_in_tour_id_t> &tour)
 
 quality_delta_t fn_test_flip(TSPInsertionSwap &test_swap, const vector<town_in_tour_id_t> &tour, const DistanceMatrix &dist)
 {
-	// Test the impact of changing the position of a town in the tour:
-	// [...,A,B,C,...,D,E,F,...] we choose E to insert at position of B
-	// [...,A,E,B,C,...,D,F,...]: result
-	town_in_tour_id_t town_to_move = tour[test_swap.i]; // Store the town to be moved.
+    using distance_t = double;
+    // Check if i and new_pos are equal or if they are negative
+    if (test_swap.i == test_swap.new_pos || test_swap.i < 0 || test_swap.new_pos < 0) {
+        // Return 0 if i equals new_pos or if either i or new_pos is negative
+        return 0;
+    }
 
-	const int a = test_swap.i - 1 < 0 ? tour.size() - 1 : test_swap.i - 1, b = test_swap.i + 1 == tour.size() ? 0 : test_swap.i + 1;
-	const int c = test_swap.new_pos - 1 < 0 ? tour.size() - 1 : test_swap.new_pos - 1, d = test_swap.new_pos + 1 == tour.size() ? 0 : test_swap.new_pos + 1;
+    // Get the IDs of the towns to be swapped
+    town_in_tour_id_t town1_id = tour[test_swap.i];
+    town_in_tour_id_t town2_id = tour[test_swap.new_pos];
 
-	double delta = 0;
-	// We remove the edges around the position in the tour
-	delta -= dist.get(tour.at(a), tour.at(test_swap.i));
-	delta -= dist.get(tour.at(test_swap.i), tour.at(b));
-	// And the one at new_pos
-	delta -= dist.get(tour.at(c), tour.at(test_swap.new_pos));
-	// And we add the new edges between a and b and between c and i and between i and new_pos
-	delta += dist.get(tour.at(a), tour.at(b));
-	delta += dist.get(tour.at(c), tour.at(test_swap.i));
-	delta += dist.get(tour.at(test_swap.i), tour.at(d));
-	// Return the computed variation of tour length.
-	return delta;
+    // Calculate the distance between town1 and its predecessor
+    town_in_tour_id_t prev1_id = (test_swap.i == 0) ? tour.back() : tour[test_swap.i - 1];
+    distance_t dist1 = dist.get(prev1_id, town1_id);
+
+    // Calculate the distance between town1 and its successor
+    town_in_tour_id_t next1_id = (test_swap.i == tour.size() - 1) ? tour[0] : tour[test_swap.i + 1];
+    distance_t dist2 = dist.get(town1_id, next1_id);
+
+    int prev_new_pos = test_swap.new_pos;
+    //if (test_swap.i > test_swap.new_pos) prev_new_pos = (prev_new_pos - 1 < 0) ? tour.size()-1 : prev_new_pos - 1;
+    // Calculate the distance between town2 and its predecessor
+    town_in_tour_id_t prev2_id = tour[prev_new_pos];
+    distance_t dist3 = dist.get(prev2_id, tour[test_swap.i]);
+
+    // Calculate the distance between town2 and its successor
+    town_in_tour_id_t next2_id = tour[(prev_new_pos + 1)%tour.size()];
+    distance_t dist4 = dist.get(tour[test_swap.i], next2_id);
+
+    town_in_tour_id_t next2_id_i = tour[(test_swap.i + 1) % tour.size()];
+    town_in_tour_id_t prev2_id_i = tour[(test_swap.i - 1 + tour.size()) % tour.size()];
+    distance_t dist5 = dist.get(prev2_id_i, next2_id_i);
+
+    distance_t dist6 = dist.get(tour[prev_new_pos], next2_id);
+    // Calculate the change in tour length (delta) after the swap
+    quality_delta_t delta = dist3 + dist4 + dist5 - (dist1 + dist2 + dist6);
+
+    return delta;
 }
 
 void fn_flip(const TSPInsertionSwap &swap, vector<town_in_tour_id_t> &tour)
@@ -240,11 +258,11 @@ void fn_flip(const TSPInsertionSwap &swap, vector<town_in_tour_id_t> &tour)
 	if (swap.i < swap.new_pos)
 	{
 		// In this case, we want to insert the town just before the position swap.new_pos, so we use tour.begin() + swap.new_pos - 1 as the insertion point. The -1 is there to account for the fact that we removed the town from its original position before inserting it at the new position.
-		tour.insert(tour.begin() + swap.new_pos - 1, id);
+		tour.insert(tour.begin() + swap.new_pos, id);
 	}
 	else
 	{
 		// In this case, we want to insert the town at the position swap.new_pos itself, as there is no need to adjust for a previously removed town.
-		tour.insert(tour.begin() + swap.new_pos, id);
+		tour.insert(tour.begin() + swap.new_pos+1, id);
 	}
 }

@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <stdio.h>
+#include <cstdlib>
 #include "../../src/launch/threapool.hpp"
 #include "../../src/out/abstract.hpp"
 #include "../../src/data/get_data.hpp"
@@ -25,38 +26,52 @@
 #include "../../src/launch/generators/maxsat.hpp"
 #include "../../src/launch/generators/abstract.hpp"
 
-
-void test_gather_metadata(const int argc, char** argv) {
+void test_gather_metadata(const int argc, char **argv)
+{
 	Args arguments = parseArguments(argc, argv);
-	unique_ptr<set<int>> missing(read_missing());
-	if (arguments.problem == "tsp") {
+	const string command = "python3 " + arguments.root + "check/check.py " + arguments.root + "metadata.json " + arguments.root + "out/merged_dataset.txt";
+	int r = system(command.c_str());
+	cout << "Return code " << r << endl;
+	unique_ptr<set<int>> missing(read_missing(arguments));
+	cout << missing->size() << " missing seeds found" << endl;
+	if (arguments.problem == "tsp")
+	{
 		cout << "tsp " << arguments.all << endl;
-		if (arguments.all == "true") {
+		if (arguments.all == "true")
+		{
 			run_tsp_full(arguments, missing);
 		}
-		else {
+		else
+		{
 			run_tsp<-1>(arguments, missing);
 		}
 	}
-	else if (arguments.problem == "clustering") {
+	else if (arguments.problem == "clustering")
+	{
 		cout << "clustering " << arguments.all << endl;
-		if (arguments.all == "true") {
+		if (arguments.all == "true")
+		{
 			run_clustering_full(arguments, missing);
 		}
-		else {
+		else
+		{
 			run_clustering<-1>(arguments, missing);
 		}
 	}
-	else if (arguments.problem == "maxsat") {
+	else if (arguments.problem == "maxsat")
+	{
 		cout << "maxsat " << arguments.all << endl;
-		if (arguments.all == "true") {
+		if (arguments.all == "true")
+		{
 			run_maxsat_full(arguments, missing);
 		}
-		else {
+		else
+		{
 			run_maxsat<-1>(arguments, missing);
 		}
 	}
-	else {
+	else
+	{
 		cout << "Unknown problem " << arguments.problem << endl;
 		throw runtime_error("Unknown problem " + arguments.problem);
 	}
