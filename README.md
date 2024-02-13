@@ -1,5 +1,8 @@
 # Repository of the paper BI vs FI revisited
 
+[FIBI/analysis_results/](FIBI/analysis_results/) contains the code used to extract the results and build the figures from the metrics gathered in the c++ local searches programs.
+[cpp_generation/FIBI/](cpp_generation/FIBI/) contains the acctual local searches (TSP, MSSC, wMAXSAT)
+
 ## Litterature review
 
 To see the litterature review, go on https://rob174.github.io/BibliographyMaker/.
