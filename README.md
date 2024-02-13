@@ -10,7 +10,7 @@ To see the litterature review, go on https://rob174.github.io/BibliographyMaker/
 4. Then click on the "View Graph" tab
 
 ## Algorithms
-
+Below are the initialization algorithms used in this paper. The code is in folder [cpp_generation/FIBI/src/data/improvements/](cpp_generation/FIBI/src/data/improvements/)
 ### TSP
 
 ![](imgs/algorithms/1.png)
