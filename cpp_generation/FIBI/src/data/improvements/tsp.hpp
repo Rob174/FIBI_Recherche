@@ -116,11 +116,18 @@ vector<int>* init_tsp_greedy_randomized(const long num_towns, const long seed, c
 		// Prepare for the top N
 		vector<double> weights;
 		vector<int> points;
+		double sum = 0;
 		for (int j : available_points)
 		{
 			// we invert to choose
-			weights.push_back(-distances.get(tour->at(i), j));
+			double v = distances.get(tour->at(i), j);
+			weights.push_back(v);
+			sum += v;
 			points.push_back(j);
+		}
+
+		for (int wi; wi < weights.size(); wi++) {
+			weights.at(wi) = 1.-wi/sum;
 		}
 		// Weighted distribution by the distance
 		discrete_distribution<int> distribution(weights.begin(), weights.end());
