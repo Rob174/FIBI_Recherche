@@ -12796,6 +12796,10 @@
     "url": "http://dx.doi.org/10.1016/j.ins.2017.06.019",
     "tags": [
       {
+        "text": "mention-concl-FIvsBI",
+        "id": "a31545c695472499d875ee479d9600c18"
+      },
+      {
         "text": "different-problem",
         "id": "abe45214a9c6b4d5383f504a3176a4561"
       },
@@ -43109,10 +43113,6 @@
       {
         "text": "CL",
         "id": "aeacc522c4b7a483da34b4762f08423ec"
-      },
-      {
-        "text": "mention-concl-FIvsBI",
-        "id": "a31545c695472499d875ee479d9600c18"
       },
       {
         "text": "diff-algorithm",
